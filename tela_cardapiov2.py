@@ -11,7 +11,8 @@ from PIL import Image, ImageTk
 class tela_cardapio(Cardapio, Pedido, Local):
     def __init__(self, root_cardapio, info_cliente, end_cliente):
         super().__init__()
-        self.root_cardapio = Toplevel(root_cardapio)
+        root_cardapio.destroy()
+        self.root_cardapio = Tk()
         self.root_cardapio.title('Cardapio')
         self.root_cardapio.geometry('800x500')
         self.menu_geral()
@@ -441,32 +442,41 @@ class tela_cardapio(Cardapio, Pedido, Local):
         escolha_base = Label(self.pag1, text='Escolha 1', foreground='white')
         escolha_base.configure(font=letra2)
         escolha_base.place(relx=0.02, rely=0.13, relwidth=0.2, relheight=0.1)
+        self.extra_poke = []
+        self.escolha_base = IntVar()
+        if self.escolha_base == 2 or self.escolha_base == 3:
+            self.extra_poke.append(4)
 
-        op_base_1 = Radiobutton(self.pag1, text='Arroz de sushi', anchor='w', value= 1)
+        op_base_1 = Radiobutton(self.pag1, text='Arroz de sushi', anchor='w', value= 1,
+        variable= self.escolha_base)
         op_base_1.place(relx=0.02, rely=0.25, relwidth=0.25, relheight=0.1)
-        op_base_2 = Radiobutton(self.pag1, text='Arroz negro(+ R$4)', anchor='w', value= 2)
+        op_base_2 = Radiobutton(self.pag1, text='Arroz negro(+ R$4)', anchor='w', value= 2,
+        variable= self.escolha_base)
         op_base_2.place(relx=0.02, rely=0.35, relwidth=0.3, relheight=0.1)
-        op_base_3 = Radiobutton(self.pag1, text='Quinoa(+R$4)', anchor='w', value= 3)
+        op_base_3 = Radiobutton(self.pag1, text='Quinoa(+R$4)', anchor='w', value= 3,
+        variable= self.escolha_base)
         op_base_3.place(relx=0.02, rely=0.45, relwidth=0.25, relheight=0.1)
-        op_base_4 = Radiobutton(self.pag1, text='Espaguete de abobrinha', anchor='w', value= 4)
+        op_base_4 = Radiobutton(self.pag1, text='Espaguete de abobrinha', anchor='w', value= 4,
+        variable= self.escolha_base)
         op_base_4.place(relx=0.02, rely=0.55, relwidth=0.4, relheight=0.1)
         op_base_5 = Radiobutton(self.pag1, text='Espaguete de palmito de\n pupunha ao pesto(+ R$5',
         anchor='w', value= 5)
         op_base_5.place(relx=0.02, rely=0.65, relwidth=0.4, relheight=0.25)
 
-        proteina = Label(self.pag1, text='1.PROTEÍNAS 120g', anchor='w')
         letra = font.Font(family='Arial', size= 20, weight='bold')
         letra2 = font.Font(family='Arial', size=14, weight='bold', slant='italic')
+
+        proteina = Label(self.pag1, text='1.PROTEÍNAS 120g', anchor='w')
+        proteina.place(relx=0.45, rely=0.02, relwidth=0.55, relheight=0.15)
         proteina.configure(font=letra)
-        proteina.place(relx=0.45, rely=0.03, relwidth=0.4, relheight=0.1)
         escolha_prot = Label(self.pag1, text='Escolha até 2 (60g de cada)', foreground='white',
         anchor='w')
+        escolha_prot.place(relx=0.45, rely=0.15, relwidth=0.5, relheight=0.08)
+        escolha_prot.configure(font=letra2)
         info_prot = Label(self.pag1, text='-Sera considerada a proteína de maior valor-',
         anchor='w')
-        info_prot.place(relx=0.45, rely=0.22, relwidth=0.55, relheight=0.1)
+        info_prot.place(relx=0.45, rely=0.23, relwidth=0.55, relheight=0.08)
         info_prot.configure(font=letra3)
-        escolha_prot.configure(font=letra2)
-        escolha_prot.place(relx=0.45, rely=0.13, relwidth=0.5, relheight=0.1)
 
         op_prot1 = Checkbutton(self.pag1, text='Salmão', anchor='w')
         op_prot1.place(relx=0.45, rely=0.35, relwidth=0.25, relheight=0.1)
@@ -503,32 +513,36 @@ class tela_cardapio(Cardapio, Pedido, Local):
         def verifica(tamanho):
             if tamanho > 4:
                 messagebox.showerror('MAKE IT incompleto', 'Escolha no máximo 4 opções do MAKE IT')
-            if tamanho == 0:
+                self.make_it.clear()
+            elif tamanho == 0:
                 messagebox.showerror('MAKE IT incompleto', 'Escolha no minímo 1 opção do MAKE IT')
+                self.make_it.clear()
+            elif tamanho < 5 or tamanho >= 1:
+                self.poke_3()
         def check_make():
             if self.make1.get() == 1:
                 self.make_it.append(1)
-            elif self.make2.get() == 1:
+            if self.make2.get() == 1:
                 self.make_it.append(2)
-            elif self.make3.get() == 1:
+            if self.make3.get() == 1:
                 self.make_it.append(3)
-            elif self.make4.get() == 1:
+            if self.make4.get() == 1:
                 self.make_it.append(4)
-            elif self.make5.get() == 1:
+            if self.make5.get() == 1:
                 self.make_it.append(5)
-            elif self.make6.get() == 1:
+            if self.make6.get() == 1:
                 self.make_it.append(6)
-            elif self.make7.get() == 1:
+            if self.make7.get() == 1:
                 self.make_it.append(7)
-            elif self.make8.get() == 1:
+            if self.make8.get() == 1:
                 self.make_it.append(8)
-            elif self.make9.get() == 1:
+            if self.make9.get() == 1:
                 self.make_it.append(9)
-            elif self.make10.get() == 1:
+            if self.make10.get() == 1:
                 self.make_it.append(10)
-            elif self.make11.get() == 1:
+            if self.make11.get() == 1:
                 self.make_it.append(11)
-            elif self.make12.get() == 1:
+            if self.make12.get() == 1:
                 self.make_it.append(12)
             print(self.make_it)
             verifica(len(self.make_it))
@@ -636,38 +650,38 @@ class tela_cardapio(Cardapio, Pedido, Local):
 
         finish = Label(self.pag4, text='4.FINISH IT', anchor='w')
         finish.configure(font=letra)
-        finish.place(relx=0.45, rely=0.03, relwidth=0.25, relheight=0.1)
+        finish.place(relx=0.05, rely=0.03, relwidth=0.3, relheight=0.1)
         escolha_finish = Label(self.pag4, text='Escolha 1', foreground='white', anchor='w')
         escolha_finish.configure(font=letra2)
-        escolha_finish.place(relx=0.45, rely=0.13, relwidth=0.2, relheight=0.1)
+        escolha_finish.place(relx=0.05, rely=0.13, relwidth=0.2, relheight=0.1)
 
         op_finish1 = Radiobutton(self.pag4, text='Shoyo clássico', anchor='w', value= 1,
         variable= self.finish_it)
-        op_finish1.place(relx=0.4, rely=0.25, relwidth=0.25, relheight=0.1)
+        op_finish1.place(relx=0.05, rely=0.25, relwidth=0.25, relheight=0.1)
         op_finish2 = Radiobutton(self.pag4, text='Wasabi', anchor='w', value= 2,
         variable= self.finish_it)
-        op_finish2.place(relx=0.7, rely=0.25, relwidth=0.3, relheight=0.1)
+        op_finish2.place(relx=0.05, rely=0.35, relwidth=0.3, relheight=0.1)
         op_finish3 = Radiobutton(self.pag4, text='Ponzu', anchor='w', value= 3,
         variable= self.finish_it)
-        op_finish3.place(relx=0.4, rely=0.35, relwidth=0.25, relheight=0.1)
+        op_finish3.place(relx=0.05, rely=0.45, relwidth=0.25, relheight=0.1)
         op_finish4 = Radiobutton(self.pag4, text='Cream cheese', anchor='w', value= 4,
         variable= self.finish_it)
-        op_finish4.place(relx=0.7, rely=0.35, relwidth=0.25, relheight=0.1)
+        op_finish4.place(relx=0.05, rely=0.55, relwidth=0.25, relheight=0.1)
         op_finish5 = Radiobutton(self.pag4, text='Tarê', anchor='w', value= 5,
         variable= self.finish_it)
-        op_finish5.place(relx=0.4, rely=0.45, relwidth=0.3, relheight=0.1)
+        op_finish5.place(relx=0.05, rely=0.65, relwidth=0.3, relheight=0.1)
         op_finish6 = Radiobutton(self.pag4, text='Tarê de laranja', anchor='w', value= 6,
         variable= self.finish_it)
-        op_finish6.place(relx=0.7, rely=0.45, relwidth=0.25, relheight=0.1)
+        op_finish6.place(relx=0.45, rely=0.25, relwidth=0.25, relheight=0.1)
         op_finish7 = Radiobutton(self.pag4, text='Mel com gengibre', anchor='w', value= 7,
         variable= self.finish_it)
-        op_finish7.place(relx=0.4, rely=0.55, relwidth=0.32, relheight=0.1)
+        op_finish7.place(relx=0.45, rely=0.35, relwidth=0.32, relheight=0.1)
         op_finish8 = Radiobutton(self.pag4, text='Molho de pimenta com srirancha', anchor='w', value= 8,
         variable= self.finish_it)
-        op_finish8.place(relx=0.4, rely=0.65, relwidth=0.3, relheight=0.1)
+        op_finish8.place(relx=0.45, rely=0.45, relwidth=0.5, relheight=0.1)
         op_finish9 = Radiobutton(self.pag4, text='Soyo de coco(+ R$3)', anchor='w', value= 9,
         variable= self.finish_it)
-        op_finish9.place(relx=0.4, rely=0.75, relwidth=0.3, relheight=0.1)
+        op_finish9.place(relx=0.45, rely=0.55, relwidth=0.4, relheight=0.1)
 
         pag3 = Button(self.pag3, text='>>>>', command=lambda:[self.poke_4()])
         pag3.place(relx=0.8, rely=0.85, relwidth=0.1, relheight=0.1)
@@ -702,7 +716,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
                         self.menu.insert(parent='Snack', index='end', text='',
                                     values=(prato, (valor,'$')), tags=('cor1',))
                         count -= 1
-                elif categoria == 'Bowl':
+                if categoria == 'Bowl':
                     if count % 2 == 0:
                         self.menu.insert(parent='Bowl', index='end', text='',
                                     values=(prato, (valor,'$')), tags=('cor2',))

@@ -5,10 +5,12 @@ from PIL import Image, ImageTk
 from Cliente import *
 from tela_cardapiov2 import *
 import pedido
+import tela_cardapiov2
 
 class tela_cliente(Cliente):
-  def __init__(self, nome_c, end_c):
+  def __init__(self, root, nome_c, end_c):
     super().__init__()
+    root.destroy()
     self.root_clientes = Tk()
     self.root_clientes.title('Cliente')
     self.root_clientes.geometry('800x500')

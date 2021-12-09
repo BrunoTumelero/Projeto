@@ -24,9 +24,9 @@ class Janela_principal(Pedido):
 			self.root.mainloop()
 
 		def background(self):
-			imagem = Image.open('Wonder.jpg')
+			imagem = Image.open('Health.jpeg')
 			photo = ImageTk.PhotoImage(imagem)
-			fundo = Label(self.root, text='OK', image= photo)
+			fundo = Label(self.root, image= photo)
 			fundo.image = photo
 			fundo.place(relx=0.0, rely=0.0, relwidth=0.1, relheight=0.1)
 			self.root.configure(background = '#FFFAFA')
@@ -48,14 +48,14 @@ class Janela_principal(Pedido):
 			
 			cadastra_cliente = Button(self.framebotao, text = 'Clientes', relief=FLAT, activebackground='#87CEEB',
 			activeforeground='#0000FF', command= lambda: 
-			[tela_cliente(self.nome_entry.get(), self.endereco_entry.get())])
+			[tela_cliente(self.root, self.nome_entry.get(), self.endereco_entry.get())])
 			cadastra_cliente.place(relx = 0.42, rely = 0.5, relwidth = 0.15,
 										relheight = 0.35)
 			cadastra_cliente['background'] = 'Snow'
 			cadastra_cliente.configure(font = ('Helvetica', 16))
 			
 			consultar = Button(self.framebotao, text = 'Entregas', relief=SUNKEN, activebackground='Crimson',
-			activeforeground='DarkGreen', command = lambda: [Janela()])
+			activeforeground='DarkGreen', command = lambda: [Janela(self.root)])
 			consultar.place(relx = 0.72, rely = 0.5, relwidth = 0.15,
 										relheight = 0.35)
 			consultar['background'] = 'Snow'

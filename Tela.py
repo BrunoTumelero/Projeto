@@ -10,8 +10,9 @@ from PIL import Image, ImageTk
 from janela_bairros import Tela_bairros
 
 class Janela(Entregador, Pedido):
-    def __init__(self):
+    def __init__(self, root):
         super().__init__()
+        root.destroy()
         self.root_entregas = Tk()
         self.root_entregas.title('Restaurante')
         self.root_entregas.geometry('800x500')
@@ -277,7 +278,9 @@ class Janela(Entregador, Pedido):
                 self.dinheiro =  sum(self.final_dia)
             conn.close()
         except AttributeError:
-            messagebox.showwarning('Caixa', 'Numa venda realizada hoje')
+            erro = messagebox.showwarning('Caixa', 'Numa venda realizada hoje')
+            erro
+            self.root_entregas.lower()
         
     def mostra_caixa(self):
         try:
