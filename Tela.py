@@ -51,9 +51,10 @@ class Janela(Entregador, Pedido):
         self.root_entregas.config(menu=my_menu)
 
         # Configurar menu
+        # opcoes do menu
         option_menu = Menu(my_menu, tearoff=0)
         my_menu.add_cascade(label="Opções", menu=option_menu)
-        # opcoes do menu
+        
         option_menu.add_command(label="Tabela bairros", command= lambda:[Tela_bairros()])
         option_menu.add_command(label="Funcionarios", command= lambda:[self.tela_cadastrar()])
         option_menu.add_command(label="Cardapio", command=lambda:[tela_cardapio(self.root_entregas, None, None)])
@@ -67,7 +68,8 @@ class Janela(Entregador, Pedido):
         search_menu.add_command(label="Caixa", command=lambda:[self.caixa(), self.mostra_caixa()] )
         search_menu.add_command(label="Teles", command=lambda:[self.Fechar_teles(), self.valor_teles()])
         search_menu.add_separator()
-        search_menu.add_command(label="Entregas", command=lambda:[self.view(), self.widgets()])
+        search_menu.add_command(label="Entregas", command=lambda:[self.view(), self.widgets(),
+        self.botoes()])
 
     def Fechar_teles(self):
         self.tree_frame.forget()
@@ -143,6 +145,8 @@ class Janela(Entregador, Pedido):
         self.tabela_entregas.bind('<Double-Button-1>', self.seleciona)
 
     def valor_teles(self):
+        bt1 = Image.open('pagamento.png')
+        img = ImageTk.PhotoImage(bt1)
         self.button_frame.forget()
         self.data_frame.forget()
         self.tabela_entregas.forget()
@@ -159,8 +163,10 @@ class Janela(Entregador, Pedido):
         l = [x for x in c.fetchall()]
         nomes = ttk.Combobox(self.resumo, values=l)
         nomes.place(relx=0.1, rely=0.15, relwidth=0.2, relheight=0.3)
-        finalizar_func = Button(botoes_frame, text='Finalizar', command=lambda:[finalizar(nomes.get())])
-        finalizar_func.place(relx=0.45, rely=0.35, relwidth=0.12, relheight=0.3)
+        finalizar_func = Button(botoes_frame, image= img, compound= CENTER,
+        command=lambda:[finalizar(nomes.get())])
+        finalizar_func.place(relx=0.45, rely=0.35, relwidth=0.15, relheight=0.55)
+        finalizar_func.imagem = img
 
         def finalizar(nomes):
             pagar = [0]
@@ -175,7 +181,7 @@ class Janela(Entregador, Pedido):
                     if tipo == 1:
                         pagar.append(10)
                         conta_ifood += 1
-                    else:
+                    if tipo == 2:
                         c.execute("""SELECT nome_cliente FROM pedidos WHERE id_pedido= %s""",
                         (idd,))
                         nome = c.fetchall()
@@ -367,7 +373,7 @@ class Janela(Entregador, Pedido):
                 nome_func, dia
                 FROM pedidos as pe
                 join clientes as cl on cl.nome_cliente = pe.nome_cliente
-                """)
+                ORDER BY dia""")
 
         global count
         count = 0
@@ -402,72 +408,59 @@ class Janela(Entregador, Pedido):
         global count
         count = 0
         if len(nome) > 0:
+            nome_p = f'%{nome}%'.title()
             c.execute("""SELECT Id_pedido, pe.nome_cliente,
                     cl.endereco, 
                     nome_func, dia
                     FROM pedidos as pe
                     join clientes as cl on cl.nome_cliente = pe.nome_cliente
-                    WHERE pe.nome_cliente = %s
-                    """, (nome,))
+                    WHERE pe.nome_cliente LIKE %s ORDER BY pe.nome_cliente
+                    """, (nome_p,))
             for idd, nome , end, entregador, data in c.fetchall():
                 if count % 2 == 0:
-                    self.lista.insert(parent='', index='end', text='',
+                    self.lista.insert(parent='', index='0', text='',
                                 values=(idd, nome , end, entregador, data),
                                 tags=('evenrow',))
                 else:
-                    self.lista.insert(parent='', index='end', text='',
+                    self.lista.insert(parent='', index='0', text='',
                                 values=(idd, nome, end, entregador, data),
                                 tags=('oddrow',))
                 count += 1
         elif len(local) > 0:
+            local = f'{local}%'.title()
             c.execute("""SELECT Id_pedido, pe.nome_cliente,
                     cl.endereco, 
                     nome_func, dia
                     FROM pedidos as pe
                     join clientes as cl on cl.nome_cliente = pe.nome_cliente
-                    WHERE cl.endereco = %s
+                    WHERE cl.endereco LIKE %s ORDER BY cl.endereco
                     """, (local,))
             for idd, nome , end, entregador, data in c.fetchall():
                 if count % 2 == 0:
-                    self.lista.insert(parent='', index='end', text='',
+                    self.lista.insert(parent='', index='0', text='',
                                 values=(idd, nome , end, entregador, data),
                                 tags=('evenrow',))
                 else:
-                    self.lista.insert(parent='', index='end', text='',
+                    self.lista.insert(parent='', index='0', text='',
                                 values=(idd, nome, end, entregador, data),
                                 tags=('oddrow',))
                 count += 1
         elif len(boy) > 0:
+            boy =f'%{boy}%'.title()
             c.execute("""SELECT Id_pedido, pe.nome_cliente,
                     cl.endereco, 
                     nome_func, dia
                     FROM pedidos as pe
                     join clientes as cl on cl.nome_cliente = pe.nome_cliente
-                    WHERE nome_func = %s
+                    WHERE nome_func LIKE %s ORDER BY dia
                     """, (boy,))
             for idd, nome , end, entregador, data in c.fetchall():
                 if count % 2 == 0:
-                    self.lista.insert(parent='', index='end', text='',
+                    self.lista.insert(parent='', index='0', text='',
                                 values=(idd, nome , end, entregador, data),
                                 tags=('evenrow',))
                 else:
-                    self.lista.insert(parent='', index='end', text='',
-                                values=(idd, nome, end, entregador, data),
-                                tags=('oddrow',))
-                count += 1
-        else:
-            c.execute("""SELECT Id_pedido, pe.nome_cliente,
-                    cl.endereco, 
-                    nome_func, dia
-                    FROM pedidos as pe
-                    join clientes as cl on cl.nome_cliente = pe.nome_cliente""")
-            for idd, nome , end, entregador, data in c.fetchall():
-                if count % 2 == 0:
-                    self.lista.insert(parent='', index='end', text='',
-                                values=(idd, nome , end, entregador, data),
-                                tags=('evenrow',))
-                else:
-                    self.lista.insert(parent='', index='end', text='',
+                    self.lista.insert(parent='', index='0', text='',
                                 values=(idd, nome, end, entregador, data),
                                 tags=('oddrow',))
                 count += 1
@@ -502,7 +495,7 @@ class Janela(Entregador, Pedido):
                 nome_func, dia
                 FROM pedidos as pe
                 join clientes as cl on cl.nome_cliente = pe.nome_cliente
-                """)
+                ORDER BY dia""")
 
         global count
         count = 0
@@ -520,21 +513,32 @@ class Janela(Entregador, Pedido):
         conn.close()
 
     def botoes(self):
+        bt1 = Image.open('Imagens/lixo.ico')
+        img = ImageTk.PhotoImage(bt1)
+        bt2 = Image.open('Imagens/atualizar.png')
+        img2 = ImageTk.PhotoImage(bt2)
+        bt3 = Image.open('Imagens/consultar.ico')
+        img3 = ImageTk.PhotoImage(bt3)
         # Add Buttons
         self.button_frame = LabelFrame(self.root_entregas, text="Comandos")
         self.button_frame.place(relx=0.05, rely=0.8, relwidth=0.9, relheight=0.18)
-
-        consultar_button = Button(self.button_frame, text="Consultar", command=
-                                  lambda: [self.rusultado_consulta(self.nome_entry.get(),
-                                  self.bairro_entry.get(), self.boy_entry.get())])
+        #consultar
+        consultar_button = Button(self.button_frame, image= img3, compound=CENTER,
+        command= lambda: [self.rusultado_consulta(self.nome_entry.get(),
+        self.bairro_entry.get(), self.boy_entry.get())])
         consultar_button.place(relx=0.13, rely=0.1, relwidth=0.1, relheight=0.55)
-
-        atualizar_button = Button(self.button_frame, text="Atualizar")
+        consultar_button.imagem = img3
+        #atualizar
+        atualizar_button = Button(self.button_frame, image= img2, compound=CENTER, command= lambda:[
+        self.atualiza_tabela()])
         atualizar_button.place(relx=0.43, rely=0.1, relwidth=0.1, relheight=0.55)
-
-        apagar = Button(self.button_frame, text="Apagar", command= lambda:[self.apagar(self.idp),
+        atualizar_button. imagem = img2
+        #apagar
+        apagar = Button(self.button_frame, image= img, compound=CENTER,
+        command= lambda:[self.apagar(self.idp),
         self.limpa(self.nome_entry, self.bairro_entry, self.boy_entry), self.atualiza_tabela()])
         apagar.place(relx=0.73, rely=0.1, relwidth=0.1, relheight=0.55)
+        apagar.imagem = img
 
     def tela_cadastrar(self):
         self.tela = Toplevel(self.root_entregas)

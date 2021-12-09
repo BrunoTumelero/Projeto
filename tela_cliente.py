@@ -8,14 +8,14 @@ import pedido
 import tela_cardapiov2
 
 class tela_cliente(Cliente):
-  def __init__(self, root, nome_c, end_c):
+  def __init__(self, root):
     super().__init__()
-    root.destroy()
+    #root.forget(root)
     self.root_clientes = Tk()
     self.root_clientes.title('Cliente')
     self.root_clientes.geometry('800x500')
     self.tabela()
-    self.acessorios(nome_c, end_c)
+    self.acessorios()
     self.botoes()
     self.menu()
     self.root_clientes.mainloop()
@@ -45,7 +45,7 @@ class tela_cliente(Cliente):
 
     c = conn.cursor()
 
-    nome_pesquisa =  nome + "%"
+    nome_pesquisa = f'%{nome}%'.title()
     c.execute("""SELECT cl.nome_cliente, cl.endereco, COUNT(pe.nome_cliente) FROM clientes as cl
             JOIN pedidos as pe on cl.nome_cliente = pe.nome_cliente
             WHERE cl.nome_cliente LIKE %s
@@ -56,14 +56,14 @@ class tela_cliente(Cliente):
 
     for nome, end, num in c.fetchall():
         if contador_cliente % 2 == 0:
-            lista.insert(parent='', index='end', text='',
+            lista.insert(parent='', index='0', text='',
                            values=(nome, end, num),
-                           tags=('evenrow',))
+                           tags=('cor1',))
 
         else:
-          lista.insert(parent='', index='end', text='',
+          lista.insert(parent='', index='0', text='',
                                  values=(nome, end, num),
-                                 tags=('oddrow',))
+                                 tags=('cor2',))
         contador_cliente += 1
         conn.close()
   
@@ -191,7 +191,7 @@ class tela_cliente(Cliente):
     conn.close()
     self.lista.bind('<Double-Button-1>', self.seleciona)
 
-  def acessorios(self, nome_c, end_c):
+  def acessorios(self):
     data_frame = LabelFrame(self.root_clientes, text= 'Novo cliente')
     data_frame.place(relx=0.05, rely=0.58, relwidth=0.9, relheight=0.25)
 
@@ -200,35 +200,43 @@ class tela_cliente(Cliente):
     nome_label.place(relx=0.15, rely=0.1, relwidth=0.2, relheight=0.35)
     self.nome_entry = Entry(data_frame)
     self.nome_entry.place(relx=0.1, rely=0.35, relwidth=0.3, relheight=0.25)
-    self.nome_entry.delete(0, END)
-    self.nome_entry.insert(0, nome_c)
 
     endereco_label = Label(data_frame, text="Bairro")
     endereco_label.configure(font=('helvetica', 16))
     endereco_label.place(relx=0.64, rely=0.1, relwidth=0.2, relheight=0.35)
     self.endereco_entry = Entry(data_frame)
     self.endereco_entry.place(relx=0.585, rely=0.35, relwidth=0.3, relheight=0.25)
-    self.endereco_entry.delete(0, END)
-    self.endereco_entry.insert(0, end_c)
 
   def botoes(self):
+    bt1 = Image.open('Imagens/lixo.ico')
+    img = ImageTk.PhotoImage(bt1)
+    bt2 = Image.open('Imagens/order.png')
+    img2 = ImageTk.PhotoImage(bt2)
+    bt3 = Image.open('Imagens/busca.ico')
+    img3 = ImageTk.PhotoImage(bt3)
     lista = self.lista
-    botao_salvar = Button(self.root_clientes, text= 'Cadastrar', command= lambda: [self.salvar(self.nome_entry.get().title(), self.endereco_entry.get().title()),
-      self.limpa(self.nome_entry, self.endereco_entry)])
+    botao_salvar = Button(self.root_clientes, text= 'Cadastrar', image= img, compound=LEFT,
+    command= lambda: [self.salvar(self.nome_entry.get().title(), self.endereco_entry.get().title()),
+    self.limpa(self.nome_entry, self.endereco_entry)])
     botao_salvar.configure(font=('Roman', 14))
-    botao_salvar.place(relx=0.1, rely=0.85, relwidth=0.15, relheight=0.1)
+    botao_salvar.place(relx=0.1, rely=0.85, relwidth=0.18, relheight=0.1)
+    botao_salvar.imagem = img
 
-    new_pedido = Button(self.root_clientes, text= 'Novo\nPedido', command= lambda:[
+    new_pedido = Button(self.root_clientes, text= 'Novo\nPedido', image= img2, compound=LEFT,
+    command= lambda:[
     tela_cardapio(self.root_clientes, self.nome_entry.get().title(), 
     self.endereco_entry.get().title())])
     new_pedido.configure(font=('Roman', 14))
     new_pedido.place(relx=0.42, rely=0.85, relwidth=0.15, relheight=0.12)
+    new_pedido.imagem = img2
 
-    pesquisar = Button(self.root_clientes, text= 'Pesquisar', command= lambda: [self.pesquisar(
+    pesquisar = Button(self.root_clientes, text= 'Pesquisar', image= img3, compound=LEFT,
+    command= lambda: [self.pesquisar(
     self.nome_entry.get(), self.lista),
     self.limpa(self.nome_entry, self.endereco_entry)])
     pesquisar.configure(font=('Roman', 14))
-    pesquisar.place(relx=0.75, rely=0.85, relwidth=0.15, relheight=0.1)
+    pesquisar.place(relx=0.75, rely=0.85, relwidth=0.18, relheight=0.1)
+    pesquisar.imagem = img3
   
   def inserir(self, name, end):
     self.nome_entry.insert(name, 'end')
@@ -254,9 +262,6 @@ class tela_cliente(Cliente):
     local = self.endereco_entry.get()
     print(name, local)
     return name, local
-
-
-
 
 #c = tela_cliente('nome', 'end')
 #c

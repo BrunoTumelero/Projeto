@@ -18,18 +18,17 @@ class Janela_principal(Pedido):
 			self.background()
 			self.frames()
 			self.widegets()
-			self.entradas()
 			self.conectar()
 
 			self.root.mainloop()
 
 		def background(self):
-			imagem = Image.open('Health.jpeg')
+			imagem = Image.open('Imagens/indice.png')
 			photo = ImageTk.PhotoImage(imagem)
-			fundo = Label(self.root, image= photo)
+			fundo = Label(self.root, image= photo, anchor='n', background = 'snow')
 			fundo.image = photo
-			fundo.place(relx=0.0, rely=0.0, relwidth=0.1, relheight=0.1)
-			self.root.configure(background = '#FFFAFA')
+			fundo.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
+			self.root.configure(background = 'snow')
 
 		def frames(self):
 			self.framebotao = Frame(self.root)
@@ -38,43 +37,30 @@ class Janela_principal(Pedido):
 			self.framebotao.configure(background = '#FFFAFA')
 
 		def widegets(self):
-			novo_pedido = Button(self.framebotao, text = 'Pedidos', relief=GROOVE, activebackground='#FFB6C1',
-			activeforeground='snow' ,command= lambda: 
-			[tela_cardapio(self.root, self.nome_entry.get(), self.endereco_entry.get())])
-			novo_pedido.place(relx = 0.1, rely = 0.5, relwidth = 0.15,
-										relheight = 0.35)
-			novo_pedido['background'] = 'Snow'
-			novo_pedido.configure(font = ('Helvetica', 16))
+			bt2 = Image.open('Imagens/clientes.ico')
+			img2 = ImageTk.PhotoImage(bt2)
+			bt3 = Image.open('Imagens/delivery-man.png')
+			img3 = ImageTk.PhotoImage(bt3)
 			
-			cadastra_cliente = Button(self.framebotao, text = 'Clientes', relief=FLAT, activebackground='#87CEEB',
-			activeforeground='#0000FF', command= lambda: 
-			[tela_cliente(self.root, self.nome_entry.get(), self.endereco_entry.get())])
-			cadastra_cliente.place(relx = 0.42, rely = 0.5, relwidth = 0.15,
+			cadastra_cliente = Button(self.framebotao, text = 'Clientes', image=img2, compound=LEFT,
+			relief=FLAT, activebackground='#87CEEB',
+			activeforeground='#0000FF', anchor='w', command= lambda: 
+			[tela_cliente(self.root)])
+			cadastra_cliente.place(relx = 0.22, rely = 0.5, relwidth = 0.18,
 										relheight = 0.35)
+			cadastra_cliente.imagem = img2
 			cadastra_cliente['background'] = 'Snow'
 			cadastra_cliente.configure(font = ('Helvetica', 16))
 			
-			consultar = Button(self.framebotao, text = 'Entregas', relief=SUNKEN, activebackground='Crimson',
+			consultar = Button(self.framebotao, text = 'Entregas', image=img3, compound=LEFT,
+			relief=SUNKEN, activebackground='Crimson',
 			activeforeground='DarkGreen', command = lambda: [Janela(self.root)])
-			consultar.place(relx = 0.72, rely = 0.5, relwidth = 0.15,
+			consultar.place(relx = 0.62, rely = 0.5, relwidth = 0.18,
 										relheight = 0.35)
+			consultar.imagem = img3
 			consultar['background'] = 'Snow'
 			consultar.configure(font = ('Helvetica', 16))	
-			
-		def entradas(self):
-			nome_label = Label(self.framebotao, text="Cliente")
-			nome_label.configure(font=('helvetica', 16))
-			nome_label.place(relx=0.25, rely=0.05, relwidth=0.15, relheight=0.18)
-			nome_label['background'] = 'Snow'
-			self.nome_entry = Entry(self.framebotao)
-			self.nome_entry.place(relx=0.2, rely=0.2, relwidth=0.25, relheight=0.2)
-
-			endereco_label = Label(self.framebotao, text="Endereço")
-			endereco_label.configure(font=('helvetica', 16))
-			endereco_label.place(relx=0.6, rely=0.05, relwidth=0.15, relheight=0.18)
-			endereco_label['background'] = 'Snow'
-			self.endereco_entry = Entry(self.framebotao)
-			self.endereco_entry.place(relx=0.55, rely=0.2, relwidth=0.25, relheight=0.2)		
+					
 	except Exception as erro:
 		print(erro)
 

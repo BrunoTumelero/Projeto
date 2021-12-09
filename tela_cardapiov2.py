@@ -130,6 +130,9 @@ class tela_cardapio(Cardapio, Pedido, Local):
             self.carrinho_compras.append(x[0])
 
     def acessorios(self):
+        bt1 = Image.open('Imagens/pagar.png')
+        img = ImageTk.PhotoImage(bt1)
+
         self.boy_label = Label(self.root_cardapio, text='Motoboy')
         self.boy_entry = Entry(self.root_cardapio)
 
@@ -147,12 +150,13 @@ class tela_cardapio(Cardapio, Pedido, Local):
         particular = Radiobutton(self.root_cardapio, text= 'Tele Wonder', variable= self.tipo, value=3)
         particular.place(relx=0.48, rely=0.65, relwidth=0.15, relheight=0.08)
 
-        finalizar = Button(self.root_cardapio, text='Finalizar\nPedido', 
+        finalizar = Button(self.root_cardapio, image= img, compound=CENTER,
         command=lambda:[self.novo_pedido(self.info_cliente, self.memoria, self.boy_entry.get().title(),
         self.tipo_tele(), self.tipo_pedido, self.data_entry.get()),
         self.carrinho.delete(*self.carrinho.get_children()), self.boy_entry.delete(0, 'end'),
-        self.data_entry.delete(0, 'end'), self.total_pedido(0)])
+        self.data_entry.delete(0, 'end'), self.total_pedido(0), self.root_cardapio.destroy()])
         finalizar.place(relx=0.8, rely=0.8, relwidth=0.12, relheight=0.1)
+        finalizar.imagem = img
 
     def tipo_tele(self):
         try:
