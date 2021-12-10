@@ -4,7 +4,7 @@ from datetime import *
 import tkinter
 from entregadoresv2 import *
 from pedido import Pedido
-from tela_cardapiov2 import tela_cardapio
+from tela_cliente import tela_cardapio
 from tkinter import messagebox
 from PIL import Image, ImageTk
 from janela_bairros import Tela_bairros
@@ -12,8 +12,8 @@ from janela_bairros import Tela_bairros
 class Janela(Entregador, Pedido):
     def __init__(self, root):
         super().__init__()
-        root.destroy()
-        self.root_entregas = Tk()
+        self.root = root
+        self.root_entregas = Toplevel(root)
         self.root_entregas.title('Restaurante')
         self.root_entregas.geometry('800x500')
         self.menu()
@@ -57,7 +57,8 @@ class Janela(Entregador, Pedido):
         
         option_menu.add_command(label="Tabela bairros", command= lambda:[Tela_bairros()])
         option_menu.add_command(label="Funcionarios", command= lambda:[self.tela_cadastrar()])
-        option_menu.add_command(label="Cardapio", command=lambda:[tela_cardapio(self.root_entregas, None, None)])
+        option_menu.add_command(label="Cardapio", command=lambda:[tela_cardapio(self.root,
+        self.root_entregas, None, None)])
         option_menu.add_separator()
         option_menu.add_command(label="Exit", command=self.root_entregas.quit)
 
@@ -145,8 +146,6 @@ class Janela(Entregador, Pedido):
         self.tabela_entregas.bind('<Double-Button-1>', self.seleciona)
 
     def valor_teles(self):
-        bt1 = Image.open('pagamento.png')
-        img = ImageTk.PhotoImage(bt1)
         self.button_frame.forget()
         self.data_frame.forget()
         self.tabela_entregas.forget()
@@ -163,10 +162,13 @@ class Janela(Entregador, Pedido):
         l = [x for x in c.fetchall()]
         nomes = ttk.Combobox(self.resumo, values=l)
         nomes.place(relx=0.1, rely=0.15, relwidth=0.2, relheight=0.3)
-        finalizar_func = Button(botoes_frame, image= img, compound= CENTER,
+
+        bt_finalizar = Image.open('Imagens/pagamento.png')
+        img_finalizar = ImageTk.PhotoImage(bt_finalizar)
+        finalizar_func = Button(botoes_frame, image= img_finalizar, compound= CENTER,
         command=lambda:[finalizar(nomes.get())])
-        finalizar_func.place(relx=0.45, rely=0.35, relwidth=0.15, relheight=0.55)
-        finalizar_func.imagem = img
+        finalizar_func.place(relx=0.45, rely=0.35, relwidth=0.1, relheight=0.55)
+        finalizar_func.imagem = img_finalizar
 
         def finalizar(nomes):
             pagar = [0]

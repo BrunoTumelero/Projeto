@@ -3,7 +3,6 @@ from tkinter import ttk
 from tkinter import messagebox
 from PIL import Image, ImageTk
 from Tela import * 
-from tela_cardapiov2 import *
 from tela_cliente import tela_cliente
 from Tela import Janela
 from pedido import Pedido

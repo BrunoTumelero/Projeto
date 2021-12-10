@@ -53,5 +53,3 @@ class Entregador:
             endereco.delete(0, 'end')
             boy.delete(0, 'end')
 
-e = Entregador()
-e.consultar()
