@@ -514,6 +514,42 @@ class Janela(Entregador, Pedido):
 
         conn.close()
 
+    def atualiza_pedido(self, alter):
+        conn = self.conectar()
+        c = conn.cursor()
+        c.execute("""SELECT Id_pedido, pe.nome_cliente,
+                cl.endereco, 
+                nome_func, dia
+                FROM pedidos as pe
+                join clientes as cl on cl.nome_cliente = pe.nome_cliente
+                ORDER BY dia""")
+        for idd, nome_cl, end_cl, func, day in c.fetchall():
+            pass
+        
+        if alter != func[0][0]:
+            c.execute("""SELECT nome_func, nome_cliente, tipo_tele FROM pedidos 
+            WHERE nome_cliente = %s""", (nome_cl,))
+            for boy1, nome, tipo in c.fetchall():
+                print(boy1, tipo)
+            c.execute("""SELECT endereco FROM clientes WHERE nome_cliente = %s""", (nome_cl,))
+            endereco = c.fetchall()
+            if tipo == 2:
+                c.execute("""SELECT preco FROM bairros WHERE nome_bairro = %s""", (endereco[0][0],))
+                valor = c.fetchall()
+                desconta = -valor[0][0]
+            elif tipo == 1:
+                desconta = -10
+            else:
+                print('tipo errado')
+
+            c.execute("""UPDATE pedidos SET nome_func = %s WHERE nome_cliente = %s
+            AND dia = %s""", (alter, nome_cl, day))
+            c.execute("""UPDATE funcionarios SET pagar = %s WHERE nome_func = %s""", 
+            (desconta, boy1))
+
+            conn.commit()
+            conn.close()
+
     def botoes(self):
         bt1 = Image.open('Imagens/lixo.ico')
         img = ImageTk.PhotoImage(bt1)
@@ -532,7 +568,7 @@ class Janela(Entregador, Pedido):
         consultar_button.imagem = img3
         #atualizar
         atualizar_button = Button(self.button_frame, image= img2, compound=CENTER, command= lambda:[
-        self.atualiza_tabela()])
+        self.atualiza_pedido(self.boy_entry.get()), self.atualiza_tabela()])
         atualizar_button.place(relx=0.43, rely=0.1, relwidth=0.1, relheight=0.55)
         atualizar_button. imagem = img2
         #apagar
