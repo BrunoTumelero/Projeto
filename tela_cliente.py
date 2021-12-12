@@ -833,6 +833,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
                 messagebox.showerror('MAKE IT incompleto', 'Escolha no minímo 1 opção do MAKE IT')
                 self.make_it.clear()
             elif tamanho < 5 or tamanho >= 1:
+                self.make_it.clear()
                 self.poke_3()
         def check_make():
             if self.make1.get() == 1:
@@ -859,7 +860,6 @@ class tela_cardapio(Cardapio, Pedido, Local):
                 self.make_it.append(11)
             if self.make12.get() == 1:
                 self.make_it.append(12)
-            self.make_it.clear()
             verifica(len(self.make_it))
 
         make = Label(self.pag2, text='3.MAKE IT', anchor='w')
@@ -1118,6 +1118,11 @@ class tela_cardapio(Cardapio, Pedido, Local):
                 contador +=1
             self.carrinho_compras.append(sum(self.extra_poke))
             self.set_total()
+
+            conn = self.conectar()
+            c = conn.cursor()
+            c.execute("""UPDATE menu SET valor_prato = %s WHERE nome_prato = %s""",
+            (sum(self.extra_poke), 'Monte seu poke'))
 
         pag4 = Button(self.pag4, text='ADD', command=lambda:[verifica_pag4(), add_poke()])
         pag4.place(relx=0.8, rely=0.85, relwidth=0.1, relheight=0.1)

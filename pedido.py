@@ -41,7 +41,6 @@ class Pedido:
             #seleciona o valor do prato pelo id do pedido
             lista_pratos = []
             for i in prato.keys():
-                print(prato.keys())
                 c.execute("""SELECT valor_prato FROM menu 
                     WHERE nome_prato = %s """, (i,))
                 valor1 = c.fetchall()
@@ -68,7 +67,6 @@ class Pedido:
             c.execute("""SELECT id_pedido FROM pedidos
                 WHERE nome_cliente = %s""", (nome_c,))
             id_p = c.fetchall()
-            print(id_p)
             num_id = id_p[0][0]
             
             contador = 0
