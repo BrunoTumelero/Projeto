@@ -1,3 +1,4 @@
+from os import error
 from tkinter import *
 from tkinter import ttk
 from tkinter import font
@@ -373,16 +374,13 @@ class tela_cardapio(Cardapio, Pedido, Local):
         self.tipo_tele()
         self.valor_total = sum(self.carrinho_compras) + self.tipo_tele()
         self.total_pedido(self.valor_total)
-        return self.valor_total
 
     def soma_pratos(self):
         conn = self.conectar()
         c = conn.cursor()
-        prato = self.prato
-        c.execute('''SELECT valor_prato FROM menu WHERE nome_prato = %s''', (prato,))
+        c.execute('''SELECT valor_prato FROM menu WHERE nome_prato = %s''', (self.prato,))
         preco = c.fetchall()
         for x in preco:
-            print(x)
             self.carrinho_compras.append(x[0])
 
     def acessorios(self):
@@ -694,7 +692,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
         self.pag1.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
         letra = font.Font(family='Arial', size= 20, weight='bold')
         letra2 = font.Font(family='Arial', size=12, weight='bold', slant='italic')
-        letra3 = font.Font(family='Arial', size=5, weight='bold')
+        letra3 = font.Font(family='Arial', size=10, weight='bold')
 
         base = Label(self.pag1, text='1.BASE')
         base.configure(font=letra)
@@ -789,13 +787,19 @@ class tela_cardapio(Cardapio, Pedido, Local):
                     self.extra_poke.append(5)
                 if self.prot1.get() == 1:
                     self.proteina.append(1)
+                    self.extra_poke.append(54)
                 if self.prot2.get() == 1:
                     self.proteina.append(2)
+                    self.extra_poke.append(54)
                 if self.prot3.get() == 1:
                     self.proteina.append(3)
+                    self.extra_poke(60)
                 if self.prot4.get() == 1:
                     self.proteina.append(4)
+                    self.extra_poke.append(50)
                 erros()
+                self.proteina.clear()
+                self.escolha_base.clear()
             except AttributeError as error:
                 messagebox.showwarning('ERRO', error)
 
@@ -855,7 +859,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
                 self.make_it.append(11)
             if self.make12.get() == 1:
                 self.make_it.append(12)
-            print(self.make_it)
+            self.make_it.clear()
             verifica(len(self.make_it))
 
         make = Label(self.pag2, text='3.MAKE IT', anchor='w')
@@ -902,7 +906,10 @@ class tela_cardapio(Cardapio, Pedido, Local):
         letra = font.Font(family='Arial', size= 20, weight='bold')
         letra2 = font.Font(family='Arial', size=12, weight='bold', slant='italic')
         self.pag3.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
-        self.crunch_it = IntVar(self.pag3)
+        crunch_it = []
+        self.crunch1 = IntVar(self.pag3)
+        self.crunch2 = IntVar(self.pag3)
+        self.crunch3 = IntVar(self.pag3)
 
         crunch = Label(self.pag3, text='3.CRUNCH IT', anchor='w')
         crunch.configure(font=letra)
@@ -911,51 +918,107 @@ class tela_cardapio(Cardapio, Pedido, Local):
         escolha_crunch.configure(font=letra2)
         escolha_crunch.place(relx=0.02, rely=0.13, relwidth=0.22, relheight=0.1)
 
-        op_crunch1 = Radiobutton(self.pag3, text='Chips de banana', anchor='w', value= 1,
-        variable= self.crunch_it)
-        op_crunch1.place(relx=0.02, rely=0.25, relwidth=0.25, relheight=0.1)
-        op_crunch2 = Radiobutton(self.pag3, text='Chips de batata doce', anchor='w', value= 2,
-        variable= self.crunch_it)
-        op_crunch2.place(relx=0.02, rely=0.35, relwidth=0.3, relheight=0.1)
-        op_crunch3 = Radiobutton(self.pag3, text='Kale', anchor='w', value= 3,
-        variable= self.crunch_it)
+        op_crunch1 = Checkbutton(self.pag3, text='Chips de banana', anchor='w',
+        variable= self.crunch1)
+        op_crunch1.place(relx=0.02, rely=0.25, relwidth=0.28, relheight=0.1)
+        op_crunch2 = Checkbutton(self.pag3, text='Chips de batata doce', anchor='w',
+        variable= self.crunch2)
+        op_crunch2.place(relx=0.02, rely=0.35, relwidth=0.45, relheight=0.1)
+        op_crunch3 = Checkbutton(self.pag3, text='Kale', anchor='w',
+        variable= self.crunch3)
         op_crunch3.place(relx=0.02, rely=0.45, relwidth=0.25, relheight=0.1)
 
         top_master = Frame(self.pag3)
-        top_master.place(relx=0.39, rely=0.0, relwidth=0.395, relheight=1)
+        top_master.place(relx=0.39, rely=0.0, relwidth=0.6, relheight=1)
         top = Label(top_master, text='4.TOP IT', anchor='w')
         top.configure(font=letra)
-        top.place(relx=0.45, rely=0.03, relwidth=0.25, relheight=0.1)
+        top.place(relx=0.45, rely=0.03, relwidth=0.4, relheight=0.1)
         escolha_top = Label(top_master, text='Escolha 1', foreground='white', anchor='w')
         escolha_top.configure(font=letra2)
-        escolha_top.place(relx=0.45, rely=0.13, relwidth=0.2, relheight=0.1)
+        escolha_top.place(relx=0.45, rely=0.13, relwidth=0.4, relheight=0.1)
 
-        op_top1 = Radiobutton(top_master, text='Castanhas', anchor='w', value= 1)
-        op_top1.place(relx=0.4, rely=0.25, relwidth=0.25, relheight=0.1)
-        op_top2 = Radiobutton(top_master, text='Nozes', anchor='w', value= 2)
-        op_top2.place(relx=0.7, rely=0.25, relwidth=0.3, relheight=0.1)
-        op_top3 = Radiobutton(top_master, text='Pistache', anchor='w', value= 3)
-        op_top3.place(relx=0.4, rely=0.35, relwidth=0.25, relheight=0.1)
-        op_top4 = Radiobutton(top_master, text='Amendôas', anchor='w', value= 4)
-        op_top4.place(relx=0.7, rely=0.35, relwidth=0.25, relheight=0.1)
-        op_top5 = Radiobutton(top_master, text='Gergerlim negro', anchor='w', value= 5)
-        op_top5.place(relx=0.4, rely=0.45, relwidth=0.3, relheight=0.1)
-        op_top6 = Radiobutton(top_master, text='Lascas de coco', anchor='w', value= 6)
-        op_top6.place(relx=0.7, rely=0.45, relwidth=0.25, relheight=0.1)
-        op_top7 = Radiobutton(top_master, text='Semente de abóbora', anchor='w', value= 7)
-        op_top7.place(relx=0.4, rely=0.55, relwidth=0.32, relheight=0.1)
-        op_top8 = Radiobutton(top_master, text='Linhaça dourada', anchor='w', value= 8)
-        op_top8.place(relx=0.4, rely=0.65, relwidth=0.3, relheight=0.1)
+        top_it = []
+        top1 = IntVar(top)
+        top2 = IntVar(top)
+        top3 = IntVar(top)
+        top4 = IntVar(top)
+        top5 = IntVar(top)
+        top6 = IntVar(top)
+        top7 = IntVar(top)
+        top8 = IntVar(top)
 
-        pag3 = Button(top_master, text='>>>>', command=lambda:[self.poke_4()])
-        pag3.place(relx=0.8, rely=0.85, relwidth=0.1, relheight=0.1)
+        op_top1 = Checkbutton(top_master, text='Castanhas', anchor='w', variable= top1)
+        op_top1.place(relx=0.6, rely=0.45, relwidth=0.35, relheight=0.1)
+        op_top2 = Checkbutton(top_master, text='Nozes', anchor='w', variable= top2)
+        op_top2.place(relx=0.6, rely=0.25, relwidth=0.35, relheight=0.1)
+        op_top3 = Checkbutton(top_master, text='Pistache', anchor='w', variable= top3)
+        op_top3.place(relx=0.1, rely=0.35, relwidth=0.35, relheight=0.1)
+        op_top4 = Checkbutton(top_master, text='Amendôas', anchor='w', variable= top4)
+        op_top4.place(relx=0.6, rely=0.35, relwidth=0.35, relheight=0.1)
+        op_top5 = Checkbutton(top_master, text='Gergerlim negro', anchor='w', variable= top5)
+        op_top5.place(relx=0.1, rely=0.45, relwidth=0.5, relheight=0.1)
+        op_top6 = Checkbutton(top_master, text='Lascas de coco', anchor='w', variable= top6)
+        op_top6.place(relx=0.1, rely=0.25, relwidth=0.45, relheight=0.1)
+        op_top7 = Checkbutton(top_master, text='Semente de abóbora', anchor='w', variable= top7)
+        op_top7.place(relx=0.1, rely=0.55, relwidth=0.55, relheight=0.1)
+        op_top8 = Checkbutton(top_master, text='Linhaça dourada', anchor='w', variable= top8)
+        op_top8.place(relx=0.1, rely=0.65, relwidth=0.5, relheight=0.1)
+
+        def verifica_pg3():
+            try:
+                if self.crunch1.get() == 1:
+                    crunch_it.append(1)
+                if self.crunch2.get() == 1:
+                    crunch_it.append(2)
+                if self.crunch3.get() == 1:
+                    crunch_it.append(3)
+                elif len(crunch_it) > 1:
+                    messagebox.showerror('ERRO', 'Selecione apenas 1 opção de crunch it')
+                    crunch_it.clear()
+                    top_it.clear()
+                elif len(crunch_it) == 0:
+                    messagebox.showerror('ERRO', 'Selecione no minímo 1 opção de crunch it')
+                    crunch_it.clear()
+                    top_it.clear()
+                if top1.get() == 1:
+                    top_it.append(1)
+                if top2.get() == 1:
+                    top_it.append(2)
+                if top3.get() == 1:
+                    top_it.append(3)
+                if top4.get() == 1:
+                    top_it.append(4)
+                if top5.get() == 1:
+                    top_it.append(5)
+                if top6.get() == 1:
+                    top_it.append(6)
+                if top7.get() == 1:
+                    top_it.append(7)
+                if top8.get() == 1:
+                    top_it.append(8)
+                elif len(top_it) > 1:
+                    messagebox.showerror('ERRO', 'Selecione apenas 1 opção de top it')
+                    top_it.clear()
+                    crunch_it.clear()
+                elif len(top_it) == 0:
+                    messagebox.showerror('ERRO', 'Selecione 1 opção de top it')
+                    top_it.clear()
+                    crunch_it.clear()
+                top_it.clear()
+                crunch_it.clear()
+                self.poke_4()
+            except error:
+                messagebox.showerror('ERRO', "Erro inesperado, contate o programador")
+
+        pag3 = Button(top_master, text='>>>>', command=lambda:[verifica_pg3()])
+        pag3.place(relx=0.8, rely=0.8, relwidth=0.3, relheight=0.1)
 
     def poke_4(self):
         self.pag3.forget()
         self.pag4 = Frame(self.aba_poke)
         letra = font.Font(family='Arial', size= 20, weight='bold')
         letra2 = font.Font(family='Arial', size=12, weight='bold', slant='italic')
-        letra3 = font.Font(family='Arial', size=10, weight='bold')
+
         self.pag4.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
         self.finish_it = IntVar(self.pag4)
 
@@ -966,36 +1029,98 @@ class tela_cardapio(Cardapio, Pedido, Local):
         escolha_finish.configure(font=letra2)
         escolha_finish.place(relx=0.05, rely=0.13, relwidth=0.2, relheight=0.1)
 
-        op_finish1 = Radiobutton(self.pag4, text='Shoyo clássico', anchor='w', value= 1,
-        variable= self.finish_it)
+        finish_it = []
+        finish1 = IntVar(self.pag4)
+        finish2 = IntVar(self.pag4)
+        finish3 = IntVar(self.pag4)
+        finish4 = IntVar(self.pag4)
+        finish5 = IntVar(self.pag4)
+        finish6 = IntVar(self.pag4)
+        finish7 = IntVar(self.pag4)
+        finish8 = IntVar(self.pag4)
+        finish9 = IntVar(self.pag4)
+
+        op_finish1 = Checkbutton(self.pag4, text='Shoyo clássico', anchor='w',
+        variable= finish1)
         op_finish1.place(relx=0.05, rely=0.25, relwidth=0.25, relheight=0.1)
-        op_finish2 = Radiobutton(self.pag4, text='Wasabi', anchor='w', value= 2,
-        variable= self.finish_it)
+        op_finish2 = Checkbutton(self.pag4, text='Wasabi', anchor='w',
+        variable= finish2)
         op_finish2.place(relx=0.05, rely=0.35, relwidth=0.3, relheight=0.1)
-        op_finish3 = Radiobutton(self.pag4, text='Ponzu', anchor='w', value= 3,
-        variable= self.finish_it)
+        op_finish3 = Checkbutton(self.pag4, text='Ponzu', anchor='w',
+        variable= finish3)
         op_finish3.place(relx=0.05, rely=0.45, relwidth=0.25, relheight=0.1)
-        op_finish4 = Radiobutton(self.pag4, text='Cream cheese', anchor='w', value= 4,
-        variable= self.finish_it)
+        op_finish4 = Checkbutton(self.pag4, text='Cream cheese', anchor='w',
+        variable= finish4)
         op_finish4.place(relx=0.05, rely=0.55, relwidth=0.25, relheight=0.1)
-        op_finish5 = Radiobutton(self.pag4, text='Tarê', anchor='w', value= 5,
-        variable= self.finish_it)
+        op_finish5 = Checkbutton(self.pag4, text='Tarê', anchor='w',
+        variable= finish5)
         op_finish5.place(relx=0.05, rely=0.65, relwidth=0.3, relheight=0.1)
-        op_finish6 = Radiobutton(self.pag4, text='Tarê de laranja', anchor='w', value= 6,
-        variable= self.finish_it)
+        op_finish6 = Checkbutton(self.pag4, text='Tarê de laranja', anchor='w',
+        variable= finish6)
         op_finish6.place(relx=0.45, rely=0.25, relwidth=0.25, relheight=0.1)
-        op_finish7 = Radiobutton(self.pag4, text='Mel com gengibre', anchor='w', value= 7,
-        variable= self.finish_it)
+        op_finish7 = Checkbutton(self.pag4, text='Mel com gengibre', anchor='w',
+        variable= finish7)
         op_finish7.place(relx=0.45, rely=0.35, relwidth=0.32, relheight=0.1)
-        op_finish8 = Radiobutton(self.pag4, text='Molho de pimenta com srirancha', anchor='w', value= 8,
-        variable= self.finish_it)
+        op_finish8 = Checkbutton(self.pag4, text='Molho de pimenta com srirancha', anchor='w',
+        variable= finish8)
         op_finish8.place(relx=0.45, rely=0.45, relwidth=0.5, relheight=0.1)
-        op_finish9 = Radiobutton(self.pag4, text='Soyo de coco(+ R$3)', anchor='w', value= 9,
-        variable= self.finish_it)
+        op_finish9 = Checkbutton(self.pag4, text='Soyo de coco(+ R$3)', anchor='w',
+        variable= finish9)
         op_finish9.place(relx=0.45, rely=0.55, relwidth=0.4, relheight=0.1)
 
-        pag3 = Button(self.pag3, text='>>>>', command=lambda:[self.poke_4()])
-        pag3.place(relx=0.8, rely=0.85, relwidth=0.1, relheight=0.1)
+        def verifica_pag4():
+            try:
+                if finish1.get() == 1:
+                    finish_it.append(1)
+                if finish2.get() == 1:
+                    finish_it.append(2)
+                if finish3.get() == 1:
+                    finish_it.append(3)
+                if finish4.get() == 1:
+                    finish_it.append(4)
+                if finish5.get() == 1:
+                    finish_it.append(5)
+                if finish6.get() == 1:
+                    finish_it.append(6)
+                if finish7.get() == 1:
+                    finish_it.append(7)
+                if finish8.get() == 1:
+                    finish_it.append(8)
+                if finish9.get() == 1:
+                    finish_it.append(9)
+                    self.extra_poke.append(3)
+                elif len(finish_it) > 1:
+                    messagebox.showerror('ERRO', "Selecione apenas 1 opção de finish it")
+                    finish_it.clear()
+                elif len(finish_it) == 0:
+                    messagebox.showerror('ERRO', 'Selecione no minímo 1 opção de finish it')
+                    finish_it.clear()
+                finish_it.clear()
+            except error:
+                messagebox.showerror('ERRO', "Erro inesperado, contate o programador")
+
+        def add_poke():
+            self.memoria.items()
+            self.carrinho.delete(*self.carrinho.get_children())
+            global contador
+            contador = 0
+            if 'Monte seu poke' not in self.memoria.keys():
+                self.memoria['Monte seu poke'] = 1
+            else:
+                self.memoria['Monte seu poke'] +=1
+            for p, q in self.memoria.items():
+                if contador % 2 == 0:
+                    self.carrinho.insert(parent='', index='end', text='',
+                                    values=(q, p), tags=('cor2',))
+                else:
+                    self.carrinho.insert(parent='', index='end', text='',
+                                        values=(q, p), tags=('cor1',))
+                contador +=1
+            self.carrinho_compras.append(sum(self.extra_poke))
+            self.set_total()
+
+        pag4 = Button(self.pag4, text='ADD', command=lambda:[verifica_pag4(), add_poke()])
+        pag4.place(relx=0.8, rely=0.85, relwidth=0.1, relheight=0.1)
 
     def atualiza_tabela(self):
             self.menu.delete(*self.menu.get_children())
