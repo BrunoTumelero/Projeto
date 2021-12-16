@@ -13,7 +13,7 @@ class Janela(Entregador, Pedido):
     def __init__(self, root):
         super().__init__()
         self.root = root
-        self.root_entregas = Toplevel(root)
+        self.root_entregas = root
         self.root_entregas.title('Restaurante')
         self.root_entregas.geometry('800x500')
         self.menu()
@@ -329,10 +329,12 @@ class Janela(Entregador, Pedido):
         # Criar Treeview Frame
         self.tree_frame = Frame(self.root_entregas)
         self.tree_frame.place(relx=0.08, rely=0.02, relwidth=0.9, relheight=0.5)
+        self.tree_frame.configure(background='snow')
 
         # Criar Barra de rolagem Treeview
         tree_scroll = Scrollbar(self.tree_frame)
         tree_scroll.place(relx=0.92, rely=0.0, relwidth=0.02, relheight=1)
+        tree_scroll.configure(background='snow')
 
         # Criar Treeview
         self.lista = ttk.Treeview(self.tree_frame, yscrollcommand=tree_scroll.set,
@@ -472,20 +474,24 @@ class Janela(Entregador, Pedido):
         # Add Dados Entry Boxes
         self.data_frame = LabelFrame(self.root_entregas, text="Dados")
         self.data_frame.place(relx=0.05, rely=0.58, relwidth=0.9, relheight=0.2)
+        self.data_frame.configure(background='snow')
 
         nome_label = Label(self.data_frame, text="Nome")
         nome_label.place(relx=0.0, rely=0.15, relwidth=0.1, relheight=0.15)
-        self.nome_entry = Entry(self.data_frame)
+        nome_label.configure(background='snow')
+        self.nome_entry = Entry(self.data_frame, relief=FLAT)
         self.nome_entry.place(relx=0.1, rely=0.1, relwidth=0.3, relheight=0.3)
 
         bairro_label = Label(self.data_frame, text="Bairro")
         bairro_label.place(relx=0.45, rely=0.15, relwidth=0.1, relheight=0.15)
-        self.bairro_entry = Entry(self.data_frame)
+        bairro_label.configure(background='snow')
+        self.bairro_entry = Entry(self.data_frame, relief=FLAT)
         self.bairro_entry.place(relx=0.55, rely=0.1, relwidth=0.3, relheight=0.3)
         
         boy_label = Label(self.data_frame, text="Boy")
         boy_label.place(relx=0.12, rely=0.5, relwidth=0.3, relheight=0.3)
-        self.boy_entry = Entry(self.data_frame)
+        boy_label.configure(background='snow')
+        self.boy_entry = Entry(self.data_frame, relief=FLAT)
         self.boy_entry.place(relx=0.32, rely=0.5, relwidth=0.3, relheight=0.3)
 
     def atualiza_tabela(self):
@@ -560,22 +566,27 @@ class Janela(Entregador, Pedido):
         # Add Buttons
         self.button_frame = LabelFrame(self.root_entregas, text="Comandos")
         self.button_frame.place(relx=0.05, rely=0.8, relwidth=0.9, relheight=0.18)
+        self.button_frame.configure(background='snow')
         #consultar
-        consultar_button = Button(self.button_frame, image= img3, compound=CENTER,
-        command= lambda: [self.rusultado_consulta(self.nome_entry.get(),
+        consultar_button = Button(self.button_frame, image= img3, compound=CENTER, relief=FLAT,
+        activebackground='lightblue', command= lambda: [self.rusultado_consulta(self.nome_entry.get(),
         self.bairro_entry.get(), self.boy_entry.get())])
         consultar_button.place(relx=0.13, rely=0.1, relwidth=0.1, relheight=0.55)
+        consultar_button.configure(background='snow')
         consultar_button.imagem = img3
         #atualizar
-        atualizar_button = Button(self.button_frame, image= img2, compound=CENTER, command= lambda:[
+        atualizar_button = Button(self.button_frame, image= img2, compound=CENTER, relief=FLAT,
+        activebackground='lightblue', command= lambda:[
         self.atualiza_pedido(self.boy_entry.get()), self.atualiza_tabela()])
         atualizar_button.place(relx=0.43, rely=0.1, relwidth=0.1, relheight=0.55)
+        atualizar_button.configure(background='snow')
         atualizar_button. imagem = img2
         #apagar
-        apagar = Button(self.button_frame, image= img, compound=CENTER,
-        command= lambda:[self.apagar(self.idp),
+        apagar = Button(self.button_frame, image= img, compound=CENTER, relief=FLAT,
+        activebackground='lightblue', command= lambda:[self.apagar(self.idp),
         self.limpa(self.nome_entry, self.bairro_entry, self.boy_entry), self.atualiza_tabela()])
         apagar.place(relx=0.73, rely=0.1, relwidth=0.1, relheight=0.55)
+        apagar.configure(background='snow')
         apagar.imagem = img
 
     def tela_cadastrar(self):

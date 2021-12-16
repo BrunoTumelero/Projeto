@@ -46,7 +46,7 @@ class Pedido:
                 valor1 = c.fetchall()
                 lista_pratos.append(valor1[0][0])
                 self.total_pratos = sum(lista_pratos)
-
+            
             #adiciona a tele para o funcionario
             c.execute('SELECT entregas, pagar FROM funcionarios WHERE nome_func = %s', (func,))
             for x, y in c.fetchall():
@@ -58,7 +58,7 @@ class Pedido:
             conn.commit()
             #soma o valor do prato e da tele
             total = self.total_pratos + tele
-            
+        
             c.execute("""INSERT INTO pedidos(nome_cliente, nome_func, valor_total, tipo_tele, dia) 
             VALUES(%s, %s, %s, %s, %s)""", (nome_c, func, total, tipo, data))
             conn.commit()
@@ -80,6 +80,8 @@ class Pedido:
             conn.close()
         except AttributeError:
             messagebox.showerror('Pedido', 'Selecione o tipo de entrega')
+        except Exception:
+            messagebox.showinfo('Info', 'Algo deu errado')
 
     #selec com as informações de cada pedido
     def seleciona(self):

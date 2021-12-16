@@ -1,3 +1,4 @@
+from tkinter import messagebox
 import psycopg2
 
 class Cliente:
@@ -23,13 +24,19 @@ class Cliente:
         conn.close()
 
     def salvar(self, nome, end):
-        conn = self.conectar()
-        c = conn.cursor()
-        c.execute("""INSERT INTO Clientes(Nome_cliente, endereco)
-                  VALUES(%s, %s)""", (nome, end))
-        
-        conn.commit()
-        conn.close()
+        try:
+            if nome == ' ':
+                messagebox.showinfo('ERRO', 'Insira um nome válido')
+            else:
+                conn = self.conectar()
+                c = conn.cursor()
+                c.execute("""INSERT INTO Clientes(Nome_cliente, endereco)
+                        VALUES(%s, %s)""", (nome, end))
+                
+                conn.commit()
+                conn.close()
+        except:
+            messagebox.showwarning('ERRO', 'Cliente já cadastrado')
 
     def apagar(self, excluir):
         conn = self.conectar()
