@@ -1,7 +1,6 @@
 from tkinter import *
 from tkinter import ttk
 from datetime import *
-import tkinter
 from entregadoresv2 import *
 from pedido import Pedido
 from tela_cliente import tela_cardapio
@@ -10,12 +9,14 @@ from PIL import Image, ImageTk
 from janela_bairros import Tela_bairros
 
 class Janela(Entregador, Pedido):
-    def __init__(self, root):
+    def __init__(self, root, fundo, botoes_inicio):
         super().__init__()
         self.root = root
+        self.fundo = fundo
+        self.botoes_inicio = botoes_inicio
         self.root_entregas = root
         self.root_entregas.title('Restaurante')
-        self.root_entregas.geometry('800x500')
+        self.root_entregas.configure(background='snow')
         self.menu()
         self.view()
         self.widgets()
@@ -52,6 +53,9 @@ class Janela(Entregador, Pedido):
 
         # Configurar menu
         # opcoes do menu
+        my_menu.add_command(label='Inicio', command=lambda:[self.tree_frame.place_forget(),
+        self.data_frame.place_forget(), self.button_frame.place_forget(), self.fundo, self.botoes_inicio,
+        my_menu.destroy()])
         option_menu = Menu(my_menu, tearoff=0)
         my_menu.add_cascade(label="Opções", menu=option_menu)
         

@@ -9,16 +9,21 @@ from pedido import *
 from bairrosv2 import Local
 
 class tela_cliente(Cliente):
-  def __init__(self, root):
+  def __init__(self, root, fundo, botoes_inicio, escquece1, esquece2):
     super().__init__()
     self.root = root
     self.root_clientes = root
+    self.fundo = fundo
+    self.botoes_inicio = botoes_inicio
+    self.esq1 = escquece1
+    self.esq2 = esquece2
     self.root_clientes.title('Cliente')
     self.root_clientes.configure(background='snow')
     self.tabela()
     self.acessorios()
     self.botoes()
     self.menu()
+
     self.root_clientes.mainloop()
 
   def conectar(self):
@@ -70,11 +75,15 @@ class tela_cliente(Cliente):
   
   def menu(self):
     # Add Menu
-    menu_opcaoes = Menu(self.root_clientes)
-    self.root_clientes.config(menu=menu_opcaoes)
+    menu_opcoes = Menu(self.root_clientes)
+    self.root_clientes.config(menu=menu_opcoes)
+
+    menu_opcoes.add_command(label='Inicio', command=lambda:[self.tree_frame.place_forget(),
+    self.data_frame.place_forget(), self.frame_botao.place_forget(), self.fundo, self.botoes_inicio,
+    menu_opcoes.destroy()])
     # Configurar menu
-    menu_cliente = Menu(menu_opcaoes, tearoff=0)
-    menu_opcaoes.add_cascade(label="Opções", menu=menu_cliente)
+    menu_cliente = Menu(menu_opcoes, tearoff=0)
+    menu_opcoes.add_cascade(label="Opções", menu=menu_cliente)
         # opcoes do menu
     menu_cliente.add_command(label='Clientes', command=lambda:[self.clientes_geral()])
     menu_cliente.add_command(label='Clientes com pedidos', command=lambda:[self.tabela()])
@@ -235,7 +244,8 @@ class tela_cliente(Cliente):
     new_pedido = Button(self.frame_botao, text= 'Novo\nPedido', image= img_new, compound=LEFT,
     relief=FLAT, activebackground='lightblue', background='snow',
     command= lambda:[self.frame_botao.place_forget(), self.data_frame.place_forget(),
-    self.lista.place_forget(), self.tree_scroll.place_forget(),
+    self.lista.place_forget(), self.tree_scroll.place_forget(), self.esq1.place_forget(),
+    self.esq2.place_forget(),
     tela_cardapio(self.root, self.root_clientes, self.nome_entry.get().title(),
     self.endereco_entry.get().title())])
     new_pedido.configure(font=('Roman', 14))
@@ -1405,6 +1415,3 @@ class tela_cardapio(Cardapio, Pedido, Local):
         except Exception as erro:
             print(erro)
 
-
-#c = tela_cliente()
-#c

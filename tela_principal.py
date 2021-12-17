@@ -31,6 +31,7 @@ class Janela_principal(Pedido):
 			self.back.configure(background = 'snow')
 			
 		def widegets(self):
+
 			self.framebotao = Frame(self.root)
 			self.framebotao.place(relx = 0.0, rely = 0.65, relwidth = 1,
 								relheight = 0.35)
@@ -42,18 +43,18 @@ class Janela_principal(Pedido):
 			
 			cadastra_cliente = Button(self.framebotao, text = 'Clientes', image=img2, compound=LEFT,
 			relief=FLAT, activebackground='lightblue',
-			activeforeground='#0000FF', anchor='w', command= lambda: 
-			[self.back.place_forget(), self.framebotao.place_forget(), tela_cliente(self.root)])
-			cadastra_cliente.place(relx = 0.22, rely = 0.5, relwidth = 0.18,
-										relheight = 0.35)
+			activeforeground='snow', anchor='w', command= lambda: 
+			[self.back.place_forget(), self.framebotao.place_forget(), tela_cliente(self.root,
+			self.background(), self.widegets(), self.framebotao, self.back)])
+			cadastra_cliente.place(relx = 0.22, rely = 0.5, relwidth = 0.18, relheight = 0.35)
 			cadastra_cliente.imagem = img2
 			cadastra_cliente['background'] = 'Snow'
 			cadastra_cliente.configure(font = ('Helvetica', 16))
 			
 			consultar = Button(self.framebotao, text = 'Entregas', image=img3, compound=LEFT,
-			relief=FLAT, activebackground='Crimson',
-			activeforeground='DarkGreen', command = lambda: [self.back.place_forget(),
-			self.framebotao.place_forget(), Janela(self.root)])
+			relief=FLAT, activebackground='lightblue',
+			activeforeground='snow', command = lambda: [self.back.place_forget(),
+			self.framebotao.place_forget(), Janela(self.root, self.background(), self.widegets())])
 			consultar.place(relx = 0.62, rely = 0.5, relwidth = 0.18,
 										relheight = 0.35)
 			consultar.imagem = img3
