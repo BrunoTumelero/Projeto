@@ -7,6 +7,7 @@ from Cliente import *
 from cardapio_v2 import Cardapio, Modelo_prato
 from pedido import *
 from bairrosv2 import Local
+import json
 
 class tela_cliente(Cliente):
   def __init__(self, root, fundo, botoes_inicio, escquece1, esquece2):
@@ -213,13 +214,14 @@ class tela_cliente(Cliente):
     nome_label = Label(self.data_frame, text="Nome")
     nome_label.configure(font=('helvetica', 16), background='snow')
     nome_label.place(relx=0.15, rely=0.1, relwidth=0.2, relheight=0.35)
-    self.nome_entry = Entry(self.data_frame, relief=FLAT)
+    self.nome_entry = Entry(self.data_frame, relief=FLAT, highlightbackground='lightblue')
     self.nome_entry.place(relx=0.1, rely=0.4, relwidth=0.3, relheight=0.28)
+    self.nome_entry.focus()
 
     endereco_label = Label(self.data_frame, text="Bairro")
     endereco_label.configure(font=('helvetica', 16), background='snow')
     endereco_label.place(relx=0.64, rely=0.1, relwidth=0.2, relheight=0.35)
-    self.endereco_entry = Entry(self.data_frame, relief=FLAT)
+    self.endereco_entry = Entry(self.data_frame, relief=FLAT, highlightbackground='lightblue')
     self.endereco_entry.place(relx=0.585, rely=0.4, relwidth=0.3, relheight=0.28)
 
   def botoes(self):
@@ -230,7 +232,8 @@ class tela_cliente(Cliente):
     img1 = ImageTk.PhotoImage(bt_cadastra)
     lista = self.lista
     botao_salvar = Button(self.frame_botao, text= 'Cadastrar', image= img1, compound=LEFT,
-    relief=FLAT, activebackground='lightblue', background='snow',
+    relief=FLAT, activebackground='lightblue', background='snow', activeforeground='snow',
+    highlightbackground='snow',
     command= lambda: [self.salvar(self.nome_entry.get().title(), self.endereco_entry.get().title()),
     self.limpa(self.nome_entry, self.endereco_entry)])
     botao_salvar.configure(font=('Roman', 14))
@@ -242,7 +245,8 @@ class tela_cliente(Cliente):
     bt_new = Image.open('Imagens/carrinho.ico')
     img_new = ImageTk.PhotoImage(bt_new)
     new_pedido = Button(self.frame_botao, text= 'Novo\nPedido', image= img_new, compound=LEFT,
-    relief=FLAT, activebackground='lightblue', background='snow',
+    relief=FLAT, activebackground='lightblue', background='snow', activeforeground='snow',
+    highlightbackground='snow',
     command= lambda:[self.frame_botao.place_forget(), self.data_frame.place_forget(),
     self.lista.place_forget(), self.tree_scroll.place_forget(), self.esq1.place_forget(),
     self.esq2.place_forget(),
@@ -255,7 +259,8 @@ class tela_cliente(Cliente):
     bt_pesquisa = Image.open('Imagens/consultar.ico')
     img_pesquisar = ImageTk.PhotoImage(bt_pesquisa)
     pesquisar = Button(self.frame_botao, text= 'Pesquisar', image= img_pesquisar, compound=LEFT,
-    relief=FLAT, activebackground='lightblue', background='snow',
+    relief=FLAT, activebackground='lightblue', background='snow', activeforeground='snow',
+    highlightbackground='snow',
     command= lambda: [self.pesquisar(self.nome_entry.get(), self.lista), 
     self.limpa(self.nome_entry, self.endereco_entry)])
     pesquisar.configure(font=('Roman', 14))
@@ -413,7 +418,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
             self.carrinho_compras.append(x[0])
 
     def acessorios(self):
-        self.boy_label = Label(self.root_cardapio, text='Motoboy')
+        self.boy_label = Label(self.root_cardapio, text='Motoboy', )
         self.boy_label.configure(background='snow')
         self.boy_entry = Entry(self.root_cardapio)
 
@@ -425,23 +430,27 @@ class tela_cardapio(Cardapio, Pedido, Local):
         self.data_entry.place(relx=0.4, rely=0.83, relwidth=0.25, relheight=0.05)
 
         self.tipo = IntVar(self.root_cardapio)
-        retirada = Radiobutton(self.root_cardapio, text= 'Retirada', variable= self.tipo, value=1)
+        retirada = Radiobutton(self.root_cardapio, text= 'Retirada', variable= self.tipo, value=1,
+        activeforeground='blue', highlightbackground='snow', activebackground='snow')
         retirada.place(relx=0.05, rely=0.65, relwidth=0.12, relheight=0.08)
         retirada.configure(background='snow')
-        ifood = Radiobutton(self.root_cardapio, text= 'Ifood', variable= self.tipo, value=2)
+        ifood = Radiobutton(self.root_cardapio, text= 'Ifood', variable= self.tipo, value=2,
+        activeforeground='blue', highlightbackground='snow', activebackground='snow')
         ifood.place(relx=0.27, rely=0.65, relwidth=0.1, relheight=0.08)
         ifood.configure(background='snow')
-        particular = Radiobutton(self.root_cardapio, text= 'Tele Wonder', variable= self.tipo, value=3)
+        particular = Radiobutton(self.root_cardapio, text= 'Tele Wonder', variable= self.tipo, value=3,
+        activeforeground='blue', highlightbackground='snow', activebackground='snow')
         particular.place(relx=0.48, rely=0.65, relwidth=0.15, relheight=0.08)
         particular.configure(background='snow')
 
         bt_fpedido = Image.open('Imagens/pagar.png')
         img_fpedido = ImageTk.PhotoImage(bt_fpedido)
         finalizar = Button(self.root_cardapio, image= img_fpedido, compound=CENTER, background='snow',
+        activebackground='lightblue', highlightbackground='snow', relief=FLAT,
         command=lambda:[self.novo_pedido(self.info_cliente, self.memoria, self.boy_entry.get().title(),
         self.tipo_tele(), self.tipo_pedido, self.data_entry.get()),
         self.carrinho.delete(*self.carrinho.get_children()), self.boy_entry.delete(0, 'end'),
-        self.data_entry.delete(0, 'end'), self.total_pedido(0), self.root_cardapio.destroy()])
+        self.data_entry.delete(0, 'end'), self.total_pedido(0)])
         finalizar.place(relx=0.8, rely=0.8, relwidth=0.12, relheight=0.1)
         finalizar.imagem = img_fpedido
 
@@ -485,7 +494,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
                 self.memoria[self.prato] +=1
                 self.modelo.set_prato(self.valor.get()), self.inserir(), self.soma_pratos(), 
                 self.set_total()
-
+            
     def deseleciona(self, event):
         conn = self.conectar()
         c = conn.cursor()
@@ -716,6 +725,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
         self.menu.bind('<Button-3>', self.seleciona)
 
     def monte_poke(self):
+        
         self.pag1 = Frame(self.frame_menu)
         self.pag1.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
         self.pag1.configure(background='snow')
@@ -845,8 +855,6 @@ class tela_cardapio(Cardapio, Pedido, Local):
                     self.proteina.append(4)
                     self.extra_poke.append(50)
                 erros()
-                self.proteina.clear()
-                self.escolha_base.clear()
             except AttributeError as error:
                 messagebox.showwarning('ERRO', error)
 
@@ -887,7 +895,6 @@ class tela_cardapio(Cardapio, Pedido, Local):
                 messagebox.showerror('MAKE IT incompleto', 'Escolha no minímo 1 opção do MAKE IT')
                 self.make_it.clear()
             elif tamanho < 5 or tamanho >= 1:
-                self.make_it.clear()
                 self.poke_3()
         def check_make():
             if self.make1.get() == 1:
@@ -1007,7 +1014,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
         letra = font.Font(family='Arial', size= 20, weight='bold')
         letra2 = font.Font(family='Arial', size=12, weight='bold', slant='italic')
         
-        crunch_it = []
+        self.crunch_it = []
         self.crunch1 = IntVar(self.pag3)
         self.crunch2 = IntVar(self.pag3)
         self.crunch3 = IntVar(self.pag3)
@@ -1045,7 +1052,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
         escolha_top.configure(font=letra2, background='snow')
         escolha_top.place(relx=0.45, rely=0.13, relwidth=0.4, relheight=0.1)
 
-        top_it = []
+        self.top_it = []
         top1 = IntVar(top)
         top2 = IntVar(top)
         top3 = IntVar(top)
@@ -1091,45 +1098,44 @@ class tela_cardapio(Cardapio, Pedido, Local):
         def verifica_pg3():
             try:
                 if self.crunch1.get() == 1:
-                    crunch_it.append(1)
+                    self.crunch_it.append(1)
                 if self.crunch2.get() == 1:
-                    crunch_it.append(2)
+                    self.crunch_it.append(2)
                 if self.crunch3.get() == 1:
-                    crunch_it.append(3)
-                elif len(crunch_it) > 1:
+                    self.crunch_it.append(3)
+                elif len(self.crunch_it) > 1:
                     messagebox.showerror('ERRO', 'Selecione apenas 1 opção de crunch it')
-                    crunch_it.clear()
-                    top_it.clear()
-                elif len(crunch_it) == 0:
+                    self.crunch_it.clear()
+                    self.top_it.clear()
+                elif len(self.crunch_it) == 0:
                     messagebox.showerror('ERRO', 'Selecione no minímo 1 opção de crunch it')
-                    crunch_it.clear()
-                    top_it.clear()
+                    self.crunch_it.clear()
+                    self.top_it.clear()
                 if top1.get() == 1:
-                    top_it.append(1)
+                    self.top_it.append(1)
                 if top2.get() == 1:
-                    top_it.append(2)
+                    self.top_it.append(2)
                 if top3.get() == 1:
-                    top_it.append(3)
+                    self.top_it.append(3)
                 if top4.get() == 1:
-                    top_it.append(4)
+                    self.top_it.append(4)
                 if top5.get() == 1:
-                    top_it.append(5)
+                    self.top_it.append(5)
                 if top6.get() == 1:
-                    top_it.append(6)
+                    self.top_it.append(6)
                 if top7.get() == 1:
-                    top_it.append(7)
+                    self.top_it.append(7)
                 if top8.get() == 1:
-                    top_it.append(8)
-                elif len(top_it) > 1:
+                    self.top_it.append(8)
+                elif len(self.top_it) > 1:
                     messagebox.showerror('ERRO', 'Selecione apenas 1 opção de top it')
-                    top_it.clear()
-                    crunch_it.clear()
-                elif len(top_it) == 0:
+                    self.top_it.clear()
+                    self.crunch_it.clear()
+                elif len(self.top_it) == 0:
                     messagebox.showerror('ERRO', 'Selecione 1 opção de top it')
-                    top_it.clear()
-                    crunch_it.clear()
-                top_it.clear()
-                crunch_it.clear()
+                    self.top_it.clear()
+                    self.crunch_it.clear()
+                
                 self.poke_4()
             except error:
                 messagebox.showerror('ERRO', "Erro inesperado, contate o programador")
@@ -1167,7 +1173,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
         escolha_finish.configure(font=letra2, background='snow')
         escolha_finish.place(relx=0.05, rely=0.13, relwidth=0.2, relheight=0.1)
 
-        finish_it = []
+        self.finish_it = []
         finish1 = IntVar(self.pag4)
         finish2 = IntVar(self.pag4)
         finish3 = IntVar(self.pag4)
@@ -1227,31 +1233,33 @@ class tela_cardapio(Cardapio, Pedido, Local):
         def verifica_pag4():
             try:
                 if finish1.get() == 1:
-                    finish_it.append(1)
+                    self.finish_it.append(1)
                 if finish2.get() == 1:
-                    finish_it.append(2)
+                    self.finish_it.append(2)
                 if finish3.get() == 1:
-                    finish_it.append(3)
+                    self.finish_it.append(3)
                 if finish4.get() == 1:
-                    finish_it.append(4)
+                    self.finish_it.append(4)
                 if finish5.get() == 1:
-                    finish_it.append(5)
+                    self.finish_it.append(5)
                 if finish6.get() == 1:
-                    finish_it.append(6)
+                    self.finish_it.append(6)
                 if finish7.get() == 1:
-                    finish_it.append(7)
+                    self.finish_it.append(7)
                 if finish8.get() == 1:
-                    finish_it.append(8)
+                    self.finish_it.append(8)
                 if finish9.get() == 1:
-                    finish_it.append(9)
+                    self.finish_it.append(9)
                     self.extra_poke.append(3)
-                elif len(finish_it) > 1:
+                elif len(self.finish_it) > 1:
                     messagebox.showerror('ERRO', "Selecione apenas 1 opção de finish it")
-                    finish_it.clear()
-                elif len(finish_it) == 0:
+                    self.finish_it.clear()
+                elif len(self.finish_it) == 0:
                     messagebox.showerror('ERRO', 'Selecione no minímo 1 opção de finish it')
-                    finish_it.clear()
-                finish_it.clear()
+                    self.finish_it.clear()
+                self.finish = self.finish_it
+                self.finish_it.clear()
+                
             except error:
                 messagebox.showerror('ERRO', "Erro inesperado, contate o programador")
 
@@ -1279,6 +1287,26 @@ class tela_cardapio(Cardapio, Pedido, Local):
             c = conn.cursor()
             c.execute("""UPDATE menu SET valor_prato = %s WHERE nome_prato = %s""",
             (sum(self.extra_poke), 'Monte seu poke'))
+
+            #salva as opcoes do poke
+            opcoes_poke = {'base': self.escolha_base, 'proteina': self.proteina,
+            'make_it': self.make_it, 'crunch_it': self.crunch_it, 'top_it': self.top_it,
+            'finish_it': self.finish}
+            try:
+                memory = open('Escolhas.json', 'r', encoding='utf8')
+                memoria = json.load(memory)
+                memory.close()
+                pok = {self.info_cliente: opcoes_poke}
+                memoria.append(pok)
+                memory =  open('Escolhas.json', 'w', encoding= 'utf8')
+                json.dump(memoria, memory, indent=2)
+                memory.close() 
+            except FileNotFoundError:
+                poke = [{self.info_cliente: opcoes_poke}]
+                with open('Escolhas.json', 'w', encoding= 'utf8') as f:
+                    json.dump(poke, f, indent=2)
+                memory = open('Escolhas.json', 'r')
+                 
 
         pag4 = Button(self.pag4, text='ADD', activebackground='lightblue', highlightbackground='snow',
         command=lambda:[verifica_pag4(), add_poke()])

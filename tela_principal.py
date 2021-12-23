@@ -31,7 +31,6 @@ class Janela_principal(Pedido):
 			self.back.configure(background = 'snow')
 			
 		def widegets(self):
-
 			self.framebotao = Frame(self.root)
 			self.framebotao.place(relx = 0.0, rely = 0.65, relwidth = 1,
 								relheight = 0.35)
@@ -43,7 +42,7 @@ class Janela_principal(Pedido):
 			
 			cadastra_cliente = Button(self.framebotao, text = 'Clientes', image=img2, compound=LEFT,
 			relief=FLAT, activebackground='lightblue',
-			activeforeground='snow', anchor='w', command= lambda: 
+			highlightbackground='snow', anchor='w', command= lambda: 
 			[self.back.place_forget(), self.framebotao.place_forget(), tela_cliente(self.root,
 			self.background(), self.widegets(), self.framebotao, self.back)])
 			cadastra_cliente.place(relx = 0.22, rely = 0.5, relwidth = 0.18, relheight = 0.35)
@@ -53,7 +52,7 @@ class Janela_principal(Pedido):
 			
 			consultar = Button(self.framebotao, text = 'Entregas', image=img3, compound=LEFT,
 			relief=FLAT, activebackground='lightblue',
-			activeforeground='snow', command = lambda: [self.back.place_forget(),
+			highlightbackground='snow', command = lambda: [self.back.place_forget(),
 			self.framebotao.place_forget(), Janela(self.root, self.background(), self.widegets())])
 			consultar.place(relx = 0.62, rely = 0.5, relwidth = 0.18,
 										relheight = 0.35)

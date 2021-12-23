@@ -82,8 +82,17 @@ class Pedido:
             messagebox.showerror('Pedido', 'Selecione o tipo de entrega')
         except Exception:
             messagebox.showinfo('Info', 'Algo deu errado')
-
     #selec com as informações de cada pedido
+    def monta_poke(self):
+        conn = self.conectar()
+        c = conn.cursor()
+        c.execute("""create table if not exists monte_seu_poke(id_poke serial,
+					id_pedido integer references pedido(id_pedido),
+					base integer, proteina integer, make_it integer, crunch_it integer, 
+                    top_it integer, finish_it integer
+                    valor_poke integer references pedido(valor_total),
+                    tipo_tele integer,
+					dia date not null""")
     def seleciona(self):
         conn = self.conectar()
         c = conn.cursor()
