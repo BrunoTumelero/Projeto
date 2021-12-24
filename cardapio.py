@@ -8,284 +8,8 @@ from cardapio_v2 import Cardapio, Modelo_prato
 from pedido import *
 from bairrosv2 import Local
 import json
-#from cardapio import tela_cardapio
 
-class tela_cliente(Cliente):
-  def __init__(self, root, fundo, botoes_inicio, escquece1, esquece2):
-    super().__init__()
-    self.root = root
-    self.root_clientes = root
-    self.fundo = fundo
-    self.botoes_inicio = botoes_inicio
-    self.esq1 = escquece1
-    self.esq2 = esquece2
-    self.root_clientes.title('Cliente')
-    self.root_clientes.configure(background='snow')
-    self.clientes_geral()
-    self.acessorios()
-    self.botoes()
-    self.menu()
 
-    self.root_clientes.mainloop()
-
-  def conectar(self):
-    return super().conectar()
-
-  def mostrar(self):
-    return super().mostrar()
-
-  def salvar(self, nome, end):
-    return super().salvar(nome, end)
-
-  def apagar(self):
-    return super().apagar()
-
-  def atualizar(self, lista):
-    return super().atualizar(lista)
-
-  def limpa(self, nome, endereco):
-    return super().limpa(nome, endereco)
-
-  def pesquisar(self, nome, lista):
-    lista.delete(*lista.get_children())
-    
-    conn = self.conectar()
-    c = conn.cursor()
-    nome_pesquisa = f'%{nome}%'.title()
-    c.execute("""SELECT * FROM clientes
-            WHERE nome_cliente LIKE %s""", (nome_pesquisa,))
-
-    global contador_cliente
-    contador_cliente = 0
-
-    for num, nome, end in c.fetchall():
-        if contador_cliente % 2 == 0:
-            lista.insert(parent='', index='0', text='',
-                           values=(num, nome, end),
-                           tags=('cor1',))
-
-        else:
-          lista.insert(parent='', index='0', text='',
-                                 values=(num, nome, end),
-                                 tags=('cor2',))
-        contador_cliente += 1
-        conn.close()
-  
-  def menu(self):
-    # Add Menu
-    menu_opcoes = Menu(self.root_clientes)
-    self.root_clientes.config(menu=menu_opcoes)
-
-    menu_opcoes.add_command(label='Inicio', command=lambda:[self.tree_frame.place_forget(),
-    self.data_frame.place_forget(), self.frame_botao.place_forget(), self.fundo, self.botoes_inicio,
-    menu_opcoes.destroy()])
-    # Configurar menu
-    menu_cliente = Menu(menu_opcoes, tearoff=0)
-    menu_opcoes.add_cascade(label="Opções", menu=menu_cliente)
-        # opcoes do menu
-    menu_cliente.add_command(label='Clientes', command=lambda:[self.clientes_geral()])
-    menu_cliente.add_command(label='Clientes com pedidos', command=lambda:[self.tabela()])
-
-  def clientes_geral(self):
-    estilo = ttk.Style()
-    estilo.theme_use('default')
-    estilo.configure("geral.Treeview", background="#D3D3D3", foreground="black",
-                    rowheight=25, fieldbackground="#D3D3D3", font='Helvetica')
-    estilo.map('geral.treeview', background=[('selected', "#347083")])
-    self.tree_frame = Frame(self.root_clientes)
-    self.tree_frame.place(relx=0.02, rely=0.05, relwidth=0.95, relheight=0.5)
-    self.tree_frame.configure(background='snow')
-    
-    self.barra = Scrollbar(self.tree_frame)
-    self.barra.place(relx=0.97, rely=0.0, relwidth=0.02, relheight=1)
-    self.barra.configure(background='snow')
-
-    self.todos_clientes = ttk.Treeview(self.tree_frame, style= 'geral.Treeview', 
-                                      yscrollcommand=self.barra.set, selectmode="extended")
-    self.todos_clientes.place(relx=0.02, rely=0.0, relwidth=0.95, relheight=1)
-
-    self.barra.config(command=self.todos_clientes.yview)
-
-    self.todos_clientes['columns'] = ("Id", "Nome", "Endereço")
-    self.todos_clientes.column("#0", width=0, stretch=NO)
-    self.todos_clientes.column("Id", anchor=W, width=20)
-    self.todos_clientes.column("Nome", anchor=CENTER, width=450)
-    self.todos_clientes.column("Endereço", anchor=CENTER, width=200)
-
-    self.todos_clientes.heading("#0", text="", anchor=W)
-    self.todos_clientes.heading("Id", text="Id", anchor=CENTER)
-    self.todos_clientes.heading("Nome", text="Nome", anchor=CENTER)
-    self.todos_clientes.heading("Endereço", text="Endereço", anchor=CENTER)
-
-    self.todos_clientes.tag_configure('cor1', background="white")
-    self.todos_clientes.tag_configure('cor2', background="lightblue")
-
-    conn = self.conectar()
-
-    c = conn.cursor()
-    c.execute("""SELECT * FROM clientes""")
-
-    global contador_cliente
-    contador_cliente = 0
-
-    for idd, nome, loc in c.fetchall():
-        if contador_cliente % 2 == 0:
-            self.todos_clientes.insert(parent='', index='end', text='',
-            values=(idd, nome, loc), tags=('cor2',))
-        else:
-          self.todos_clientes.insert(parent='', index='end', text='',
-              values=(idd, nome, loc), tags=('cor1',))
-        contador_cliente += 1
-    conn.close()
-    self.todos_clientes.bind('<Double-Button-1>', self.seleciona_cliente)
-
-  def tabela(self):
-    self.todos_clientes.place_forget()
-    self.barra.place_forget()
-    style = ttk.Style()
-    style.theme_use('default')
-    style.configure("cliente.Treeview",
-                background="#D3D3D3",
-                foreground="black",
-                rowheight=25,
-                fieldbackground="#D3D3D3",
-                font='Helvetica')
-    style.map('cliente.Treeview', background=[('selected', "#347083")])
-
-    self.tree_scroll = Scrollbar(self.tree_frame)
-    self.tree_scroll.place(relx=0.97, rely=0.0, relwidth=0.02, relheight=1)
-    self.tree_scroll.configure(background='snow')
-
-    self.lista = ttk.Treeview(self.tree_frame, style= 'cliente.Treeview', 
-                              yscrollcommand=self.tree_scroll.set, selectmode="extended")
-    self.lista.place(relx=0.02, rely=0.0, relwidth=0.95, relheight=1)
-
-    self.tree_scroll.config(command=self.lista.yview)
-
-    self.lista['columns'] = ("Nome", "Endereço", "Numero_de_pedidos")
-    self.lista.column("#0", width=0, stretch=NO)
-    self.lista.column("Nome", anchor=W, width=250)
-    self.lista.column("Endereço", anchor=W, width=250)
-    self.lista.column("Numero_de_pedidos", anchor=CENTER, width=200)
-
-    self.lista.heading("#0", text="", anchor=W)
-    self.lista.heading("Nome", text="Nome", anchor=CENTER)
-    self.lista.heading("Endereço", text="Endereço", anchor=CENTER)
-    self.lista.heading("Numero_de_pedidos", text="Numero de pedidos", anchor=CENTER)
-
-    self.lista.tag_configure('cor1', background="white")
-    self.lista.tag_configure('cor2', background="lightblue")
-
-    conn = self.conectar()
-
-    c = conn.cursor()
-    c.execute("""SELECT cl.nome_cliente, cl.endereco, COUNT(pe.nome_cliente) 
-                    FROM clientes as cl
-                    JOIN pedidos as pe on cl.nome_cliente = pe.nome_cliente
-                    GROUP BY cl.nome_cliente""")
-
-    global contador_cliente
-    contador_cliente = 0
-
-    for nome, end, num in c.fetchall():
-        if contador_cliente % 2 == 0:
-            self.lista.insert(parent='', index='end', text='',
-                           values=(nome, end, num),
-                           tags=('cor2',))
-
-        else:
-          self.lista.insert(parent='', index='end', text='',
-                                 values=(nome, end, num),
-                                 tags=('cor1',))
-        contador_cliente += 1
-    conn.close()
-    self.lista.bind('<Double-Button-1>', self.seleciona)
-
-  def acessorios(self):
-    self.data_frame = LabelFrame(self.root_clientes, text= 'Novo cliente')
-    self.data_frame.place(relx=0.05, rely=0.58, relwidth=0.9, relheight=0.2)
-    self.data_frame.configure(background='snow')
-
-    nome_label = Label(self.data_frame, text="Nome")
-    nome_label.configure(font=('helvetica', 16), background='snow')
-    nome_label.place(relx=0.15, rely=0.1, relwidth=0.2, relheight=0.35)
-    self.nome_entry = Entry(self.data_frame, relief=FLAT, highlightbackground='lightblue')
-    self.nome_entry.place(relx=0.1, rely=0.4, relwidth=0.3, relheight=0.28)
-    self.nome_entry.focus()
-
-    endereco_label = Label(self.data_frame, text="Bairro")
-    endereco_label.configure(font=('helvetica', 16), background='snow')
-    endereco_label.place(relx=0.64, rely=0.1, relwidth=0.2, relheight=0.35)
-    self.endereco_entry = Entry(self.data_frame, relief=FLAT, highlightbackground='lightblue')
-    self.endereco_entry.place(relx=0.585, rely=0.4, relwidth=0.3, relheight=0.28)
-
-  def botoes(self):
-    self.frame_botao = Frame(self.root_clientes)
-    self.frame_botao.place(relx=0.05, rely=0.8, relwidth=0.9, relheight=0.18)
-    self.frame_botao.configure(background='snow')
-    bt_cadastra = Image.open('Imagens/add.ico')
-    img1 = ImageTk.PhotoImage(bt_cadastra)
-    botao_salvar = Button(self.frame_botao, text= 'Cadastrar', image= img1, compound=LEFT,
-    relief=FLAT, activebackground='lightblue', background='snow', activeforeground='snow',
-    highlightbackground='snow',
-    command= lambda: [self.salvar(self.nome_entry.get().title(), self.endereco_entry.get().title()),
-    self.limpa(self.nome_entry, self.endereco_entry), self.clientes_geral()])
-    botao_salvar.configure(font=('Roman', 14))
-    botao_salvar.place(relx=0.1, rely=0.3, relwidth=0.2, relheight=0.45)
-    botao_salvar.imagem = img1
-
-    bt_fpedido = Image.open('Imagens/pagar.png')
-    img_fpedido = ImageTk.PhotoImage(bt_fpedido)
-    bt_new = Image.open('Imagens/carrinho.ico')
-    img_new = ImageTk.PhotoImage(bt_new)
-    new_pedido = Button(self.frame_botao, text= 'Novo\nPedido', image= img_new, compound=LEFT,
-    relief=FLAT, activebackground='lightblue', background='snow', activeforeground='snow',
-    highlightbackground='snow',
-    command= lambda:[self.frame_botao.place_forget(), self.data_frame.place_forget(),
-    tela_cardapio(self.root, self.root_clientes, self.nome_entry.get().title(),
-    self.endereco_entry.get().title(), self.fundo, self.botoes_inicio),
-    
-    self.tree_frame.place_forget(),
-    ])
-    new_pedido.configure(font=('Roman', 14))
-    new_pedido.place(relx=0.42, rely=0.3, relwidth=0.2, relheight=0.52)
-    new_pedido.imagem = img_new
-
-    bt_pesquisa = Image.open('Imagens/consultar.ico')
-    img_pesquisar = ImageTk.PhotoImage(bt_pesquisa)
-    pesquisar = Button(self.frame_botao, text= 'Pesquisar', image= img_pesquisar, compound=LEFT,
-    relief=FLAT, activebackground='lightblue', background='snow', activeforeground='snow',
-    highlightbackground='snow',
-    command= lambda: [self.clientes_geral() ,self.pesquisar(self.nome_entry.get(), self.todos_clientes), 
-    self.limpa(self.nome_entry, self.endereco_entry)])
-    pesquisar.configure(font=('Roman', 14))
-    pesquisar.place(relx=0.75, rely=0.3, relwidth=0.2, relheight=0.45)
-    pesquisar.imagem = img_pesquisar
-  
-  def inserir(self, name, end):
-    self.nome_entry.insert(name, 'end')
-    self.endereco_entry.insert(end, 'end')
-
-  def seleciona(self, event):
-    self.limpa(self.nome_entry, self.endereco_entry)
-    for x in self.lista.selection():
-      n, e, p = self.lista.item(x, 'values')
-      self.nome_entry.insert(END, n)
-      self.endereco_entry.insert(END, e)
-    return self.nome_entry.get()
-  
-  def seleciona_cliente(self, event):
-    self.limpa(self.nome_entry, self.endereco_entry)
-    for x in self.todos_clientes.selection():
-      i, n, e= self.todos_clientes.item(x, 'values')
-      self.nome_entry.insert(END, n)
-      self.endereco_entry.insert(END, e)
-
-  def dados(self):
-    name = self.nome_entry.get()
-    local = self.endereco_entry.get()
-    print(name, local)
-    return name, local
 
 class tela_cardapio(Cardapio, Pedido, Local):
     def __init__(self, root, root_cardapio, info_cliente, end_cliente, fundo, botoes_inicio):
@@ -360,11 +84,9 @@ class tela_cardapio(Cardapio, Pedido, Local):
         option_menu = Menu(my_menu, tearoff=0)
         my_menu.add_cascade(label="Opções", menu=option_menu)
         # opcoes do menu
-        option_menu.add_command(label="Configurar pratos", command= lambda:[self.add_prato()])
+        option_menu.add_command(label="Cardapio", command= lambda:[self.add_prato()])
         option_menu.add_command(label="Monte seu poke", command= lambda:[self.menu.place_forget(),
         self.monte_poke()])
-        option_menu.add_command(label="Menu", command= lambda:[self.pag1.place_forget(),
-        self.menu_geral()])
 
     def add_prato(self):
         self.janela = Toplevel(self.root_cardapio)
@@ -414,7 +136,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
     def soma_pratos(self):
         conn = self.conectar()
         c = conn.cursor()
-        c.execute("""SELECT valor_prato FROM menu WHERE nome_prato = %s""", (self.prato,))
+        c.execute('''SELECT valor_prato FROM menu WHERE nome_prato = %s''', (self.prato,))
         preco = c.fetchall()
         for x in preco:
             self.carrinho_compras.append(x[0])
@@ -730,6 +452,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
         self.menu.bind('<Button-3>', self.seleciona)
 
     def monte_poke(self):
+        
         self.pag1 = Frame(self.frame_menu)
         self.pag1.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
         self.pag1.configure(background='snow')
