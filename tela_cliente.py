@@ -21,6 +21,7 @@ class tela_cliente(Cliente):
     self.esq2 = esquece2
     self.root_clientes.title('Cliente')
     self.root_clientes.configure(background='snow')
+    self.tabela_geral()
     self.clientes_geral()
     self.acessorios()
     self.botoes()
@@ -76,19 +77,17 @@ class tela_cliente(Cliente):
     menu_opcoes = Menu(self.root_clientes)
     self.root_clientes.config(menu=menu_opcoes)
 
-    menu_opcoes.add_command(label='Inicio', command=lambda:[self.fundo, self.botoes_inicio,
-    self.tree_frame.destroy(),
-    self.tabela_clientes.destroy(), self.com_pedidos.destroy(),
-    self.data_frame.place_forget(), self.frame_botao.place_forget(),
-    menu_opcoes.destroy()])
+    menu_opcoes.add_command(label='Inicio', command=lambda:[self.tree_frame.destroy(),
+    menu_opcoes.destroy(), self.data_frame.place_forget(), self.frame_botao.place_forget(),
+    self.fundo, self.botoes_inicio])
     # Configurar menu
     menu_cliente = Menu(menu_opcoes, tearoff=0)
     menu_opcoes.add_cascade(label="Opções", menu=menu_cliente)
-        # opcoes do menu
+    # opcoes do menu
     menu_cliente.add_command(label='Clientes', command=lambda:[self.clientes_geral()])
     menu_cliente.add_command(label='Clientes com pedidos', command=lambda:[self.tabela()])
 
-  def clientes_geral(self):
+  def tabela_geral(self):
     estilo = ttk.Style()
     estilo.theme_use('default')
     estilo.configure("geral.Treeview", background="#D3D3D3", foreground="black",
@@ -97,114 +96,95 @@ class tela_cliente(Cliente):
     self.tree_frame = Frame(self.root_clientes)
     self.tree_frame.place(relx=0.02, rely=0.05, relwidth=0.95, relheight=0.5)
     self.tree_frame.configure(background='snow')
+    self.barra = Scrollbar(self.tree_frame)
+    self.barra.place(relx=0.97, rely=0.0, relwidth=0.02, relheight=1)
+    self.barra.configure(background='snow')
+
+    self.tabela_clientes = ttk.Treeview(self.tree_frame, style= 'geral.Treeview', 
+                                    yscrollcommand=self.barra.set, selectmode="extended")
+    self.tabela_clientes.place(relx=0.02, rely=0.0, relwidth=0.95, relheight=1)
+
+    self.barra.config(command=self.tabela_clientes.yview)
+
+  def clientes_geral(self):
     try:
-        self.com_pedidos.destroy()
-        self.barra2.destroy()
-    except AttributeError:
-        self.barra = Scrollbar(self.tree_frame)
-        self.barra.place(relx=0.97, rely=0.0, relwidth=0.02, relheight=1)
-        self.barra.configure(background='snow')
+      self.tabela_clientes.delete(*self.tabela_clientes.get_children())
+    except TypeError as er:
+      print(er)
+    finally:
+      self.tabela_clientes['columns'] = ("Id", "Nome", "Endereço")
+      self.tabela_clientes.column("#0", width=0, stretch=NO)
+      self.tabela_clientes.column("Id", anchor=W, width=20)
+      self.tabela_clientes.column("Nome", anchor=CENTER, width=450)
+      self.tabela_clientes.column("Endereço", anchor=CENTER, width=200)
 
-        self.tabela_clientes = ttk.Treeview(self.tree_frame, style= 'geral.Treeview', 
-                                        yscrollcommand=self.barra.set, selectmode="extended")
-        self.tabela_clientes.place(relx=0.02, rely=0.0, relwidth=0.95, relheight=1)
+      self.tabela_clientes.heading("#0", text="", anchor=W)
+      self.tabela_clientes.heading("Id", text="Id", anchor=CENTER)
+      self.tabela_clientes.heading("Nome", text="Nome", anchor=CENTER)
+      self.tabela_clientes.heading("Endereço", text="Endereço", anchor=CENTER)
 
-        self.barra.config(command=self.tabela_clientes.yview)
+      self.tabela_clientes.tag_configure('cor1', background="white")
+      self.tabela_clientes.tag_configure('cor2', background="lightblue")
 
-        self.tabela_clientes['columns'] = ("Id", "Nome", "Endereço")
-        self.tabela_clientes.column("#0", width=0, stretch=NO)
-        self.tabela_clientes.column("Id", anchor=W, width=20)
-        self.tabela_clientes.column("Nome", anchor=CENTER, width=450)
-        self.tabela_clientes.column("Endereço", anchor=CENTER, width=200)
+      conn = self.conectar()
 
-        self.tabela_clientes.heading("#0", text="", anchor=W)
-        self.tabela_clientes.heading("Id", text="Id", anchor=CENTER)
-        self.tabela_clientes.heading("Nome", text="Nome", anchor=CENTER)
-        self.tabela_clientes.heading("Endereço", text="Endereço", anchor=CENTER)
+      c = conn.cursor()
+      c.execute("""SELECT * FROM clientes""")
 
-        self.tabela_clientes.tag_configure('cor1', background="white")
-        self.tabela_clientes.tag_configure('cor2', background="lightblue")
+      global contador_cliente
+      contador_cliente = 0
 
-        conn = self.conectar()
-
-        c = conn.cursor()
-        c.execute("""SELECT * FROM clientes""")
-
-        global contador_cliente
-        contador_cliente = 0
-
-        for idd, nome, loc in c.fetchall():
-            if contador_cliente % 2 == 0:
-                self.tabela_clientes.insert(parent='', index='end', text='',
-                values=(idd, nome, loc), tags=('cor2',))
-            else:
-                self.tabela_clientes.insert(parent='', index='end', text='',
-                values=(idd, nome, loc), tags=('cor1',))
-            contador_cliente += 1
-        conn.close()
-        self.tabela_clientes.bind('<Double-Button-1>', self.seleciona_cliente)
+      for idd, nome, loc in c.fetchall():
+          if contador_cliente % 2 == 0:
+              self.tabela_clientes.insert(parent='', index='end', text='',
+              values=(idd, nome, loc), tags=('cor2',))
+          else:
+              self.tabela_clientes.insert(parent='', index='end', text='',
+              values=(idd, nome, loc), tags=('cor1',))
+          contador_cliente += 1
+      conn.close()
+      self.tabela_clientes.bind('<Double-Button-1>', self.seleciona_cliente)
 
   def tabela(self):
-    def cria_tabela():
-        self.tree_frame = Frame(self.root_clientes)
-        self.tree_frame.place(relx=0.02, rely=0.05, relwidth=0.95, relheight=0.5)
-        self.tree_frame.configure(background='snow')
+    self.tabela_clientes.delete(*self.tabela_clientes.get_children())
+    self.tabela_clientes['columns'] = ("Nome", "Endereço", "Numero_de_pedidos")
+    self.tabela_clientes.column("#0", width=0, stretch=NO)
+    self.tabela_clientes.column("Nome", anchor=W, width=250)
+    self.tabela_clientes.column("Endereço", anchor=W, width=250)
+    self.tabela_clientes.column("Numero_de_pedidos", anchor=CENTER, width=200)
+
+    self.tabela_clientes.heading("#0", text="", anchor=W)
+    self.tabela_clientes.heading("Nome", text="Nome", anchor=CENTER)
+    self.tabela_clientes.heading("Endereço", text="Endereço", anchor=CENTER)
+    self.tabela_clientes.heading("Numero_de_pedidos", text="Numero de pedidos", anchor=CENTER)
+
+    self.tabela_clientes.tag_configure('cor1', background="white")
+    self.tabela_clientes.tag_configure('cor2', background="lightblue")
+
+    conn = self.conectar()
+    c = conn.cursor()
+    c.execute("""SELECT cl.nome_cliente, cl.endereco, COUNT(pe.nome_cliente) 
+                    FROM clientes as cl
+                    JOIN pedidos as pe on cl.nome_cliente = pe.nome_cliente
+                    GROUP BY cl.nome_cliente""")
+
+    global contador_cliente
+    contador_cliente = 0
+
+    for nome, end, num in c.fetchall():
+        if contador_cliente % 2 == 0:
+            self.tabela_clientes.insert(parent='', index='end', text='',
+                        values=(nome, end, num),
+                        tags=('cor2',))
+
+        else:
+            self.tabela_clientes.insert(parent='', index='end', text='',
+                                values=(nome, end, num),
+                                tags=('cor1',))
+        contador_cliente += 1
+    conn.close()
+    self.tabela_clientes.bind('<Double-Button-1>', self.seleciona)
         
-        self.barra2 = Scrollbar(self.tree_frame)
-        self.barra2.place(relx=0.97, rely=0.0, relwidth=0.02, relheight=1)
-        self.barra2.configure(background='snow')
-
-        self.com_pedidos = ttk.Treeview(self.tree_frame, style= 'geral.Treeview', 
-                                        yscrollcommand=self.barra2.set, selectmode="extended")
-        self.com_pedidos.place(relx=0.02, rely=0.0, relwidth=0.95, relheight=1)
-
-        self.barra2.config(command=self.com_pedidos.yview)
-        
-        self.com_pedidos['columns'] = ("Nome", "Endereço", "Numero_de_pedidos")
-        self.com_pedidos.column("#0", width=0, stretch=NO)
-        self.com_pedidos.column("Nome", anchor=W, width=250)
-        self.com_pedidos.column("Endereço", anchor=W, width=250)
-        self.com_pedidos.column("Numero_de_pedidos", anchor=CENTER, width=200)
-
-        self.com_pedidos.heading("#0", text="", anchor=W)
-        self.com_pedidos.heading("Nome", text="Nome", anchor=CENTER)
-        self.com_pedidos.heading("Endereço", text="Endereço", anchor=CENTER)
-        self.com_pedidos.heading("Numero_de_pedidos", text="Numero de pedidos", anchor=CENTER)
-
-        self.com_pedidos.tag_configure('cor1', background="white")
-        self.com_pedidos.tag_configure('cor2', background="lightblue")
-
-        conn = self.conectar()
-
-        c = conn.cursor()
-        c.execute("""SELECT cl.nome_cliente, cl.endereco, COUNT(pe.nome_cliente) 
-                        FROM clientes as cl
-                        JOIN pedidos as pe on cl.nome_cliente = pe.nome_cliente
-                        GROUP BY cl.nome_cliente""")
-
-        global contador_cliente
-        contador_cliente = 0
-
-        for nome, end, num in c.fetchall():
-            if contador_cliente % 2 == 0:
-                self.com_pedidos.insert(parent='', index='end', text='',
-                            values=(nome, end, num),
-                            tags=('cor2',))
-
-            else:
-                self.com_pedidos.insert(parent='', index='end', text='',
-                                    values=(nome, end, num),
-                                    tags=('cor1',))
-            contador_cliente += 1
-        conn.close()
-        self.com_pedidos.bind('<Double-Button-1>', self.seleciona)
-    try:
-        self.tabela_clientes.destroy()
-        self.barra.destroy()
-        cria_tabela()
-    except AttributeError:
-        cria_tabela()
-
   def acessorios(self):
     self.data_frame = LabelFrame(self.root_clientes, text= 'Novo cliente')
     self.data_frame.place(relx=0.05, rely=0.58, relwidth=0.9, relheight=0.2)
@@ -247,9 +227,7 @@ class tela_cliente(Cliente):
     highlightbackground='snow',
     command= lambda:[tela_cardapio(self.root, self.root_clientes, self.nome_entry.get().title(),
     self.endereco_entry.get().title(), self.fundo, self.botoes_inicio),
-    self.frame_botao.destroy(), 
-    self.data_frame.destroy(), self.tree_frame.destroy(),
-    self.tabela_clientes.destroy(), self.barra.destroy(), ])
+    self.frame_botao.destroy(), self.data_frame.destroy(), self.tree_frame.destroy()])
     new_pedido.configure(font=('Roman', 14))
     new_pedido.place(relx=0.42, rely=0.3, relwidth=0.2, relheight=0.52)
     new_pedido.imagem = img_new
@@ -356,8 +334,8 @@ class tela_cardapio(Cardapio, Pedido, Local):
         my_menu = Menu(self.root_cardapio)
         self.root_cardapio.config(menu=my_menu)
 
-        my_menu.add_command(label='Inicio', command=lambda:[self.name.place_forget(),
-        self.frame_menu.place_forget(), self.frame_botao.place_forget(), self.total.place_forget(),
+        my_menu.add_command(label='Inicio', command=lambda:[self.name.destroy(),
+        self.frame_menu.destroy(), self.frame_botao.destroy(), self.total.place_forget(),
         self.fundo_inicio, self.inicio_botoes, my_menu.destroy()])
         # Configurar menu
         option_menu = Menu(my_menu, tearoff=0)
