@@ -76,8 +76,10 @@ class tela_cliente(Cliente):
     menu_opcoes = Menu(self.root_clientes)
     self.root_clientes.config(menu=menu_opcoes)
 
-    menu_opcoes.add_command(label='Inicio', command=lambda:[self.tree_frame.place_forget(),
-    self.data_frame.place_forget(), self.frame_botao.place_forget(), self.fundo, self.botoes_inicio,
+    menu_opcoes.add_command(label='Inicio', command=lambda:[self.fundo, self.botoes_inicio,
+    self.tree_frame.destroy(),
+    self.tabela_clientes.destroy(), self.com_pedidos.destroy(),
+    self.data_frame.place_forget(), self.frame_botao.place_forget(),
     menu_opcoes.destroy()])
     # Configurar menu
     menu_cliente = Menu(menu_opcoes, tearoff=0)
@@ -95,111 +97,113 @@ class tela_cliente(Cliente):
     self.tree_frame = Frame(self.root_clientes)
     self.tree_frame.place(relx=0.02, rely=0.05, relwidth=0.95, relheight=0.5)
     self.tree_frame.configure(background='snow')
-    
-    self.barra = Scrollbar(self.tree_frame)
-    self.barra.place(relx=0.97, rely=0.0, relwidth=0.02, relheight=1)
-    self.barra.configure(background='snow')
+    try:
+        self.com_pedidos.destroy()
+        self.barra2.destroy()
+    except AttributeError:
+        self.barra = Scrollbar(self.tree_frame)
+        self.barra.place(relx=0.97, rely=0.0, relwidth=0.02, relheight=1)
+        self.barra.configure(background='snow')
 
-    self.todos_clientes = ttk.Treeview(self.tree_frame, style= 'geral.Treeview', 
-                                      yscrollcommand=self.barra.set, selectmode="extended")
-    self.todos_clientes.place(relx=0.02, rely=0.0, relwidth=0.95, relheight=1)
+        self.tabela_clientes = ttk.Treeview(self.tree_frame, style= 'geral.Treeview', 
+                                        yscrollcommand=self.barra.set, selectmode="extended")
+        self.tabela_clientes.place(relx=0.02, rely=0.0, relwidth=0.95, relheight=1)
 
-    self.barra.config(command=self.todos_clientes.yview)
+        self.barra.config(command=self.tabela_clientes.yview)
 
-    self.todos_clientes['columns'] = ("Id", "Nome", "Endereço")
-    self.todos_clientes.column("#0", width=0, stretch=NO)
-    self.todos_clientes.column("Id", anchor=W, width=20)
-    self.todos_clientes.column("Nome", anchor=CENTER, width=450)
-    self.todos_clientes.column("Endereço", anchor=CENTER, width=200)
+        self.tabela_clientes['columns'] = ("Id", "Nome", "Endereço")
+        self.tabela_clientes.column("#0", width=0, stretch=NO)
+        self.tabela_clientes.column("Id", anchor=W, width=20)
+        self.tabela_clientes.column("Nome", anchor=CENTER, width=450)
+        self.tabela_clientes.column("Endereço", anchor=CENTER, width=200)
 
-    self.todos_clientes.heading("#0", text="", anchor=W)
-    self.todos_clientes.heading("Id", text="Id", anchor=CENTER)
-    self.todos_clientes.heading("Nome", text="Nome", anchor=CENTER)
-    self.todos_clientes.heading("Endereço", text="Endereço", anchor=CENTER)
+        self.tabela_clientes.heading("#0", text="", anchor=W)
+        self.tabela_clientes.heading("Id", text="Id", anchor=CENTER)
+        self.tabela_clientes.heading("Nome", text="Nome", anchor=CENTER)
+        self.tabela_clientes.heading("Endereço", text="Endereço", anchor=CENTER)
 
-    self.todos_clientes.tag_configure('cor1', background="white")
-    self.todos_clientes.tag_configure('cor2', background="lightblue")
+        self.tabela_clientes.tag_configure('cor1', background="white")
+        self.tabela_clientes.tag_configure('cor2', background="lightblue")
 
-    conn = self.conectar()
+        conn = self.conectar()
 
-    c = conn.cursor()
-    c.execute("""SELECT * FROM clientes""")
+        c = conn.cursor()
+        c.execute("""SELECT * FROM clientes""")
 
-    global contador_cliente
-    contador_cliente = 0
+        global contador_cliente
+        contador_cliente = 0
 
-    for idd, nome, loc in c.fetchall():
-        if contador_cliente % 2 == 0:
-            self.todos_clientes.insert(parent='', index='end', text='',
-            values=(idd, nome, loc), tags=('cor2',))
-        else:
-          self.todos_clientes.insert(parent='', index='end', text='',
-              values=(idd, nome, loc), tags=('cor1',))
-        contador_cliente += 1
-    conn.close()
-    self.todos_clientes.bind('<Double-Button-1>', self.seleciona_cliente)
+        for idd, nome, loc in c.fetchall():
+            if contador_cliente % 2 == 0:
+                self.tabela_clientes.insert(parent='', index='end', text='',
+                values=(idd, nome, loc), tags=('cor2',))
+            else:
+                self.tabela_clientes.insert(parent='', index='end', text='',
+                values=(idd, nome, loc), tags=('cor1',))
+            contador_cliente += 1
+        conn.close()
+        self.tabela_clientes.bind('<Double-Button-1>', self.seleciona_cliente)
 
   def tabela(self):
-    self.todos_clientes.place_forget()
-    self.barra.place_forget()
-    style = ttk.Style()
-    style.theme_use('default')
-    style.configure("cliente.Treeview",
-                background="#D3D3D3",
-                foreground="black",
-                rowheight=25,
-                fieldbackground="#D3D3D3",
-                font='Helvetica')
-    style.map('cliente.Treeview', background=[('selected', "#347083")])
+    def cria_tabela():
+        self.tree_frame = Frame(self.root_clientes)
+        self.tree_frame.place(relx=0.02, rely=0.05, relwidth=0.95, relheight=0.5)
+        self.tree_frame.configure(background='snow')
+        
+        self.barra2 = Scrollbar(self.tree_frame)
+        self.barra2.place(relx=0.97, rely=0.0, relwidth=0.02, relheight=1)
+        self.barra2.configure(background='snow')
 
-    self.tree_scroll = Scrollbar(self.tree_frame)
-    self.tree_scroll.place(relx=0.97, rely=0.0, relwidth=0.02, relheight=1)
-    self.tree_scroll.configure(background='snow')
+        self.com_pedidos = ttk.Treeview(self.tree_frame, style= 'geral.Treeview', 
+                                        yscrollcommand=self.barra2.set, selectmode="extended")
+        self.com_pedidos.place(relx=0.02, rely=0.0, relwidth=0.95, relheight=1)
 
-    self.lista = ttk.Treeview(self.tree_frame, style= 'cliente.Treeview', 
-                              yscrollcommand=self.tree_scroll.set, selectmode="extended")
-    self.lista.place(relx=0.02, rely=0.0, relwidth=0.95, relheight=1)
+        self.barra2.config(command=self.com_pedidos.yview)
+        
+        self.com_pedidos['columns'] = ("Nome", "Endereço", "Numero_de_pedidos")
+        self.com_pedidos.column("#0", width=0, stretch=NO)
+        self.com_pedidos.column("Nome", anchor=W, width=250)
+        self.com_pedidos.column("Endereço", anchor=W, width=250)
+        self.com_pedidos.column("Numero_de_pedidos", anchor=CENTER, width=200)
 
-    self.tree_scroll.config(command=self.lista.yview)
+        self.com_pedidos.heading("#0", text="", anchor=W)
+        self.com_pedidos.heading("Nome", text="Nome", anchor=CENTER)
+        self.com_pedidos.heading("Endereço", text="Endereço", anchor=CENTER)
+        self.com_pedidos.heading("Numero_de_pedidos", text="Numero de pedidos", anchor=CENTER)
 
-    self.lista['columns'] = ("Nome", "Endereço", "Numero_de_pedidos")
-    self.lista.column("#0", width=0, stretch=NO)
-    self.lista.column("Nome", anchor=W, width=250)
-    self.lista.column("Endereço", anchor=W, width=250)
-    self.lista.column("Numero_de_pedidos", anchor=CENTER, width=200)
+        self.com_pedidos.tag_configure('cor1', background="white")
+        self.com_pedidos.tag_configure('cor2', background="lightblue")
 
-    self.lista.heading("#0", text="", anchor=W)
-    self.lista.heading("Nome", text="Nome", anchor=CENTER)
-    self.lista.heading("Endereço", text="Endereço", anchor=CENTER)
-    self.lista.heading("Numero_de_pedidos", text="Numero de pedidos", anchor=CENTER)
+        conn = self.conectar()
 
-    self.lista.tag_configure('cor1', background="white")
-    self.lista.tag_configure('cor2', background="lightblue")
+        c = conn.cursor()
+        c.execute("""SELECT cl.nome_cliente, cl.endereco, COUNT(pe.nome_cliente) 
+                        FROM clientes as cl
+                        JOIN pedidos as pe on cl.nome_cliente = pe.nome_cliente
+                        GROUP BY cl.nome_cliente""")
 
-    conn = self.conectar()
+        global contador_cliente
+        contador_cliente = 0
 
-    c = conn.cursor()
-    c.execute("""SELECT cl.nome_cliente, cl.endereco, COUNT(pe.nome_cliente) 
-                    FROM clientes as cl
-                    JOIN pedidos as pe on cl.nome_cliente = pe.nome_cliente
-                    GROUP BY cl.nome_cliente""")
+        for nome, end, num in c.fetchall():
+            if contador_cliente % 2 == 0:
+                self.com_pedidos.insert(parent='', index='end', text='',
+                            values=(nome, end, num),
+                            tags=('cor2',))
 
-    global contador_cliente
-    contador_cliente = 0
-
-    for nome, end, num in c.fetchall():
-        if contador_cliente % 2 == 0:
-            self.lista.insert(parent='', index='end', text='',
-                           values=(nome, end, num),
-                           tags=('cor2',))
-
-        else:
-          self.lista.insert(parent='', index='end', text='',
-                                 values=(nome, end, num),
-                                 tags=('cor1',))
-        contador_cliente += 1
-    conn.close()
-    self.lista.bind('<Double-Button-1>', self.seleciona)
+            else:
+                self.com_pedidos.insert(parent='', index='end', text='',
+                                    values=(nome, end, num),
+                                    tags=('cor1',))
+            contador_cliente += 1
+        conn.close()
+        self.com_pedidos.bind('<Double-Button-1>', self.seleciona)
+    try:
+        self.tabela_clientes.destroy()
+        self.barra.destroy()
+        cria_tabela()
+    except AttributeError:
+        cria_tabela()
 
   def acessorios(self):
     self.data_frame = LabelFrame(self.root_clientes, text= 'Novo cliente')
@@ -241,12 +245,11 @@ class tela_cliente(Cliente):
     new_pedido = Button(self.frame_botao, text= 'Novo\nPedido', image= img_new, compound=LEFT,
     relief=FLAT, activebackground='lightblue', background='snow', activeforeground='snow',
     highlightbackground='snow',
-    command= lambda:[self.frame_botao.place_forget(), self.data_frame.place_forget(),
-    tela_cardapio(self.root, self.root_clientes, self.nome_entry.get().title(),
+    command= lambda:[tela_cardapio(self.root, self.root_clientes, self.nome_entry.get().title(),
     self.endereco_entry.get().title(), self.fundo, self.botoes_inicio),
-    
-    self.tree_frame.place_forget(),
-    ])
+    self.frame_botao.destroy(), 
+    self.data_frame.destroy(), self.tree_frame.destroy(),
+    self.tabela_clientes.destroy(), self.barra.destroy(), ])
     new_pedido.configure(font=('Roman', 14))
     new_pedido.place(relx=0.42, rely=0.3, relwidth=0.2, relheight=0.52)
     new_pedido.imagem = img_new
@@ -256,7 +259,7 @@ class tela_cliente(Cliente):
     pesquisar = Button(self.frame_botao, text= 'Pesquisar', image= img_pesquisar, compound=LEFT,
     relief=FLAT, activebackground='lightblue', background='snow', activeforeground='snow',
     highlightbackground='snow',
-    command= lambda: [self.clientes_geral() ,self.pesquisar(self.nome_entry.get(), self.todos_clientes), 
+    command= lambda: [self.clientes_geral() ,self.pesquisar(self.nome_entry.get(), self.tabela_clientes), 
     self.limpa(self.nome_entry, self.endereco_entry)])
     pesquisar.configure(font=('Roman', 14))
     pesquisar.place(relx=0.75, rely=0.3, relwidth=0.2, relheight=0.45)
@@ -268,16 +271,16 @@ class tela_cliente(Cliente):
 
   def seleciona(self, event):
     self.limpa(self.nome_entry, self.endereco_entry)
-    for x in self.lista.selection():
-      n, e, p = self.lista.item(x, 'values')
+    for x in self.tabela_clientes.selection():
+      n, e, p = self.tabela_clientes.item(x, 'values')
       self.nome_entry.insert(END, n)
       self.endereco_entry.insert(END, e)
     return self.nome_entry.get()
   
   def seleciona_cliente(self, event):
     self.limpa(self.nome_entry, self.endereco_entry)
-    for x in self.todos_clientes.selection():
-      i, n, e= self.todos_clientes.item(x, 'values')
+    for x in self.tabela_clientes.selection():
+      i, n, e= self.tabela_clientes.item(x, 'values')
       self.nome_entry.insert(END, n)
       self.endereco_entry.insert(END, e)
 
@@ -1262,7 +1265,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
                     messagebox.showerror('ERRO', 'Selecione no minímo 1 opção de finish it')
                     self.finish_it.clear()
                 self.finish = self.finish_it
-                self.finish_it.clear()
+                #self.finish_it.clear()
                 
             except error:
                 messagebox.showerror('ERRO', "Erro inesperado, contate o programador")
@@ -1291,6 +1294,9 @@ class tela_cardapio(Cardapio, Pedido, Local):
             c = conn.cursor()
             c.execute("""UPDATE menu SET valor_prato = %s WHERE nome_prato = %s""",
             (sum(self.extra_poke), 'Monte seu poke'))
+            c.execute("""SELECT id_pedido FROM pedidos WHERE nome_cliente = %s""",
+            (self.info_cliente,))
+            idd = c.fetchall()
 
             #salva as opcoes do poke
             opcoes_poke = {'base': self.escolha_base, 'proteina': self.proteina,
@@ -1300,13 +1306,13 @@ class tela_cardapio(Cardapio, Pedido, Local):
                 memory = open('Escolhas.json', 'r', encoding='utf8')
                 memoria = json.load(memory)
                 memory.close()
-                pok = {self.info_cliente: opcoes_poke}
+                pok = {self.info_cliente: {idd[0][0]: opcoes_poke}}
                 memoria.append(pok)
                 memory =  open('Escolhas.json', 'w', encoding= 'utf8')
                 json.dump(memoria, memory, indent=2)
                 memory.close() 
             except FileNotFoundError:
-                poke = [{self.info_cliente: opcoes_poke}]
+                poke = [{self.info_cliente: {idd[0][0]: opcoes_poke}}]
                 with open('Escolhas.json', 'w', encoding= 'utf8') as f:
                     json.dump(poke, f, indent=2)
                 memory = open('Escolhas.json', 'r')
