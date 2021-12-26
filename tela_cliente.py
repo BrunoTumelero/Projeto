@@ -276,6 +276,8 @@ class tela_cardapio(Cardapio, Pedido, Local):
         self.root_cardapio.configure(background='snow')
         self.fundo_inicio = fundo
         self.inicio_botoes = botoes_inicio
+        self.cria_menu()
+        self.cria_poke()
         self.menu_geral()
         self.opcoes()
         self.acessorios()
@@ -335,17 +337,15 @@ class tela_cardapio(Cardapio, Pedido, Local):
         self.root_cardapio.config(menu=my_menu)
 
         my_menu.add_command(label='Inicio', command=lambda:[self.name.destroy(),
-        self.frame_menu.destroy(), self.frame_botao.destroy(), self.total.place_forget(),
+        self.frame_menu.destroy(), self.frame_botao.destroy(), self.total.place_forget(), self.frame_cardapio.destroy(),
         self.fundo_inicio, self.inicio_botoes, my_menu.destroy()])
         # Configurar menu
         option_menu = Menu(my_menu, tearoff=0)
         my_menu.add_cascade(label="Opções", menu=option_menu)
         # opcoes do menu
         option_menu.add_command(label="Configurar pratos", command= lambda:[self.add_prato()])
-        option_menu.add_command(label="Monte seu poke", command= lambda:[self.menu.place_forget(),
-        self.monte_poke()])
-        option_menu.add_command(label="Menu", command= lambda:[self.pag1.place_forget(),
-        self.menu_geral()])
+        option_menu.add_command(label="Monte seu poke", command= lambda:[self.monte_poke()])
+        option_menu.add_command(label="Menu", command= lambda:[self.frame_cardapio.destroy(), self.menu_geral()])
 
     def add_prato(self):
         self.janela = Toplevel(self.root_cardapio)
@@ -561,7 +561,26 @@ class tela_cardapio(Cardapio, Pedido, Local):
             contador +=1
             self.set_total()
     #Menu
-    def menu_geral(self):
+    def cria_menu(self):
+        self.frame_cardapio = Frame(self.root_cardapio)
+        self.frame_cardapio.place(relx=0.01, rely=0.02, relwidth=0.65, relheight=0.6)
+        self.frame_cardapio.configure(background='snow')
+        style = ttk.Style()
+        style.theme_use('default')
+        style.configure("tema_cardapio",
+                background="white",
+                foreground="black",
+                rowheight=25,
+                fieldbackground="#D3D3D3",
+                font=('Helvetica', 11))
+        style.map('tema_cardapio', background=[('selected', "#347083")])
+
+        self.valor = StringVar(self.frame_cardapio)
+
+        self.menu = ttk.Treeview(self.frame_cardapio, selectmode="browse")
+        self.menu.place(relx=0.0, rely=0.0, relwidth=0.972, relheight=1)
+
+    def cria_poke(self):
         self.frame_menu = Frame(self.root_cardapio)
         self.frame_menu.place(relx=0.01, rely=0.02, relwidth=0.65, relheight=0.6)
         self.frame_menu.configure(background='snow')
@@ -577,279 +596,287 @@ class tela_cardapio(Cardapio, Pedido, Local):
 
         self.valor = StringVar(self.frame_menu)
 
-        tree_scroll = Scrollbar(self.frame_menu)
-        tree_scroll.place(relx=0.971, rely=0.0, relwidth=0.03, relheight=1)
-        tree_scroll.configure(background='snow')
-
-        self.menu = ttk.Treeview(self.frame_menu, yscrollcommand=tree_scroll.set, selectmode="browse")
+        self.menu = ttk.Treeview(self.frame_menu, selectmode="browse")
         self.menu.place(relx=0.0, rely=0.0, relwidth=0.972, relheight=1)
 
-        tree_scroll.config(command=self.menu.yview)
+    def menu_geral(self):
+        try:
+            self.pag1.place_forget()
+            self.cria_menu()
+            
+        except:
+            pass
+        finally:
+            self.menu.delete(*self.menu.get_children())
+            self.menu['columns'] = ("Prato", "Valor")
+            self.menu.column("#0", width=0, stretch=NO)
+            self.menu.column("Prato", anchor=W, width=250)
+            self.menu.column("Valor", anchor=CENTER, width=50)
 
-        self.menu['columns'] = ("Prato", "Valor")
-        self.menu.column("#0", width=0, stretch=NO)
-        self.menu.column("Prato", anchor=W, width=250)
-        self.menu.column("Valor", anchor=CENTER, width=50)
+            self.menu.heading("#0", text="", anchor=W)
+            self.menu.heading("Prato", text="Prato", anchor=CENTER)
+            self.menu.heading("Valor", text="Valor", anchor=CENTER)
 
-        self.menu.heading("#0", text="", anchor=W)
-        self.menu.heading("Prato", text="Prato", anchor=CENTER)
-        self.menu.heading("Valor", text="Valor", anchor=CENTER)
+            self.menu.tag_configure('cor1', background="#91C4F2")
+            self.menu.tag_configure('cor2', background="#8CA0D7")
+            self.menu.tag_configure('cor3', background="#9D79BC")
+            self.menu.tag_configure('cor4', background="#A14DA0")
+            self.menu.tag_configure('cor5', background="#7E1F86")
 
-        self.menu.tag_configure('cor1', background="#91C4F2")
-        self.menu.tag_configure('cor2', background="#8CA0D7")
-        self.menu.tag_configure('cor3', background="#9D79BC")
-        self.menu.tag_configure('cor4', background="#A14DA0")
-        self.menu.tag_configure('cor5', background="#7E1F86")
+            conn = self.conectar()
+            c = conn.cursor()
+            c.execute("""SELECT nome_prato, valor_prato, categoria FROM menu ORDER BY nome_prato""")
+            global count
+            count = 0
+            self.menu.insert('', 'end', 'Snack', tags=('cor3',), values=('⮯Snacks'))
+            self.menu.insert('', 'end', 'Bowl', tags=('cor4',), values='⮯Bowls')
+            self.menu.insert('', 'end', 'Salada', tags=('cor3',), values='⮯Saladas')
+            self.menu.insert('', 'end', 'Brunch', tags=('cor4',), values='⮯Brunch')            
+            self.menu.insert('', 'end', 'Pizza', tags=('cor3',), values='⮯Pizzas')
+            self.menu.insert('', 'end', 'Burger', tags=('cor4',), values='⮯Burgers')
+            self.menu.insert('', 'end', 'Poke', tags=('cor3',), values='⮯Pokes')
+            self.menu.insert('', 'end', 'Doce', tags=('cor4',), values='⮯Doces')
+            self.menu.insert('', 'end', 'Cafe', tags=('cor3',), values='⮯Cafés')
+            self.menu.insert('', 'end', 'Suco', tags=('cor4',), values='⮯Sucos')
+            self.menu.insert('', 'end', 'Bebida', tags=('cor3',), values='⮯Bebidas')
 
-        conn = self.conectar()
-        c = conn.cursor()
-        c.execute("""SELECT nome_prato, valor_prato, categoria FROM menu ORDER BY nome_prato""")
-        global count
-        count = 0
-        self.menu.insert('', 'end', 'Snack', tags=('cor3',), values=('⮯Snacks'))
-        self.menu.insert('', 'end', 'Bowl', tags=('cor4',), values='⮯Bowls')
-        self.menu.insert('', 'end', 'Salada', tags=('cor3',), values='⮯Saladas')
-        self.menu.insert('', 'end', 'Brunch', tags=('cor4',), values='⮯Brunch')            
-        self.menu.insert('', 'end', 'Pizza', tags=('cor3',), values='⮯Pizzas')
-        self.menu.insert('', 'end', 'Burger', tags=('cor4',), values='⮯Burgers')
-        self.menu.insert('', 'end', 'Poke', tags=('cor3',), values='⮯Pokes')
-        self.menu.insert('', 'end', 'Doce', tags=('cor4',), values='⮯Doces')
-        self.menu.insert('', 'end', 'Cafe', tags=('cor3',), values='⮯Cafés')
-        self.menu.insert('', 'end', 'Suco', tags=('cor4',), values='⮯Sucos')
-        self.menu.insert('', 'end', 'Bebida', tags=('cor3',), values='⮯Bebidas')
-
-        for prato, valor, categoria in c.fetchall():
-            if categoria == 'Snack':
-                if count % 2 == 0:
+            for prato, valor, categoria in c.fetchall():
+                if categoria == 'Snack':
+                    if count % 2 == 0:
+                            self.menu.insert(parent='Snack', index='end', text='',
+                                    values=(prato, (valor,'$')), tags=('cor2',))
+                    else:
                         self.menu.insert(parent='Snack', index='end', text='',
-                                values=(prato, (valor,'$')), tags=('cor2',))
-                else:
-                    self.menu.insert(parent='Snack', index='end', text='',
-                                values=(prato, (valor,'$')), tags=('cor1',))
-                count += 1
-            elif categoria == 'Bowl':
-                if count % 2 == 0:
-                    self.menu.insert(parent='Bowl', index='end', text='',
-                                values=(prato, (valor,'$')), tags=('cor2',))
-                else:
-                    self.menu.insert(parent='Bowl', index='end', text='',
-                                values=(prato, (valor,'$')), tags=('cor1',))
-                count += 1
-            elif categoria == 'Salada':
-                if count % 2 == 0:
-                    self.menu.insert(parent='Salada', index='end', text='',
-                                values=(prato, (valor,'$')), tags=('cor2',))
-                else:
-                    self.menu.insert(parent='Salada', index='end', text='',
-                                values=(prato, (valor,'$')), tags=('cor1',))
-                count += 1
-            elif categoria == 'Brunch':
-                if count % 2 == 0:
-                    self.menu.insert(parent='Brunch', index='end', text='',
-                                values=(prato, (valor,'$')), tags=('cor2',))
-                else:
-                    self.menu.insert(parent='Brunch', index='end', text='',
-                                values=(prato, (valor,'$')), tags=('cor1',))
-                count += 1
-            elif categoria == 'Pizza':
-                if count % 2 == 0:
-                    self.menu.insert(parent='Pizza', index='end', text='',
-                                values=(prato, (valor,'$')), tags=('cor2',))
-                else:
-                    self.menu.insert(parent='Pizza', index='end', text='',
-                                values=(prato, (valor,'$')), tags=('cor1',))
-                count += 1
-            elif categoria == 'Burger':
-                if count % 2 == 0:
-                    self.menu.insert(parent='Burger', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                else:
-                    self.menu.insert(parent='Burger', index='end', text='',
                                     values=(prato, (valor,'$')), tags=('cor1',))
-                count += 1
-            elif categoria == 'Poke':
-                if count % 2 == 0:
-                    self.menu.insert(parent='Poke', index='end', text='',
+                    count += 1
+                elif categoria == 'Bowl':
+                    if count % 2 == 0:
+                        self.menu.insert(parent='Bowl', index='end', text='',
                                     values=(prato, (valor,'$')), tags=('cor2',))
-                else:
-                    self.menu.insert(parent='Poke', index='end', text='',
+                    else:
+                        self.menu.insert(parent='Bowl', index='end', text='',
                                     values=(prato, (valor,'$')), tags=('cor1',))
-                count += 1
-            elif categoria == 'Doce':
-                if count % 2 == 0:
-                    self.menu.insert(parent='Doce', index='end', text='',
+                    count += 1
+                elif categoria == 'Salada':
+                    if count % 2 == 0:
+                        self.menu.insert(parent='Salada', index='end', text='',
                                     values=(prato, (valor,'$')), tags=('cor2',))
-                else:
-                    self.menu.insert(parent='Doce', index='end', text='',
+                    else:
+                        self.menu.insert(parent='Salada', index='end', text='',
                                     values=(prato, (valor,'$')), tags=('cor1',))
-                count += 1
-            elif categoria == 'Cafe':
-                if count % 2 == 0:
-                    self.menu.insert(parent='Cafe', index='end', text='',
+                    count += 1
+                elif categoria == 'Brunch':
+                    if count % 2 == 0:
+                        self.menu.insert(parent='Brunch', index='end', text='',
                                     values=(prato, (valor,'$')), tags=('cor2',))
-                else:
-                    self.menu.insert(parent='Cafe', index='end', text='',
+                    else:
+                        self.menu.insert(parent='Brunch', index='end', text='',
                                     values=(prato, (valor,'$')), tags=('cor1',))
-                count += 1
-            elif categoria == 'Suco':
-                if count % 2 == 0:
-                    self.menu.insert(parent='Suco', index='end', text='',
+                    count += 1
+                elif categoria == 'Pizza':
+                    if count % 2 == 0:
+                        self.menu.insert(parent='Pizza', index='end', text='',
                                     values=(prato, (valor,'$')), tags=('cor2',))
-                else:
-                    self.menu.insert(parent='Suco', index='end', text='',
+                    else:
+                        self.menu.insert(parent='Pizza', index='end', text='',
                                     values=(prato, (valor,'$')), tags=('cor1',))
-                count += 1
-            elif categoria == 'Bebida':
-                if count % 2 == 0:
+                    count += 1
+                elif categoria == 'Burger':
+                    if count % 2 == 0:
+                        self.menu.insert(parent='Burger', index='end', text='',
+                                        values=(prato, (valor,'$')), tags=('cor2',))
+                    else:
+                        self.menu.insert(parent='Burger', index='end', text='',
+                                        values=(prato, (valor,'$')), tags=('cor1',))
+                    count += 1
+                elif categoria == 'Poke':
+                    if count % 2 == 0:
+                        self.menu.insert(parent='Poke', index='end', text='',
+                                        values=(prato, (valor,'$')), tags=('cor2',))
+                    else:
+                        self.menu.insert(parent='Poke', index='end', text='',
+                                        values=(prato, (valor,'$')), tags=('cor1',))
+                    count += 1
+                elif categoria == 'Doce':
+                    if count % 2 == 0:
+                        self.menu.insert(parent='Doce', index='end', text='',
+                                        values=(prato, (valor,'$')), tags=('cor2',))
+                    else:
+                        self.menu.insert(parent='Doce', index='end', text='',
+                                        values=(prato, (valor,'$')), tags=('cor1',))
+                    count += 1
+                elif categoria == 'Cafe':
+                    if count % 2 == 0:
+                        self.menu.insert(parent='Cafe', index='end', text='',
+                                        values=(prato, (valor,'$')), tags=('cor2',))
+                    else:
+                        self.menu.insert(parent='Cafe', index='end', text='',
+                                        values=(prato, (valor,'$')), tags=('cor1',))
+                    count += 1
+                elif categoria == 'Suco':
+                    if count % 2 == 0:
+                        self.menu.insert(parent='Suco', index='end', text='',
+                                        values=(prato, (valor,'$')), tags=('cor2',))
+                    else:
+                        self.menu.insert(parent='Suco', index='end', text='',
+                                        values=(prato, (valor,'$')), tags=('cor1',))
+                    count += 1
+                elif categoria == 'Bebida':
+                    if count % 2 == 0:
+                            self.menu.insert(parent='Bebida', index='end', text='',
+                                        values=(prato, (valor,'$')), tags=('cor2',))
+                    else:
                         self.menu.insert(parent='Bebida', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                else:
-                    self.menu.insert(parent='Bebida', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                count += 1
+                                        values=(prato, (valor,'$')), tags=('cor1',))
+                    count += 1
 
-        self.menu.bind('<Button-3>', self.seleciona)
+            self.menu.bind('<Button-3>', self.seleciona)
 
     def monte_poke(self):
-        self.pag1 = Frame(self.frame_menu)
-        self.pag1.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
-        self.pag1.configure(background='snow')
-        letra = font.Font(family='Arial', size= 20, weight='bold')
-        letra2 = font.Font(family='Arial', size=12, weight='bold', slant='italic')
-        letra3 = font.Font(family='Arial', size=10, weight='bold')
+        try:
+            self.frame_cardapio.place_forget()
+        except:
+            pass
+        finally:
+            self.pag1 = Frame(self.frame_menu)
+            self.pag1.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
+            self.pag1.configure(background='snow')
+            letra = font.Font(family='Arial', size= 20, weight='bold')
+            letra2 = font.Font(family='Arial', size=12, weight='bold', slant='italic')
+            letra3 = font.Font(family='Arial', size=10, weight='bold')
 
-        base = Label(self.pag1, text='1.BASE')
-        base.configure(font=letra, background='snow')
-        base.place(relx=0.02, rely=0.03, relwidth=0.2, relheight=0.1)
-        escolha_base = Label(self.pag1, text='Escolha 1', foreground='blue')
-        escolha_base.configure(font=letra2, background='snow')
-        escolha_base.place(relx=0.02, rely=0.13, relwidth=0.2, relheight=0.1)
+            base = Label(self.pag1, text='1.BASE')
+            base.configure(font=letra, background='snow')
+            base.place(relx=0.02, rely=0.03, relwidth=0.2, relheight=0.1)
+            escolha_base = Label(self.pag1, text='Escolha 1', foreground='blue')
+            escolha_base.configure(font=letra2, background='snow')
+            escolha_base.place(relx=0.02, rely=0.13, relwidth=0.2, relheight=0.1)
 
-        self.extra_poke = []
-        self.escolha_base = []
-        self.proteina = []
-        self.base_1 = IntVar(self.pag1) 
-        self.base_2 = IntVar(self.pag1) 
-        self.base_3 = IntVar(self.pag1) 
-        self.base_4 = IntVar(self.pag1) 
-        self.base_5 = IntVar(self.pag1)
+            self.extra_poke = []
+            self.escolha_base = []
+            self.proteina = []
+            self.base_1 = IntVar(self.pag1) 
+            self.base_2 = IntVar(self.pag1) 
+            self.base_3 = IntVar(self.pag1) 
+            self.base_4 = IntVar(self.pag1) 
+            self.base_5 = IntVar(self.pag1)
 
-        self.op_base_1 = Checkbutton(self.pag1, text='Arroz de sushi', variable= self.base_1,
-        highlightbackground='snow', activebackground='snow', activeforeground='blue4', relief=FLAT,
-        anchor='w')
-        self.op_base_1.place(relx=0.02, rely=0.25, relwidth=0.25, relheight=0.1)
-        self.op_base_1.configure(background='snow')
-        self.op_base_2 = Checkbutton(self.pag1, text='Arroz negro(+ R$4)', anchor='w', relief=FLAT,
-        variable= self.base_2, highlightbackground='snow', activeforeground='blue4',
-        activebackground='snow')
-        self.op_base_2.place(relx=0.02, rely=0.35, relwidth=0.3, relheight=0.1)
-        self.op_base_2.configure(background='snow')
-        self.op_base_3 = Checkbutton(self.pag1, text='Quinoa(+R$4)', anchor='w', relief=FLAT,
-        variable= self.base_3, highlightbackground='snow', activeforeground='blue4',
-        activebackground='snow')
-        self.op_base_3.place(relx=0.02, rely=0.45, relwidth=0.25, relheight=0.1)
-        self.op_base_3.configure(background='snow')
-        self.op_base_4 = Checkbutton(self.pag1, text='Espaguete de abobrinha', anchor='w', relief=FLAT,
-        variable= self.base_4, highlightbackground='snow', activeforeground='blue4',
-        activebackground='snow')
-        self.op_base_4.place(relx=0.02, rely=0.55, relwidth=0.4, relheight=0.1)
-        self.op_base_4.configure(background='snow')
-        self.op_base_5 = Checkbutton(self.pag1, text='Espaguete de palmito de\n pupunha ao pesto(+ R$5)',
-        relief=FLAT, anchor='w', variable= self.base_5, highlightbackground='snow', 
-        activeforeground='blue4', activebackground='snow')
-        self.op_base_5.place(relx=0.02, rely=0.65, relwidth=0.4, relheight=0.25)
-        self.op_base_5.configure(background='snow')
+            self.op_base_1 = Checkbutton(self.pag1, text='Arroz de sushi', variable= self.base_1,
+            highlightbackground='snow', activebackground='snow', activeforeground='blue4', relief=FLAT,
+            anchor='w')
+            self.op_base_1.place(relx=0.02, rely=0.25, relwidth=0.25, relheight=0.1)
+            self.op_base_1.configure(background='snow')
+            self.op_base_2 = Checkbutton(self.pag1, text='Arroz negro(+ R$4)', anchor='w', relief=FLAT,
+            variable= self.base_2, highlightbackground='snow', activeforeground='blue4',
+            activebackground='snow')
+            self.op_base_2.place(relx=0.02, rely=0.35, relwidth=0.3, relheight=0.1)
+            self.op_base_2.configure(background='snow')
+            self.op_base_3 = Checkbutton(self.pag1, text='Quinoa(+R$4)', anchor='w', relief=FLAT,
+            variable= self.base_3, highlightbackground='snow', activeforeground='blue4',
+            activebackground='snow')
+            self.op_base_3.place(relx=0.02, rely=0.45, relwidth=0.25, relheight=0.1)
+            self.op_base_3.configure(background='snow')
+            self.op_base_4 = Checkbutton(self.pag1, text='Espaguete de abobrinha', anchor='w', relief=FLAT,
+            variable= self.base_4, highlightbackground='snow', activeforeground='blue4',
+            activebackground='snow')
+            self.op_base_4.place(relx=0.02, rely=0.55, relwidth=0.4, relheight=0.1)
+            self.op_base_4.configure(background='snow')
+            self.op_base_5 = Checkbutton(self.pag1, text='Espaguete de palmito de\n pupunha ao pesto(+ R$5)',
+            relief=FLAT, anchor='w', variable= self.base_5, highlightbackground='snow', 
+            activeforeground='blue4', activebackground='snow')
+            self.op_base_5.place(relx=0.02, rely=0.65, relwidth=0.4, relheight=0.25)
+            self.op_base_5.configure(background='snow')
 
-        proteina = Label(self.pag1, text='1.PROTEÍNAS 120g', anchor='w')
-        proteina.place(relx=0.45, rely=0.02, relwidth=0.55, relheight=0.15)
-        proteina.configure(font=letra, background='snow')
-        escolha_prot = Label(self.pag1, text='Escolha até 2 (60g de cada)', foreground='blue',
-        anchor='w')
-        escolha_prot.place(relx=0.45, rely=0.15, relwidth=0.5, relheight=0.08)
-        escolha_prot.configure(font=letra2, background='snow')
-        info_prot = Label(self.pag1, text='-Sera considerada a proteína de maior valor-',
-        anchor='w')
-        info_prot.place(relx=0.45, rely=0.23, relwidth=0.55, relheight=0.08)
-        info_prot.configure(font=letra3, background='snow')
+            proteina = Label(self.pag1, text='1.PROTEÍNAS 120g', anchor='w')
+            proteina.place(relx=0.45, rely=0.02, relwidth=0.55, relheight=0.15)
+            proteina.configure(font=letra, background='snow')
+            escolha_prot = Label(self.pag1, text='Escolha até 2 (60g de cada)', foreground='blue',
+            anchor='w')
+            escolha_prot.place(relx=0.45, rely=0.15, relwidth=0.5, relheight=0.08)
+            escolha_prot.configure(font=letra2, background='snow')
+            info_prot = Label(self.pag1, text='-Sera considerada a proteína de maior valor-',
+            anchor='w')
+            info_prot.place(relx=0.45, rely=0.23, relwidth=0.55, relheight=0.08)
+            info_prot.configure(font=letra3, background='snow')
 
-        self.prot1 = IntVar(self.root_cardapio)
-        self.prot2 = IntVar(self.root_cardapio)
-        self.prot3 = IntVar(self.root_cardapio)
-        self.prot4 = IntVar(self.root_cardapio)
-        op_prot1 = Checkbutton(self.pag1, text='Salmão', anchor='w', variable=self.prot1,
-        highlightbackground='snow', activeforeground='blue4',)
-        op_prot1.place(relx=0.45, rely=0.35, relwidth=0.25, relheight=0.1)
-        op_prot1.configure(background='snow')
-        op_prot2 = Checkbutton(self.pag1, text='Atum', anchor='w', variable=self.prot2,
-        highlightbackground='snow', activeforeground='blue4',)
-        op_prot2.place(relx=0.45, rely=0.45, relwidth=0.3, relheight=0.1)
-        op_prot2.configure(background='snow')
-        op_prot3 = Checkbutton(self.pag1, text='Camarão', anchor='w', variable=self.prot3,
-        highlightbackground='snow', activeforeground='blue4',)
-        op_prot3.place(relx=0.45, rely=0.55, relwidth=0.25, relheight=0.1)
-        op_prot3.configure(background='snow')
-        op_prot4 = Checkbutton(self.pag1, text='Shitake', anchor='w', variable=self.prot4,
-        highlightbackground='snow', activeforeground='blue4')
-        op_prot4.place(relx=0.45, rely=0.65, relwidth=0.25, relheight=0.1)
-        op_prot4.configure(background='snow')
+            self.prot1 = IntVar(self.root_cardapio)
+            self.prot2 = IntVar(self.root_cardapio)
+            self.prot3 = IntVar(self.root_cardapio)
+            self.prot4 = IntVar(self.root_cardapio)
+            op_prot1 = Checkbutton(self.pag1, text='Salmão', anchor='w', variable=self.prot1,
+            highlightbackground='snow', activeforeground='blue4',)
+            op_prot1.place(relx=0.45, rely=0.35, relwidth=0.25, relheight=0.1)
+            op_prot1.configure(background='snow')
+            op_prot2 = Checkbutton(self.pag1, text='Atum', anchor='w', variable=self.prot2,
+            highlightbackground='snow', activeforeground='blue4',)
+            op_prot2.place(relx=0.45, rely=0.45, relwidth=0.3, relheight=0.1)
+            op_prot2.configure(background='snow')
+            op_prot3 = Checkbutton(self.pag1, text='Camarão', anchor='w', variable=self.prot3,
+            highlightbackground='snow', activeforeground='blue4',)
+            op_prot3.place(relx=0.45, rely=0.55, relwidth=0.25, relheight=0.1)
+            op_prot3.configure(background='snow')
+            op_prot4 = Checkbutton(self.pag1, text='Shitake', anchor='w', variable=self.prot4,
+            highlightbackground='snow', activeforeground='blue4')
+            op_prot4.place(relx=0.45, rely=0.65, relwidth=0.25, relheight=0.1)
+            op_prot4.configure(background='snow')
 
-        def erros():
-            if len(self.escolha_base) > 1:
-                messagebox.showerror('ERRO', 'Escolha apenas uma opção para base')
-                self.escolha_base.clear()
-                self.proteina.clear()
-            elif len(self.escolha_base) == 0:
-                messagebox.showerror('ERRO', 'Escolha uma opção para base')
-                self.proteina.clear()
-                self.escolha_base.clear()
-            elif len(self.proteina) > 2:
-                messagebox.showerror('ERRO', 'Escolha apenas 2 opção de proteína')
-                self.proteina.clear()
-                self.escolha_base.clear()
-            elif len(self.proteina) == 0:
-                messagebox.showerror('ERRO', 'Escolha no mínimo uma opção de proteína')
-                self.proteina.clear()
-                self.escolha_base.clear()
-            if len(self.escolha_base) == 1 and len(self.proteina) <= 2 and len(self.proteina) > 0 and len(self.proteina) < 3:
-                self.poke_2()
-        def verificacao():
-            try:
-                if self.base_1.get() == 1:
-                    self.escolha_base.append(1)
-                if self.base_2.get() == 1:
-                    self.escolha_base.append(2)
-                    self.extra_poke.append(4)
-                if self.base_3.get() == 1:
-                    self.escolha_base.append(3)
-                    self.extra_poke.append(4)
-                if self.base_4.get() == 1:
-                    self.escolha_base.append(4)
-                if self.base_5.get() == 1:
-                    self.escolha_base.append(5)
-                    self.extra_poke.append(5)
-                if self.prot1.get() == 1:
-                    self.proteina.append(1)
-                    self.extra_poke.append(54)
-                if self.prot2.get() == 1:
-                    self.proteina.append(2)
-                    self.extra_poke.append(54)
-                if self.prot3.get() == 1:
-                    self.proteina.append(3)
-                    self.extra_poke.append(60)
-                if self.prot4.get() == 1:
-                    self.proteina.append(4)
-                    self.extra_poke.append(50)
-                erros()
-            except AttributeError as error:
-                messagebox.showwarning('ERRO', error)
+            def erros():
+                if len(self.escolha_base) > 1:
+                    messagebox.showerror('ERRO', 'Escolha apenas uma opção para base')
+                    self.escolha_base.clear()
+                    self.proteina.clear()
+                elif len(self.escolha_base) == 0:
+                    messagebox.showerror('ERRO', 'Escolha uma opção para base')
+                    self.proteina.clear()
+                    self.escolha_base.clear()
+                elif len(self.proteina) > 2:
+                    messagebox.showerror('ERRO', 'Escolha apenas 2 opção de proteína')
+                    self.proteina.clear()
+                    self.escolha_base.clear()
+                elif len(self.proteina) == 0:
+                    messagebox.showerror('ERRO', 'Escolha no mínimo uma opção de proteína')
+                    self.proteina.clear()
+                    self.escolha_base.clear()
+                if len(self.escolha_base) == 1 and len(self.proteina) <= 2 and len(self.proteina) > 0 and len(self.proteina) < 3:
+                    self.poke_2()
+            def verificacao():
+                try:
+                    if self.base_1.get() == 1:
+                        self.escolha_base.append(1)
+                    if self.base_2.get() == 1:
+                        self.escolha_base.append(2)
+                        self.extra_poke.append(4)
+                    if self.base_3.get() == 1:
+                        self.escolha_base.append(3)
+                        self.extra_poke.append(4)
+                    if self.base_4.get() == 1:
+                        self.escolha_base.append(4)
+                    if self.base_5.get() == 1:
+                        self.escolha_base.append(5)
+                        self.extra_poke.append(5)
+                    if self.prot1.get() == 1:
+                        self.proteina.append(1)
+                        self.extra_poke.append(54)
+                    if self.prot2.get() == 1:
+                        self.proteina.append(2)
+                        self.extra_poke.append(54)
+                    if self.prot3.get() == 1:
+                        self.proteina.append(3)
+                        self.extra_poke.append(60)
+                    if self.prot4.get() == 1:
+                        self.proteina.append(4)
+                        self.extra_poke.append(50)
+                    erros()
+                except AttributeError as error:
+                    messagebox.showwarning('ERRO', error)
 
-        bt_avancar = Image.open('Imagens/avancar.png')
-        img_avancar = ImageTk.PhotoImage(bt_avancar)
-        pag2 = Button(self.pag1, image= img_avancar, compound=CENTER, activebackground='lightblue',
-        command=lambda:[verificacao()])
-        pag2.place(relx=0.8, rely=0.85, relwidth=0.1, relheight=0.1)
-        pag2.configure(background='snow')
-        pag2.imagem = img_avancar
+            bt_avancar = Image.open('Imagens/avancar.png')
+            img_avancar = ImageTk.PhotoImage(bt_avancar)
+            pag2 = Button(self.pag1, image= img_avancar, compound=CENTER, activebackground='lightblue',
+            command=lambda:[verificacao()])
+            pag2.place(relx=0.8, rely=0.85, relwidth=0.1, relheight=0.1)
+            pag2.configure(background='snow')
+            pag2.imagem = img_avancar
     
     def poke_2(self):
         self.pag1.place_forget()
