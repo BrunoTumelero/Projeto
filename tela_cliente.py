@@ -351,31 +351,39 @@ class tela_cardapio(Cardapio, Pedido, Local):
         self.janela = Toplevel(self.root_cardapio)
         self.janela.title('Configurações - cardapio')
         self.janela.geometry('600x200')
+        self.janela.configure(background='snow')
 
         #Labels e Entrys
         lb_prato = Label(self.janela, text='Prato')
         lb_prato.place(relx=0.12, rely=0.08, relwidth=0.15, relheight=0.15)
+        lb_prato.configure(background='snow')
         ent_prato = Entry(self.janela)
         ent_prato.place(relx=0.05, rely=0.25, relwidth=0.3, relheight=0.12)
 
         lb_valor = Label(self.janela, text='Valor')
         lb_valor.place(relx=0.45, rely=0.08, relwidth=0.15, relheight=0.15)
+        lb_valor.configure(background='snow')
         ent_valor = Entry(self.janela)
         ent_valor.place(relx=0.43, rely=0.25, relwidth=0.2, relheight=0.12)
 
         cat_label = Label(self.janela, text='Catedoria')
         cat_label.place(relx=0.75, rely=0.08, relwidth=0.15, relheight=0.15)
+        cat_label.configure(background='snow')
         self.categoria_prato = ttk.Combobox(self.janela, values=['Snack', 'Bowl', 'Salada', 'Brunch',
         'Pizza', 'Burger', 'Poke', 'Doce', 'Café', 'Suco', 'Bebida'])
         self.categoria_prato.place(relx=0.72, rely=0.25, relwidth=0.2, relheight=0.12)
 
-        bt_add = Button(self.janela, text='Adicionar', command=lambda:[self.adicionar(ent_prato.get(),
+        bt_add = Button(self.janela, text='Adicionar', compound=CENTER, background='snow',
+        activebackground='lightblue', highlightbackground='snow', relief=FLAT, activeforeground='snow',
+        command=lambda:[self.adicionar(ent_prato.get(),
         ent_valor.get(), self.categoria_prato.get()), self.limpa(ent_prato, ent_valor), self.atualiza_tabela()])
         bt_add.place(relx=0.1, rely=0.6, relwidth=0.18, relheight=0.15)
-        bt_atualizar = Button(self.janela, text='Atualizar', command= lambda:[self.atualizar(ent_prato.get(),
+        bt_atualizar = Button(self.janela, text='Atualizar', compound=CENTER, background='snow', activeforeground='snow',
+        activebackground='lightblue', highlightbackground='snow', relief=FLAT, command= lambda:[self.atualizar(ent_prato.get(),
         ent_valor.get()), self.limpa(ent_prato, ent_valor), self.atualiza_tabela()])
         bt_atualizar.place(relx=0.4, rely=0.6, relwidth=0.18, relheight=0.15)
-        bt_apagar = Button(self.janela, text='Apagar', command=lambda: [self.apagar(ent_prato.get()),
+        bt_apagar = Button(self.janela, text='Apagar', compound=CENTER, background='snow', activeforeground='snow',
+        activebackground='lightblue', highlightbackground='snow', relief=FLAT, command=lambda: [self.apagar(ent_prato.get()),
         self.limpa(ent_prato, ent_valor), self.atualiza_tabela()])
         bt_apagar.place(relx=0.7, rely=0.6, relwidth=0.18, relheight=0.15)
 
@@ -648,7 +656,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
                     else:
                         self.menu.insert(parent='Snack', index='end', text='',
                                     values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
+                    count += 2
                 elif categoria == 'Bowl':
                     if count % 2 == 0:
                         self.menu.insert(parent='Bowl', index='end', text='',
