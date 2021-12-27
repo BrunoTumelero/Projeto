@@ -54,7 +54,7 @@ class Janela(Entregador, Pedido):
 
         # Configurar menu
         # opcoes do menu
-        self.my_menu.add_command(label='Inicio', command=lambda:[self.tree_frame.destroy(),
+        self.my_menu.add_command(label='Inicio', command=lambda:[self.frame_tele.destroy(),
         self.data_frame.destroy(), self.button_frame.destroy(), self.fundo, self.botoes_inicio,
         self.my_menu.destroy()])
         option_menu = Menu(self.my_menu, tearoff=0)
@@ -74,23 +74,20 @@ class Janela(Entregador, Pedido):
         search_menu.add_command(label="Caixa", command=lambda:[self.caixa(), self.mostra_caixa()] )
         search_menu.add_command(label="Teles", command=lambda:[self.Fechar_teles(), self.valor_teles()])
         search_menu.add_separator()
-        search_menu.add_command(label="Entregas", command=lambda:[self.view(), self.widgets(),
-        self.botoes()])
+        search_menu.add_command(label="Entregas", command=lambda:[self.data_frame.destroy(), self.button_frame.destroy(),
+        self.view(), self.widgets(), self.botoes()])
 
     def cria_tabela(self):
         # Add Style
         style = ttk.Style()
-
         # Pegar Tema
         style.theme_use('classic')
-
         # Configurar as cores da Treeview
         style.configure("Treeview",
                 background="#D3D3D3",
                 foreground="black",
                 rowheight=25,
                 fieldbackground="#D3D3D3")
-        
         # Change Selected Color
         style.map('Treeview',
                 background=[('selected', "#347083")])
@@ -111,10 +108,11 @@ class Janela(Entregador, Pedido):
         # Configurar a barra de rolagem
         tree_rolagem.config(command=self.tabela_entregas.yview)
 
-
     def Fechar_teles(self):
         def novo_menu():
             self.my_menu.destroy()
+            self.data_frame.destroy()
+            self.button_frame.destroy()
             # Add Menu
             menu2 = Menu(self.root_entregas)
             self.root_entregas.config(menu=menu2)
@@ -134,17 +132,21 @@ class Janela(Entregador, Pedido):
             option_menu.add_separator()
             option_menu.add_command(label="Exit", command=self.root_entregas.quit)
 
-            #Pesquisa Menu
             search_menu = Menu(menu2, tearoff=0)
             menu2.add_cascade(label="Fechamento", menu=search_menu)
-            # opcoes pesquisa menu
             search_menu.add_command(label="Caixa", command=lambda:[self.caixa(), self.mostra_caixa()] )
             search_menu.add_command(label="Teles", command=lambda:[self.Fechar_teles(), self.valor_teles()])
             search_menu.add_separator()
-            search_menu.add_command(label="Entregas", command=lambda:[self.view(), self.widgets(),
-            self.botoes(), self.menu(), menu2.destroy()])
-        
-        novo_menu()
+            search_menu.add_command(label="Entregas", command=lambda:[self.resumo.destroy(), self.botoes_frame.destroy(),
+            self.view(), self.widgets(), self.botoes(), self.menu(), menu2.destroy()])
+        try:
+            self.resumo.destroy()
+            self.botoes_frame.destroy()
+            novo_menu()
+        except AttributeError:
+            novo_menu()
+
+    def tabela_teles(self):
         self.data_frame.destroy()
         self.button_frame.destroy()
         # Definir colunas
@@ -247,7 +249,6 @@ class Janela(Entregador, Pedido):
             entredas_watts.place(relx=0.432, rely=0.4, relwidth=0.2, relheight=0.3),
             pagar_boy.place(relx=0.7, rely=0.15, relwidth=0.2, relheight=0.3)
 
-
         self.tabela_entregas.delete(*self.tabela_entregas.get_children())
         # Definir colunas
         self.tabela_entregas['columns'] = ("Data", "Nome", "Numero de entregas")
@@ -302,86 +303,54 @@ class Janela(Entregador, Pedido):
         except AttributeError:
             erro = messagebox.showwarning('Caixa', 'Numa venda realizada hoje')
             erro
+            self.caixa_frame.destroy()
             self.root_entregas.lower()
         
     def mostra_caixa(self):
         try:
-            self.data_frame.forget()
+            self.data_frame.destroy()
             dia = datetime.now()
             dia_caixa = dia.strftime("%d/%m")
-            caixa = LabelFrame(self.root_entregas, text=f"Caixa dia: {dia_caixa}")
-            caixa.place(relx=0.05, rely=0.58, relwidth=0.9, relheight=0.2)
-            caixa.configure(background='snow')
+            self.caixa_frame = LabelFrame(self.root_entregas, text=f"Caixa dia: {dia_caixa}")
+            self.caixa_frame.place(relx=0.05, rely=0.58, relwidth=0.9, relheight=0.2)
+            self.caixa_frame.configure(background='snow')
 
-            caixa_total = Label(caixa, text=f'Valor total: {self.dinheiro}$')
+            caixa_total = Label(self.caixa_frame, text=f'Valor total: {self.dinheiro}$')
             caixa_total.place(relx=0.15, rely=0.3, relwidth=0.3, relheight=0.4)
             caixa_total.configure(font=('Helvetica', 20), background='snow')
         except AttributeError:
             info_caixa = messagebox.showwarning('Caixa', 'Numa venda realizada hoje')
             if info_caixa == 'ok':
+                self.caixa_frame.destroy()
                 self.view()
                 self.widgets()
             else:
                 info_caixa
 
     def view(self):
-        # Add Style
-        style = ttk.Style()
-
-        # Pegar Tema
-        style.theme_use('default')
-
-        # Configurar as cores da Treeview
-        style.configure("Treeview",
-                background="#D3D3D3",
-                foreground="black",
-                rowheight=25,
-                fieldbackground="#D3D3D3")
-        
-        # Change Selected Color
-        style.map('Treeview',
-                background=[('selected', "#347083")])
-        # Criar Treeview Frame
-        self.tree_frame = Frame(self.root_entregas)
-        self.tree_frame.place(relx=0.08, rely=0.02, relwidth=0.9, relheight=0.5)
-        self.tree_frame.configure(background='snow')
-
-        # Criar Barra de rolagem Treeview
-        tree_scroll = Scrollbar(self.tree_frame)
-        tree_scroll.place(relx=0.92, rely=0.0, relwidth=0.02, relheight=1)
-        tree_scroll.configure(background='snow')
-
-        # Criar Treeview
-        self.lista = ttk.Treeview(self.tree_frame, yscrollcommand=tree_scroll.set,
-                               selectmode="extended")
-        self.lista.place(relx=0.02, rely=0.0, relwidth=0.9, relheight=1)
-
-        # Configurar a barra de rolagem
-        tree_scroll.config(command=self.lista.yview)
-
         # Definir colunas
-        self.lista['columns'] = ("Id", "Nome", "Bairro", "Boy", "Data")
+        self.tabela_entregas['columns'] = ("Id", "Nome", "Bairro", "Boy", "Data")
 
         # Formatar colunas
-        self.lista.column("#0", width=0, stretch=NO)
-        self.lista.column("Id", anchor=W, width=50)
-        self.lista.column("Nome", anchor=W, width=250)
-        self.lista.column("Bairro", anchor=W, width=140)
-        self.lista.column("Boy", anchor=CENTER, width=90)
-        self.lista.column("Data", anchor=CENTER, width=100)
+        self.tabela_entregas.column("#0", width=0, stretch=NO)
+        self.tabela_entregas.column("Id", anchor=W, width=50)
+        self.tabela_entregas.column("Nome", anchor=W, width=250)
+        self.tabela_entregas.column("Bairro", anchor=W, width=140)
+        self.tabela_entregas.column("Boy", anchor=CENTER, width=90)
+        self.tabela_entregas.column("Data", anchor=CENTER, width=100)
 
 
         # Criar nome das colunas
-        self.lista.heading("#0", text="", anchor=W)
-        self.lista.heading("Id", text="Id", anchor=CENTER)
-        self.lista.heading("Nome", text="Nome", anchor=CENTER)
-        self.lista.heading("Bairro", text="Bairro", anchor=CENTER)
-        self.lista.heading("Boy", text="Boy", anchor=CENTER)
-        self.lista.heading("Data", text="Data", anchor=CENTER)
+        self.tabela_entregas.heading("#0", text="", anchor=W)
+        self.tabela_entregas.heading("Id", text="Id", anchor=CENTER)
+        self.tabela_entregas.heading("Nome", text="Nome", anchor=CENTER)
+        self.tabela_entregas.heading("Bairro", text="Bairro", anchor=CENTER)
+        self.tabela_entregas.heading("Boy", text="Boy", anchor=CENTER)
+        self.tabela_entregas.heading("Data", text="Data", anchor=CENTER)
 
         # Criar as cores para mesclar
-        self.lista.tag_configure('oddrow', background="white")
-        self.lista.tag_configure('evenrow', background="lightblue")
+        self.tabela_entregas.tag_configure('oddrow', background="white")
+        self.tabela_entregas.tag_configure('evenrow', background="lightblue")
 
         self.conectar()
         #Add dados na tela
@@ -398,17 +367,17 @@ class Janela(Entregador, Pedido):
         count = 0
         for idd, nome , end, boy, data in c.fetchall():
             if count % 2 == 0:
-                self.lista.insert(parent='', index='0', text='',
+                self.tabela_entregas.insert(parent='', index='0', text='',
                                values=(idd, nome , end, boy, data),
                                tags=('evenrow',))
             else:
-                self.lista.insert(parent='', index='0', text='',
+                self.tabela_entregas.insert(parent='', index='0', text='',
                                values=(idd, nome, end, boy, data),
                                tags=('oddrow',))
             count += 1
 
         conn.close()
-        self.lista.bind('<Double-Button-1>', self.seleciona)
+        self.tabela_entregas.bind('<Double-Button-1>', self.seleciona)
 
     def seleciona(self, event):
         self.limpa(self.nome_entry, self.bairro_entry, self.boy_entry)
