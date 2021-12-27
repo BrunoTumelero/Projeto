@@ -17,6 +17,7 @@ class Janela(Entregador, Pedido):
         self.root_entregas = root
         self.root_entregas.title('Restaurante')
         self.root_entregas.configure(background='snow')
+        self.cria_tabela()
         self.menu()
         self.view()
         self.widgets()
@@ -48,16 +49,16 @@ class Janela(Entregador, Pedido):
 
     def menu(self):
         # Add Menu
-        my_menu = Menu(self.root_entregas)
-        self.root_entregas.config(menu=my_menu)
+        self.my_menu = Menu(self.root_entregas)
+        self.root_entregas.config(menu=self.my_menu)
 
         # Configurar menu
         # opcoes do menu
-        my_menu.add_command(label='Inicio', command=lambda:[self.tree_frame.place_forget(),
-        self.data_frame.place_forget(), self.button_frame.place_forget(), self.fundo, self.botoes_inicio,
-        my_menu.destroy()])
-        option_menu = Menu(my_menu, tearoff=0)
-        my_menu.add_cascade(label="Opções", menu=option_menu)
+        self.my_menu.add_command(label='Inicio', command=lambda:[self.tree_frame.destroy(),
+        self.data_frame.destroy(), self.button_frame.destroy(), self.fundo, self.botoes_inicio,
+        self.my_menu.destroy()])
+        option_menu = Menu(self.my_menu, tearoff=0)
+        self.my_menu.add_cascade(label="Opções", menu=option_menu)
         
         option_menu.add_command(label="Tabela bairros", command= lambda:[Tela_bairros()])
         option_menu.add_command(label="Funcionarios", command= lambda:[self.tela_cadastrar()])
@@ -67,8 +68,8 @@ class Janela(Entregador, Pedido):
         option_menu.add_command(label="Exit", command=self.root_entregas.quit)
 
         #Pesquisa Menu
-        search_menu = Menu(my_menu, tearoff=0)
-        my_menu.add_cascade(label="Fechamento", menu=search_menu)
+        search_menu = Menu(self.my_menu, tearoff=0)
+        self.my_menu.add_cascade(label="Fechamento", menu=search_menu)
         # opcoes pesquisa menu
         search_menu.add_command(label="Caixa", command=lambda:[self.caixa(), self.mostra_caixa()] )
         search_menu.add_command(label="Teles", command=lambda:[self.Fechar_teles(), self.valor_teles()])
@@ -76,11 +77,7 @@ class Janela(Entregador, Pedido):
         search_menu.add_command(label="Entregas", command=lambda:[self.view(), self.widgets(),
         self.botoes()])
 
-    def Fechar_teles(self):
-        self.tree_frame.forget()
-        conn = self.conectar()
-        c = conn.cursor()
-        c.execute("""SELECT * FROM funcionarios""")
+    def cria_tabela(self):
         # Add Style
         style = ttk.Style()
 
@@ -100,6 +97,7 @@ class Janela(Entregador, Pedido):
         # Criar Treeview Frame
         self.frame_tele = Frame(self.root_entregas)
         self.frame_tele.place(relx=0.08, rely=0.02, relwidth=0.9, relheight=0.5)
+        self.frame_tele.configure(background='snow')
 
         # Criar Barra de rolagem Treeview
         tree_rolagem = Scrollbar(self.frame_tele)
@@ -113,6 +111,42 @@ class Janela(Entregador, Pedido):
         # Configurar a barra de rolagem
         tree_rolagem.config(command=self.tabela_entregas.yview)
 
+
+    def Fechar_teles(self):
+        def novo_menu():
+            self.my_menu.destroy()
+            # Add Menu
+            menu2 = Menu(self.root_entregas)
+            self.root_entregas.config(menu=menu2)
+
+            # Configurar menu
+            # opcoes do menu
+            menu2.add_command(label='Inicio', command=lambda:[self.frame_tele.destroy(),
+            self.resumo.destroy(), self.botoes_frame.destroy(), self.fundo, self.botoes_inicio,
+            menu2.destroy()])
+            option_menu = Menu(menu2, tearoff=0)
+            menu2.add_cascade(label="Opções", menu=option_menu)
+            
+            option_menu.add_command(label="Tabela bairros", command= lambda:[Tela_bairros()])
+            option_menu.add_command(label="Funcionarios", command= lambda:[self.tela_cadastrar()])
+            option_menu.add_command(label="Cardapio", command=lambda:[tela_cardapio(self.root,
+            self.root_entregas, None, None)])
+            option_menu.add_separator()
+            option_menu.add_command(label="Exit", command=self.root_entregas.quit)
+
+            #Pesquisa Menu
+            search_menu = Menu(menu2, tearoff=0)
+            menu2.add_cascade(label="Fechamento", menu=search_menu)
+            # opcoes pesquisa menu
+            search_menu.add_command(label="Caixa", command=lambda:[self.caixa(), self.mostra_caixa()] )
+            search_menu.add_command(label="Teles", command=lambda:[self.Fechar_teles(), self.valor_teles()])
+            search_menu.add_separator()
+            search_menu.add_command(label="Entregas", command=lambda:[self.view(), self.widgets(),
+            self.botoes(), self.menu(), menu2.destroy()])
+        
+        novo_menu()
+        self.data_frame.destroy()
+        self.button_frame.destroy()
         # Definir colunas
         self.tabela_entregas['columns'] = ("Id", "Nome", "Numero de entregas", "Pagar")
 
@@ -133,6 +167,9 @@ class Janela(Entregador, Pedido):
         # Criar as cores para mesclar
         self.tabela_entregas.tag_configure('oddrow', background="white")
         self.tabela_entregas.tag_configure('evenrow', background="lightblue")
+        conn = self.conectar()
+        c = conn.cursor()
+        c.execute("""SELECT * FROM funcionarios""")
         global count
         count = 0
         for i, func, teles, pagar in c.fetchall():
@@ -150,18 +187,17 @@ class Janela(Entregador, Pedido):
         self.tabela_entregas.bind('<Double-Button-1>', self.seleciona)
 
     def valor_teles(self):
-        self.button_frame.forget()
-        self.data_frame.forget()
-        self.tabela_entregas.forget()
         self.data_pagamento = date.today()
         self.data_inicio = date.today() - timedelta(7)
         conn = self.conectar()
         c = conn.cursor()
         self.resumo = LabelFrame(self.root_entregas, text="Entregas da semana")
         self.resumo.place(relx=0.05, rely=0.58, relwidth=0.9, relheight=0.2)
+        self.resumo.configure(background='snow')
         #botoes
-        botoes_frame = LabelFrame(self.root_entregas)
-        botoes_frame.place(relx=0.05, rely=0.8, relwidth=0.9, relheight=0.18)
+        self.botoes_frame = LabelFrame(self.root_entregas)
+        self.botoes_frame.place(relx=0.05, rely=0.8, relwidth=0.9, relheight=0.18)
+        self.botoes_frame.configure(background='snow')
         c.execute("""SELECT nome_func FROM funcionarios""")
         l = [x for x in c.fetchall()]
         nomes = ttk.Combobox(self.resumo, values=l)
@@ -169,7 +205,8 @@ class Janela(Entregador, Pedido):
 
         bt_finalizar = Image.open('Imagens/pagamento.png')
         img_finalizar = ImageTk.PhotoImage(bt_finalizar)
-        finalizar_func = Button(botoes_frame, image= img_finalizar, compound= CENTER,
+        finalizar_func = Button(self.botoes_frame, image= img_finalizar, compound= CENTER, relief=FLAT, background='snow',
+        activebackground='lightblue', highlightbackground='snow',
         command=lambda:[finalizar(nomes.get())])
         finalizar_func.place(relx=0.45, rely=0.35, relwidth=0.1, relheight=0.55)
         finalizar_func.imagem = img_finalizar
@@ -201,63 +238,36 @@ class Janela(Entregador, Pedido):
                         conta_watts += 1
 
             entregas_ifood = Label(self.resumo, text=f'Ifood: {conta_ifood}')
+            entregas_ifood.configure(background='snow')
             entredas_watts = Label(self.resumo, text=f'Tele Wonder: {conta_watts}')
+            entredas_watts.configure(background='snow')
             pagar_boy = Label(self.resumo, text=f'Pagar: {sum(pagar)}$')
+            pagar_boy.configure(background='snow')
             entregas_ifood.place(relx=0.4, rely=0.15, relwidth=0.2, relheight=0.3),
             entredas_watts.place(relx=0.432, rely=0.4, relwidth=0.2, relheight=0.3),
             pagar_boy.place(relx=0.7, rely=0.15, relwidth=0.2, relheight=0.3)
-        
-        # Add Style
-        style = ttk.Style()
 
-        # Pegar Tema
-        style.theme_use('classic')
 
-        # Configurar as cores da Treeview
-        style.configure("Treeview",
-                background="#D3D3D3",
-                foreground="black",
-                rowheight=25,
-                fieldbackground="#D3D3D3")
-        
-        # Change Selected Color
-        style.map('Treeview', background=[('selected', "#347083")])
-        # Criar Treeview Frame
-        self.frame_tele = Frame(self.root_entregas)
-        self.frame_tele.place(relx=0.08, rely=0.02, relwidth=0.9, relheight=0.5)
-
-        # Criar Barra de rolagem Treeview
-        tree_rolagem = Scrollbar(self.frame_tele)
-        tree_rolagem.place(relx=0.92, rely=0.0, relwidth=0.02, relheight=1)
-
-        # Criar Treeview
-        self.tabela_teles = ttk.Treeview(self.frame_tele, yscrollcommand=tree_rolagem.set,
-                               selectmode="extended")
-        self.tabela_teles.place(relx=0.02, rely=0.0, relwidth=0.9, relheight=1)
-
-        # Configurar a barra de rolagem
-        tree_rolagem.config(command=self.tabela_teles.yview)
-
+        self.tabela_entregas.delete(*self.tabela_entregas.get_children())
         # Definir colunas
-        self.tabela_teles['columns'] = ("Data", "Nome", "Numero de entregas")
-
+        self.tabela_entregas['columns'] = ("Data", "Nome", "Numero de entregas")
         # Formatar colunas
-        self.tabela_teles.column("#0", width=0, stretch=NO)
-        self.tabela_teles.column("Data", anchor=W, width=50)
-        self.tabela_teles.column("Nome", anchor=CENTER, width=150)
-        self.tabela_teles.column("Numero de entregas", anchor=CENTER, width=200)
-        self.tabela_teles.column("Data", anchor=CENTER, width=80)
+        self.tabela_entregas.column("#0", width=0, stretch=NO)
+        self.tabela_entregas.column("Data", anchor=W, width=50)
+        self.tabela_entregas.column("Nome", anchor=CENTER, width=150)
+        self.tabela_entregas.column("Numero de entregas", anchor=CENTER, width=200)
+        self.tabela_entregas.column("Data", anchor=CENTER, width=80)
 
         # Criar nome das colunas
-        self.tabela_teles.heading("#0", text="", anchor=W)
-        self.tabela_teles.heading("Data", text="Data", anchor=CENTER)
-        self.tabela_teles.heading("Nome", text="Nome", anchor=CENTER)
-        self.tabela_teles.heading("Numero de entregas", text="Numero de entregas", anchor=CENTER)
+        self.tabela_entregas.heading("#0", text="", anchor=W)
+        self.tabela_entregas.heading("Data", text="Data", anchor=CENTER)
+        self.tabela_entregas.heading("Nome", text="Nome", anchor=CENTER)
+        self.tabela_entregas.heading("Numero de entregas", text="Numero de entregas", anchor=CENTER)
 
 
         # Criar as cores para mesclar
-        self.tabela_teles.tag_configure('oddrow', background="white")
-        self.tabela_teles.tag_configure('evenrow', background="lightblue")
+        self.tabela_entregas.tag_configure('oddrow', background="white")
+        self.tabela_entregas.tag_configure('evenrow', background="lightblue")
 
         c.execute("""SELECT nome_func, COUNT(nome_func), dia 
         FROM pedidos WHERE dia > %s and dia <= %s
@@ -266,17 +276,17 @@ class Janela(Entregador, Pedido):
         count = 0
         for func, tipo, day in c.fetchall():
             if count % 2 == 0:
-                self.tabela_teles.insert(parent='', index='0', text='',
+                self.tabela_entregas.insert(parent='', index='0', text='',
                                values=(day, func, tipo),
                                tags=('evenrow',))
             else:
-                self.tabela_teles.insert(parent='', index='0', text='',
+                self.tabela_entregas.insert(parent='', index='0', text='',
                                values=(day, func, tipo),
                                tags=('oddrow',))
             count += 1
 
         conn.close()
-        self.tabela_teles.bind('<Double-Button-1>', self.seleciona)
+        self.tabela_entregas.bind('<Double-Button-1>', self.seleciona)
 
     def caixa(self):
         try:
@@ -301,10 +311,11 @@ class Janela(Entregador, Pedido):
             dia_caixa = dia.strftime("%d/%m")
             caixa = LabelFrame(self.root_entregas, text=f"Caixa dia: {dia_caixa}")
             caixa.place(relx=0.05, rely=0.58, relwidth=0.9, relheight=0.2)
+            caixa.configure(background='snow')
 
             caixa_total = Label(caixa, text=f'Valor total: {self.dinheiro}$')
             caixa_total.place(relx=0.15, rely=0.3, relwidth=0.3, relheight=0.4)
-            caixa_total.configure(font=('Helvetica', 20))
+            caixa_total.configure(font=('Helvetica', 20), background='snow')
         except AttributeError:
             info_caixa = messagebox.showwarning('Caixa', 'Numa venda realizada hoje')
             if info_caixa == 'ok':
@@ -573,21 +584,21 @@ class Janela(Entregador, Pedido):
         self.button_frame.configure(background='snow')
         #consultar
         consultar_button = Button(self.button_frame, image= img3, compound=CENTER, relief=FLAT,
-        activebackground='lightblue', command= lambda: [self.rusultado_consulta(self.nome_entry.get(),
+        activebackground='lightblue', highlightbackground='snow', command= lambda: [self.rusultado_consulta(self.nome_entry.get(),
         self.bairro_entry.get(), self.boy_entry.get())])
         consultar_button.place(relx=0.13, rely=0.1, relwidth=0.1, relheight=0.55)
         consultar_button.configure(background='snow')
         consultar_button.imagem = img3
         #atualizar
         atualizar_button = Button(self.button_frame, image= img2, compound=CENTER, relief=FLAT,
-        activebackground='lightblue', command= lambda:[
+        activebackground='lightblue', highlightbackground='snow', command= lambda:[
         self.atualiza_pedido(self.boy_entry.get()), self.atualiza_tabela()])
         atualizar_button.place(relx=0.43, rely=0.1, relwidth=0.1, relheight=0.55)
         atualizar_button.configure(background='snow')
         atualizar_button. imagem = img2
         #apagar
         apagar = Button(self.button_frame, image= img, compound=CENTER, relief=FLAT,
-        activebackground='lightblue', command= lambda:[self.apagar(self.idp),
+        activebackground='lightblue', highlightbackground='snow', command= lambda:[self.apagar(self.idp),
         self.limpa(self.nome_entry, self.bairro_entry, self.boy_entry), self.atualiza_tabela()])
         apagar.place(relx=0.73, rely=0.1, relwidth=0.1, relheight=0.55)
         apagar.configure(background='snow')
@@ -598,21 +609,21 @@ class Janela(Entregador, Pedido):
         self.tela.geometry('400x100')
         self.tela.maxsize(400, 100)
         self.tela.title('Cadastrar - Funcionario')
+        self.tela.configure(background='snow')
 
         #Entradas
         self.lb_nome = Label(self.tela, text='Nome')
+        self.lb_nome.configure(background='snow')
         self.en_nome = Entry(self.tela)
+        self.en_nome.focus()
         self.lb_nome.pack()
         self.en_nome.pack()
         #botao
-        self.bt_cadastra = Button(self.tela, text='Cadastrar', 
-        command=lambda:[self.cadastrar(self.en_nome.get().title()),
+        self.bt_cadastra = Button(self.tela, text='Cadastrar', background='snow', relief=FLAT, activebackground='snow',
+		highlightbackground='snow', activeforeground='green', command=lambda:[self.cadastrar(self.en_nome.get().title()),
         self.en_nome.delete(0, 'end')])
         self.bt_cadastra.place(relx=0.2, rely=0.5, relwidth=0.2, relheight=0.3)
-        self.bt_excluir = Button(self.tela, text='Excluir', 
-        command=lambda:[self.apagar_func(self.en_nome.get().title()),
+        self.bt_excluir = Button(self.tela, text='Excluir', background='snow', relief=FLAT, activebackground='snow',
+		highlightbackground='snow', activeforeground='red', command=lambda:[self.apagar_func(self.en_nome.get().title()),
         self.en_nome.delete(0, 'end')])
         self.bt_excluir.place(relx=0.6, rely=0.5, relwidth=0.2, relheight=0.3)
-
-#j = Janela()
-#j
