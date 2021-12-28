@@ -337,8 +337,8 @@ class tela_cardapio(Cardapio, Pedido, Local):
         self.root_cardapio.config(menu=my_menu)
 
         my_menu.add_command(label='Inicio', command=lambda:[self.name.destroy(),
-        self.frame_menu.destroy(), self.frame_botao.destroy(), self.total.place_forget(), self.frame_cardapio.destroy(),
-        self.fundo_inicio, self.inicio_botoes, my_menu.destroy()])
+        self.frame_menu.destroy(), self.frame_botao.destroy(), self.total.destroy(), self.frame_cardapio.destroy(),
+        self.fundo_inicio, self.inicio_botoes, my_menu.destroy(), self.frame_total.destroy()])
         # Configurar menu
         option_menu = Menu(my_menu, tearoff=0)
         my_menu.add_cascade(label="Opções", menu=option_menu)
@@ -388,12 +388,19 @@ class tela_cardapio(Cardapio, Pedido, Local):
         bt_apagar.place(relx=0.7, rely=0.6, relwidth=0.18, relheight=0.15)
 
     def total_pedido(self, valor):
-        self.total = Label(self.root_cardapio, text=f'TOTAL: {valor}$')
-        self.total.place(relx=0.7, rely=0.65, relwidth=0.2, relheight=0.1)
+        self.frame_total = Frame(self.root_cardapio)
+        self.frame_total.place(relx=0.7, rely=0.65, relwidth=0.2, relheight=0.1)
+        self.total = Label(self.frame_total, text=f'TOTAL: {valor}$')
+        self.total.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
         self.total.configure(background='snow')
 
     def set_total(self):
         try:
+            self.frame_total.destroy()
+            self.tipo_tele()
+            self.valor_total = sum(self.carrinho_compras) + self.tipo_tele()
+            self.total_pedido(self.valor_total)
+        except AttributeError:
             self.tipo_tele()
             self.valor_total = sum(self.carrinho_compras) + self.tipo_tele()
             self.total_pedido(self.valor_total)
@@ -444,7 +451,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
         command=lambda:[self.novo_pedido(self.info_cliente, self.memoria, self.boy_entry.get().title(),
         self.tipo_tele(), self.tipo_pedido, self.data_entry.get()),
         self.carrinho.delete(*self.carrinho.get_children()), self.boy_entry.delete(0, 'end'),
-        self.data_entry.delete(0, 'end'), self.total_pedido(0)])
+        self.data_entry.delete(0, 'end')])
         finalizar.place(relx=0.8, rely=0.5, relwidth=0.1, relheight=0.18)
         finalizar.imagem = img_fpedido
 
@@ -482,7 +489,8 @@ class tela_cardapio(Cardapio, Pedido, Local):
             self.prato, self.preco = self.menu.item(x, 'values')
             if self.prato not in self.memoria.keys():
                 self.memoria[self.prato] = 1
-                self.modelo.set_prato(self.valor.get()), self.inserir(), self.soma_pratos(), 
+                self.modelo.set_prato(self.valor.get()), self.inserir(), self.soma_pratos(), self.total.destroy()
+
                 self.set_total()
             else:
                 self.memoria[self.prato] +=1
