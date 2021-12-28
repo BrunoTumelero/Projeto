@@ -490,7 +490,6 @@ class tela_cardapio(Cardapio, Pedido, Local):
             if self.prato not in self.memoria.keys():
                 self.memoria[self.prato] = 1
                 self.modelo.set_prato(self.valor.get()), self.inserir(), self.soma_pratos(), self.total.destroy()
-
                 self.set_total()
             else:
                 self.memoria[self.prato] +=1
