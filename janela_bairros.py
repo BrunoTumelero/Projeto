@@ -5,11 +5,12 @@ from bairrosv2 import *
 
 class Tela_bairros(Local):
 	"""docstring for Tela_bairros"""
-	def __init__(self):
+	def __init__(self, app):
 		super(Tela_bairros, self).__init__()
-		self.root = Tk()
+		self.root = Toplevel(app)
 		self.root.title('Tabela - bairros')
 		self.root.geometry('450x600')
+		self.root.configure(background='snow')
 		self.tabela()
 		self.entradas()
 		self.botoes()
@@ -29,21 +30,18 @@ class Tela_bairros(Local):
 
 	def tabela(self):
 		estilo = ttk.Style()
-
 		estilo.theme_use('default')
-
 		estilo.configure("Treeview",
                 background="#D3D3D3",
                 foreground="black",
                 rowheight=25,
                 fieldbackground="#D3D3D3")
-
 		estilo.map('Treeview',
                 background=[('selected', "#347083")])
 
 		bairros_frame = Frame(self.root)
 		bairros_frame.place(relx=0.0, rely=0.0, relwidth=0.95, relheight=0.65)
-
+		bairros_frame.configure(background='snow')
 		barra = Scrollbar(bairros_frame)
 		barra.place(relx=0.97, rely=0.05, relwidth=0.03, relheight=0.95)
 
@@ -120,26 +118,31 @@ class Tela_bairros(Local):
 	def entradas(self):
 		bairro_label = Label(self.root, text="Bairro")
 		bairro_label.configure(font=('helvetica', 16))
+		bairro_label.configure(background='snow')
 		bairro_label.place(relx=0.18, rely=0.68, relwidth=0.15, relheight=0.1)
 		self.bairro_entry = Entry(self.root)
 		self.bairro_entry.place(relx=0.05, rely=0.75, relwidth=0.4, relheight=0.05)
 
 		valor_label = Label(self.root, text="Valor")
 		valor_label.configure(font=('helvetica', 16))
+		valor_label.configure(background='snow')
 		valor_label.place(relx=0.72, rely=0.68, relwidth=0.15, relheight=0.1)
 		self.valor_entry = Entry(self.root)
 		self.valor_entry.place(relx=0.7, rely=0.75, relwidth=0.2, relheight=0.05)
 
 	def botoes(self):
-		add = Button(self.root, text="Adicionar", command = lambda: [self.salvar(self.bairro_entry.get().title(),
+		add = Button(self.root, text="Adicionar", activeforeground='green', highlightbackground='snow', activebackground='snow',
+		background='snow', relief=FLAT, command = lambda: [self.salvar(self.bairro_entry.get().title(),
 		self.valor_entry.get()), self.limpa(self.bairro_entry, self.valor_entry), self.atualiza_tabela()])
 		add.place(relx=0.1, rely=0.85, relwidth=0.18, relheight=0.08)
 
-		atualizar = Button(self.root, text="Atualizar\nvalor", command=lambda:[
+		atualizar = Button(self.root, text="Atualizar\nvalor", activeforeground='gold', highlightbackground='snow', activebackground='snow',
+		background='snow', relief=FLAT, command=lambda:[
 		self.atualiza_valor(self.valor_entry.get() ,self.bairro_entry.get().title()),
 		self.atualiza_tabela(), self.limpa(self.bairro_entry, self.valor_entry)])
 		atualizar.place(relx=0.4, rely=0.85, relwidth=0.18, relheight=0.08)
 
-		apagar = Button(self.root, text="Apagar", command= lambda: [self.apagar(self.bairro_entry.get().title()),
+		apagar = Button(self.root, text="Apagar", activeforeground='red', highlightbackground='snow', activebackground='snow',
+		background='snow', relief=FLAT, command= lambda: [self.apagar(self.bairro_entry.get().title()),
 		self.limpa(self.bairro_entry, self.valor_entry), self.atualiza_tabela()])
 		apagar.place(relx=0.7, rely=0.85, relwidth=0.18, relheight=0.08)

@@ -225,7 +225,7 @@ class tela_cliente(Cliente):
     new_pedido = Button(self.frame_botao, text= 'Novo\nPedido', image= img_new, compound=LEFT,
     relief=FLAT, activebackground='lightblue', background='snow', activeforeground='snow',
     highlightbackground='snow',
-    command= lambda:[tela_cardapio(self.root, self.root_clientes, self.nome_entry.get().title(),
+    command= lambda:[tela_cardapio(self.root, self.nome_entry.get().title(),
     self.endereco_entry.get().title(), self.fundo, self.botoes_inicio),
     self.frame_botao.destroy(), self.data_frame.destroy(), self.tree_frame.destroy()])
     new_pedido.configure(font=('Roman', 14))
@@ -269,7 +269,7 @@ class tela_cliente(Cliente):
     return name, local
 
 class tela_cardapio(Cardapio, Pedido, Local):
-    def __init__(self, root, root_cardapio, info_cliente, end_cliente, fundo, botoes_inicio):
+    def __init__(self, root, info_cliente, end_cliente, fundo, botoes_inicio):
         super().__init__()
         self.root_cardapio = root
         self.root_cardapio.title('Cardapio')

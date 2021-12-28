@@ -51,19 +51,18 @@ class Janela(Entregador, Pedido):
         # Add Menu
         self.my_menu = Menu(self.root_entregas)
         self.root_entregas.config(menu=self.my_menu)
-
         # Configurar menu
-        # opcoes do menu
         self.my_menu.add_command(label='Inicio', command=lambda:[self.frame_tele.destroy(), self.elimina_caixa(),
         self.data_frame.destroy(), self.button_frame.destroy(), self.fundo, self.botoes_inicio,
         self.my_menu.destroy()])
         option_menu = Menu(self.my_menu, tearoff=0)
         self.my_menu.add_cascade(label="Opções", menu=option_menu)
         
-        option_menu.add_command(label="Tabela bairros", command= lambda:[Tela_bairros()])
+        option_menu.add_command(label="Tabela bairros", command= lambda:[Tela_bairros(self.root_entregas)])
         option_menu.add_command(label="Funcionarios", command= lambda:[self.tela_cadastrar()])
         option_menu.add_command(label="Cardapio", command=lambda:[tela_cardapio(self.root,
-        self.root_entregas, None, None)])
+        None, None, self.fundo, self.botoes_inicio), self.elimina_caixa(), self.frame_tele.destroy(), self.data_frame.destroy(),
+        self.button_frame.destroy()])
         option_menu.add_separator()
         option_menu.add_command(label="Exit", command=self.root_entregas.quit)
 
@@ -76,7 +75,14 @@ class Janela(Entregador, Pedido):
         search_menu.add_separator()
         search_menu.add_command(label="Entregas", command=lambda:[self.data_frame.destroy(), self.button_frame.destroy(),
         self.view(), self.widgets(), self.botoes()])
-
+#elimina dados do menu 2 para chamar o inicio da janela cardapio ficar correto 
+    def elimina(self):
+        try:
+            self.frame_tele.destroy()
+            self.resumo.destroy(), self.botoes_frame.destroy()
+        except TypeError as e:
+            print(e)
+        
     def cria_tabela(self):
         # Add Style
         style = ttk.Style()
@@ -107,7 +113,7 @@ class Janela(Entregador, Pedido):
 
         # Configurar a barra de rolagem
         tree_rolagem.config(command=self.tabela_entregas.yview)
-
+#elimina dados da opcao caixa para o inicio ficar correto
     def elimina_caixa(self):
         try:
             self.caixa_frame.destroy()
@@ -134,7 +140,7 @@ class Janela(Entregador, Pedido):
             option_menu.add_command(label="Tabela bairros", command= lambda:[Tela_bairros()])
             option_menu.add_command(label="Funcionarios", command= lambda:[self.tela_cadastrar()])
             option_menu.add_command(label="Cardapio", command=lambda:[tela_cardapio(self.root,
-            self.root_entregas, None, None)])
+            None, None, self.fundo, self.botoes_inicio), self.elimina()])
             option_menu.add_separator()
             option_menu.add_command(label="Exit", command=self.root_entregas.quit)
 
@@ -555,7 +561,7 @@ class Janela(Entregador, Pedido):
         bt3 = Image.open('Imagens/consultar.ico')
         img3 = ImageTk.PhotoImage(bt3)
         # Add Buttons
-        self.button_frame = LabelFrame(self.root_entregas, text="Comandos")
+        self.button_frame = Frame(self.root_entregas)
         self.button_frame.place(relx=0.05, rely=0.8, relwidth=0.9, relheight=0.18)
         self.button_frame.configure(background='snow')
         #consultar
