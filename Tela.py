@@ -54,7 +54,7 @@ class Janela(Entregador, Pedido):
 
         # Configurar menu
         # opcoes do menu
-        self.my_menu.add_command(label='Inicio', command=lambda:[self.frame_tele.destroy(),
+        self.my_menu.add_command(label='Inicio', command=lambda:[self.frame_tele.destroy(), self.elimina_caixa(),
         self.data_frame.destroy(), self.button_frame.destroy(), self.fundo, self.botoes_inicio,
         self.my_menu.destroy()])
         option_menu = Menu(self.my_menu, tearoff=0)
@@ -108,6 +108,12 @@ class Janela(Entregador, Pedido):
         # Configurar a barra de rolagem
         tree_rolagem.config(command=self.tabela_entregas.yview)
 
+    def elimina_caixa(self):
+        try:
+            self.caixa_frame.destroy()
+        except AttributeError:
+            pass
+
     def Fechar_teles(self):
         def novo_menu():
             self.my_menu.destroy()
@@ -119,7 +125,7 @@ class Janela(Entregador, Pedido):
 
             # Configurar menu
             # opcoes do menu
-            menu2.add_command(label='Inicio', command=lambda:[self.frame_tele.destroy(),
+            menu2.add_command(label='Inicio', command=lambda:[self.frame_tele.destroy(), self.elimina_caixa(),
             self.resumo.destroy(), self.botoes_frame.destroy(), self.fundo, self.botoes_inicio,
             menu2.destroy()])
             option_menu = Menu(menu2, tearoff=0)
@@ -297,8 +303,8 @@ class Janela(Entregador, Pedido):
             data = data.strftime("%Y/%m/%d")
             c.execute("""SELECT valor_total FROM pedidos WHERE dia = %s""", (data,))
             for x in c.fetchall():
-                self.final_dia.append(x[0])
-                self.dinheiro =  sum(self.final_dia)
+                self.dinheiro = 0
+                self.dinheiro += x[0]
             conn.close()
         except AttributeError:
             erro = messagebox.showwarning('Caixa', 'Numa venda realizada hoje')
@@ -308,6 +314,7 @@ class Janela(Entregador, Pedido):
         
     def mostra_caixa(self):
         try:
+            self.elimina_caixa()
             self.data_frame.destroy()
             dia = datetime.now()
             dia_caixa = dia.strftime("%d/%m")
