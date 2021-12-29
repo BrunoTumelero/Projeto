@@ -137,7 +137,7 @@ class Janela(Entregador, Pedido):
             option_menu = Menu(menu2, tearoff=0)
             menu2.add_cascade(label="Opções", menu=option_menu)
             
-            option_menu.add_command(label="Tabela bairros", command= lambda:[Tela_bairros()])
+            option_menu.add_command(label="Tabela bairros", command= lambda:[Tela_bairros(self.root_entregas)])
             option_menu.add_command(label="Funcionarios", command= lambda:[self.tela_cadastrar()])
             option_menu.add_command(label="Cardapio", command=lambda:[tela_cardapio(self.root,
             None, None, self.fundo, self.botoes_inicio), self.elimina()])
@@ -405,7 +405,7 @@ class Janela(Entregador, Pedido):
         conn = self.conectar()
         c = conn.cursor()
 
-        self.lista.delete(*self.lista.get_children())
+        self.tabela_entregas.delete(*self.tabela_entregas.get_children())
         global count
         count = 0
         if len(nome) > 0:
@@ -419,11 +419,11 @@ class Janela(Entregador, Pedido):
                     """, (nome_p,))
             for idd, nome , end, entregador, data in c.fetchall():
                 if count % 2 == 0:
-                    self.lista.insert(parent='', index='0', text='',
+                    self.tabela_entregas.insert(parent='', index='0', text='',
                                 values=(idd, nome , end, entregador, data),
                                 tags=('evenrow',))
                 else:
-                    self.lista.insert(parent='', index='0', text='',
+                    self.tabela_entregas.insert(parent='', index='0', text='',
                                 values=(idd, nome, end, entregador, data),
                                 tags=('oddrow',))
                 count += 1
