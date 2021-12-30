@@ -3,6 +3,7 @@ from tkinter import ttk
 from datetime import *
 from entregadoresv2 import *
 from pedido import Pedido
+from Cliente import Cliente 
 from tela_cliente import tela_cardapio
 from tkinter import messagebox
 from PIL import Image, ImageTk
@@ -27,7 +28,7 @@ class Janela(Entregador, Pedido):
         self.root_entregas.mainloop()
 
     def conectar(self):
-        return super().conectar()
+        return super().conectar_func()
 
     def cadastrar(self, nome):
         return super().cadastrar(nome)
@@ -72,7 +73,6 @@ class Janela(Entregador, Pedido):
         # opcoes pesquisa menu
         search_menu.add_command(label="Caixa", command=lambda:[self.caixa(), self.mostra_caixa()] )
         search_menu.add_command(label="Teles", command=lambda:[self.Fechar_teles(), self.valor_teles()])
-        search_menu.add_separator()
         search_menu.add_command(label="Entregas", command=lambda:[self.data_frame.destroy(), self.button_frame.destroy(),
         self.view(), self.widgets(), self.botoes()])
 #elimina dados do menu 2 para chamar o inicio da janela cardapio ficar correto 
@@ -132,7 +132,7 @@ class Janela(Entregador, Pedido):
             # Configurar menu
             # opcoes do menu
             menu2.add_command(label='Inicio', command=lambda:[self.frame_tele.destroy(), self.elimina_caixa(),
-            self.resumo.destroy(), self.botoes_frame.destroy(), self.fundo, self.botoes_inicio,
+            self.resumo.destroy(), self.botoes_frame.destroy(), self.fundo, self.botoes_inicio, self.data_frame.destroy(),
             menu2.destroy()])
             option_menu = Menu(menu2, tearoff=0)
             menu2.add_cascade(label="Opções", menu=option_menu)
@@ -148,7 +148,6 @@ class Janela(Entregador, Pedido):
             menu2.add_cascade(label="Fechamento", menu=search_menu)
             search_menu.add_command(label="Caixa", command=lambda:[self.caixa(), self.mostra_caixa()] )
             search_menu.add_command(label="Teles", command=lambda:[self.Fechar_teles(), self.valor_teles()])
-            search_menu.add_separator()
             search_menu.add_command(label="Entregas", command=lambda:[self.resumo.destroy(), self.botoes_frame.destroy(),
             self.view(), self.widgets(), self.botoes(), self.menu(), menu2.destroy()])
         try:
@@ -161,6 +160,7 @@ class Janela(Entregador, Pedido):
     def tabela_teles(self):
         self.data_frame.destroy()
         self.button_frame.destroy()
+        self.tabela_entregas.delete(*self.tabela_entregas.get_children())
         # Definir colunas
         self.tabela_entregas['columns'] = ("Id", "Nome", "Numero de entregas", "Pagar")
 
@@ -181,7 +181,7 @@ class Janela(Entregador, Pedido):
         # Criar as cores para mesclar
         self.tabela_entregas.tag_configure('oddrow', background="white")
         self.tabela_entregas.tag_configure('evenrow', background="lightblue")
-        conn = self.conectar()
+        conn = self.conectar_func()
         c = conn.cursor()
         c.execute("""SELECT * FROM funcionarios""")
         global count
@@ -203,7 +203,7 @@ class Janela(Entregador, Pedido):
     def valor_teles(self):
         self.data_pagamento = date.today()
         self.data_inicio = date.today() - timedelta(7)
-        conn = self.conectar()
+        conn = self.conectar_func()
         c = conn.cursor()
         self.resumo = LabelFrame(self.root_entregas, text="Entregas da semana")
         self.resumo.place(relx=0.05, rely=0.58, relwidth=0.9, relheight=0.2)
@@ -229,7 +229,7 @@ class Janela(Entregador, Pedido):
             pagar = [0]
             conta_ifood = 0
             conta_watts = 0
-            conn = self.conectar()
+            conn = self.conectar_pedido()
             c = conn.cursor()
             c.execute("""SELECT id_pedido, nome_func, tipo_tele, dia 
             FROM pedidos WHERE dia > %s and dia <= %s""", (self.data_inicio, self.data_pagamento))
@@ -242,9 +242,10 @@ class Janela(Entregador, Pedido):
                         c.execute("""SELECT nome_cliente FROM pedidos WHERE id_pedido= %s""",
                         (idd,))
                         nome = c.fetchall()
-                        c.execute("""SELECT endereco FROM clientes WHERE nome_cliente = %s""",
+                        conect = Cliente.conectar_cliente()
+                        conect.execute("""SELECT endereco FROM clientes WHERE nome_cliente = %s""",
                         (nome[0][0],))
-                        end = c.fetchall()
+                        end = conect.fetchall()
                         c.execute("""SELECT preco FROM bairros WHERE nome_bairro = %s""",
                         (end[0][0],))
                         valor = c.fetchall()
@@ -303,7 +304,7 @@ class Janela(Entregador, Pedido):
 
     def caixa(self):
         try:
-            conn = self.conectar()
+            conn = self.conectar_pedido()
             c = conn.cursor()
             data = datetime.now()
             data = data.strftime("%Y/%m/%d")
@@ -315,9 +316,7 @@ class Janela(Entregador, Pedido):
         except AttributeError:
             erro = messagebox.showwarning('Caixa', 'Numa venda realizada hoje')
             erro
-            self.caixa_frame.destroy()
-            self.root_entregas.lower()
-        
+            
     def mostra_caixa(self):
         try:
             self.elimina_caixa()
@@ -341,6 +340,7 @@ class Janela(Entregador, Pedido):
                 info_caixa
 
     def view(self):
+        self.tabela_entregas.delete(*self.tabela_entregas.get_children())
         # Definir colunas
         self.tabela_entregas['columns'] = ("Id", "Nome", "Bairro", "Boy", "Data")
 
@@ -365,9 +365,8 @@ class Janela(Entregador, Pedido):
         self.tabela_entregas.tag_configure('oddrow', background="white")
         self.tabela_entregas.tag_configure('evenrow', background="lightblue")
 
-        self.conectar()
         #Add dados na tela
-        conn = self.conectar() 
+        conn = self.conectar_pedido() 
         c = conn.cursor()
         c.execute("""SELECT Id_pedido, pe.nome_cliente,
                 cl.endereco, 
@@ -394,15 +393,15 @@ class Janela(Entregador, Pedido):
 
     def seleciona(self, event):
         self.limpa(self.nome_entry, self.bairro_entry, self.boy_entry)
-        for x in self.lista.selection():
-            self.idp, n, e, boy, data  = self.lista.item(x, 'values')
+        for x in self.tabela_entregas.selection():
+            self.idp, n, e, boy, data  = self.tabela_entregas.item(x, 'values')
             self.nome_entry.insert(END, n)
             self.bairro_entry.insert(END, e)
             self.boy_entry.insert(END, boy)
         return self.nome_entry.get()
 
     def rusultado_consulta(self, nome, local, boy):
-        conn = self.conectar()
+        conn = self.conectar_pedido()
         c = conn.cursor()
 
         self.tabela_entregas.delete(*self.tabela_entregas.get_children())
@@ -438,11 +437,11 @@ class Janela(Entregador, Pedido):
                     """, (local,))
             for idd, nome , end, entregador, data in c.fetchall():
                 if count % 2 == 0:
-                    self.lista.insert(parent='', index='0', text='',
+                    self.tabela_entregas.insert(parent='', index='0', text='',
                                 values=(idd, nome , end, entregador, data),
                                 tags=('evenrow',))
                 else:
-                    self.lista.insert(parent='', index='0', text='',
+                    self.tabela_entregas.insert(parent='', index='0', text='',
                                 values=(idd, nome, end, entregador, data),
                                 tags=('oddrow',))
                 count += 1
@@ -457,11 +456,11 @@ class Janela(Entregador, Pedido):
                     """, (boy,))
             for idd, nome , end, entregador, data in c.fetchall():
                 if count % 2 == 0:
-                    self.lista.insert(parent='', index='0', text='',
+                    self.tabela_entregas.insert(parent='', index='0', text='',
                                 values=(idd, nome , end, entregador, data),
                                 tags=('evenrow',))
                 else:
-                    self.lista.insert(parent='', index='0', text='',
+                    self.tabela_entregas.insert(parent='', index='0', text='',
                                 values=(idd, nome, end, entregador, data),
                                 tags=('oddrow',))
                 count += 1
@@ -492,8 +491,8 @@ class Janela(Entregador, Pedido):
         self.boy_entry.place(relx=0.32, rely=0.5, relwidth=0.3, relheight=0.3)
 
     def atualiza_tabela(self):
-        self.lista.delete(*self.lista.get_children())
-        conn = self.conectar() 
+        self.tabela_entregas.delete(*self.tabela_entregas.get_children())
+        conn = self.conectar_pedido() 
         c = conn.cursor()
         c.execute("""SELECT Id_pedido, pe.nome_cliente,
                 cl.endereco, 
@@ -506,11 +505,11 @@ class Janela(Entregador, Pedido):
         count = 0
         for idd, nome , end, boy, data in c.fetchall():
             if count % 2 == 0:
-                self.lista.insert(parent='', index='0', text='',
+                self.tabela_entregas.insert(parent='', index='0', text='',
                                values=(idd, nome , end, boy, data),
                                tags=('evenrow',))
             else:
-                self.lista.insert(parent='', index='0', text='',
+                self.tabela_entregas.insert(parent='', index='0', text='',
                                values=(idd, nome, end, boy, data),
                                tags=('oddrow',))
             count += 1
@@ -518,7 +517,7 @@ class Janela(Entregador, Pedido):
         conn.close()
 
     def atualiza_pedido(self, alter):
-        conn = self.conectar()
+        conn = self.conectar_pedido()
         c = conn.cursor()
         c.execute("""SELECT Id_pedido, pe.nome_cliente,
                 cl.endereco, 

@@ -3,9 +3,9 @@ import psycopg2
 
 class Cliente:
     def __init__(self):
-        self.conectar()
+        self.conectar_cliente()
 
-    def conectar(self):
+    def conectar_cliente(self):
         conn = psycopg2.connect('dbname=restaurante user=Programador-mestre password=6cVMAj1B')
         c = conn.cursor()
 
@@ -15,7 +15,7 @@ class Cliente:
         return conn
 
     def mostrar(self):
-        conn = self.conectar()
+        conn = self.conectar_cliente()
         c = conn.cursor()
         c.execute('SELECT * FROM clientes')
         for i in c.fetchall():
@@ -28,7 +28,7 @@ class Cliente:
             if nome == ' ':
                 messagebox.showinfo('ERRO', 'Insira um nome válido')
             else:
-                conn = self.conectar()
+                conn = self.conectar_cliente()
                 c = conn.cursor()
                 c.execute("""INSERT INTO Clientes(Nome_cliente, endereco)
                         VALUES(%s, %s)""", (nome, end))
@@ -39,7 +39,7 @@ class Cliente:
             messagebox.showwarning('ERRO', 'Cliente já cadastrado')
 
     def apagar(self, excluir):
-        conn = self.conectar()
+        conn = self.conectar_cliente()
         c = conn.cursor()
         c.execute('DELETE FROM Clientes WHERE Id = %s', (excluir, ))
 
@@ -47,7 +47,7 @@ class Cliente:
         conn.close()
 
     def atualizar(self, lista):
-        conn = self.conectar()
+        conn = self.conectar_cliente()
         c = conn.cursor()
         c.execute("""SELECT cl.nome_cliente, cl.endereco, COUNT(pe.nome_cliente) 
                     FROM clientes as cl
@@ -76,11 +76,6 @@ class Cliente:
         nome.delete(0, 'end')
         endereco.delete(0, 'end')
         
-
-
-#c = Cliente()
-#c.salvar('Ana paula', 'Rio branco')
-#c.mostrar()
 
 
 

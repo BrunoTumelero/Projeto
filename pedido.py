@@ -2,10 +2,8 @@ import psycopg2
 from tkinter import messagebox
 
 class Pedido:
-    def __init__(self):
-        self.conectar()
     #conecta ao banco de dados e cria a tabela se não esxistir
-    def conectar(self):
+    def conectar_pedido(self):
         conn = psycopg2.connect('dbname=restaurante user=Programador-mestre password=6cVMAj1B')
         c = conn.cursor()
 
@@ -20,19 +18,18 @@ class Pedido:
         return conn
     #salva o nome do cliente, endereço e o funcionario que fez a entrega
     def salvar(self, nome, end, func):
-        conn = self.conectar()
+        conn = self.conectar_pedido()
         c = conn.cursor()
         c.execute("""INSERT INTO Clientes(Id_cliente, Nome_cliente, endereco)
                   VALUES (DEFAULT, %s,%s)""", (nome, end))
         c.execute("""INSERT INTO funcionarios(Nome_func)
                   VALUES (%s)""", (func,))
-        
         conn.commit()
         conn.close()
     #Função para fazer novo pedido
     def novo_pedido(self, nome_c, prato, func, tele, tipo, data):
         try:
-            conn = self.conectar()
+            conn = self.conectar_pedido()
             c = conn.cursor()
             #cria a tabela dos items pedidos
             c.execute("""CREATE TABLE IF NOT EXISTS itens_pedidos(id_pedido integer,
@@ -84,7 +81,7 @@ class Pedido:
             messagebox.showinfo('Info', 'Algo deu errado')
     #selec com as informações de cada pedido
     def monta_poke(self):
-        conn = self.conectar()
+        conn = self.conectar_pedido()
         c = conn.cursor()
         c.execute("""create table if not exists monte_seu_poke(id_poke serial,
 					id_pedido integer references pedido(id_pedido),
@@ -94,7 +91,7 @@ class Pedido:
                     tipo_tele integer,
 					dia date not null""")
     def seleciona(self):
-        conn = self.conectar()
+        conn = self.conectar_pedido()
         c = conn.cursor()
         c.execute("""SELECT Id_pedido, pe.nome_cliente, pe.valor_total,
                 cl.endereco, 

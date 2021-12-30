@@ -16,8 +16,8 @@ class Tela_bairros(Local):
 		self.botoes()
 		self.root.mainloop()
 
-	def conectar(self):
-		return super().conectar()
+	def conectar_bairros(self):
+		return super().conectar_bairros()
 
 	def salvar(self, bairro, valor):
 		return super().salvar(bairro, valor)
@@ -63,7 +63,7 @@ class Tela_bairros(Local):
 		self.tb_bairros.tag_configure('oddrow', background="white")
 		self.tb_bairros.tag_configure('evenrow', background="lightblue")
 
-		conn = self.conectar()
+		conn = self.conectar_bairros()
 		c = conn.cursor()
 		c.execute("""SELECT * FROM bairros""")
 
@@ -88,7 +88,7 @@ class Tela_bairros(Local):
 
 	def atualiza_tabela(self):
 		self.tb_bairros.delete(*self.tb_bairros.get_children())
-		conn = self.conectar()
+		conn = self.conectar_bairros()
 		c = conn.cursor()
 		c.execute("""SELECT * FROM bairros
 			GROUP BY nome_bairro""")

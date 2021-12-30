@@ -29,8 +29,8 @@ class tela_cliente(Cliente):
 
     self.root_clientes.mainloop()
 
-  def conectar(self):
-    return super().conectar()
+  def conectar_cliente(self):
+    return super().conectar_cliente()
 
   def mostrar(self):
     return super().mostrar()
@@ -50,7 +50,7 @@ class tela_cliente(Cliente):
   def pesquisar(self, nome, lista):
     lista.delete(*lista.get_children())
     
-    conn = self.conectar()
+    conn = self.conectar_cliente()
     c = conn.cursor()
     nome_pesquisa = f'%{nome}%'.title()
     c.execute("""SELECT * FROM clientes
@@ -126,7 +126,7 @@ class tela_cliente(Cliente):
       self.tabela_clientes.tag_configure('cor1', background="white")
       self.tabela_clientes.tag_configure('cor2', background="lightblue")
 
-      conn = self.conectar()
+      conn = self.conectar_cliente()
 
       c = conn.cursor()
       c.execute("""SELECT * FROM clientes""")
@@ -161,7 +161,7 @@ class tela_cliente(Cliente):
     self.tabela_clientes.tag_configure('cor1', background="white")
     self.tabela_clientes.tag_configure('cor2', background="lightblue")
 
-    conn = self.conectar()
+    conn = self.conectar_cliente()
     c = conn.cursor()
     c.execute("""SELECT cl.nome_cliente, cl.endereco, COUNT(pe.nome_cliente) 
                     FROM clientes as cl
@@ -204,6 +204,12 @@ class tela_cliente(Cliente):
     self.endereco_entry.place(relx=0.585, rely=0.4, relwidth=0.3, relheight=0.28)
 
   def botoes(self):
+    def verifica():
+        if self.nome_entry == '':
+            messagebox.showinfo('ERRO', 'Insira um nome válido')
+        if self.nome_entry == '':
+            messagebox.showinfo('ERRO', 'Informe o nome do cliente')
+            return
     self.frame_botao = Frame(self.root_clientes)
     self.frame_botao.place(relx=0.05, rely=0.8, relwidth=0.9, relheight=0.18)
     self.frame_botao.configure(background='snow')
@@ -225,7 +231,7 @@ class tela_cliente(Cliente):
     new_pedido = Button(self.frame_botao, text= 'Novo\nPedido', image= img_new, compound=LEFT,
     relief=FLAT, activebackground='lightblue', background='snow', activeforeground='snow',
     highlightbackground='snow',
-    command= lambda:[tela_cardapio(self.root, self.nome_entry.get().title(),
+    command= lambda:[verifica(), tela_cardapio(self.root, self.nome_entry.get().title(),
     self.endereco_entry.get().title(), self.fundo, self.botoes_inicio),
     self.frame_botao.destroy(), self.data_frame.destroy(), self.tree_frame.destroy()])
     new_pedido.configure(font=('Roman', 14))
@@ -296,8 +302,8 @@ class tela_cardapio(Cardapio, Pedido, Local):
         if info_cliente == '':
             messagebox.showwarning('AVISO', 'Selecione o cliente para fazer o pedido')
                 
-    def conectar(self):
-        return super().conectar()
+    def conectar_cardapio(self):
+        return super().conectar_cardapio()
 
     def adicionar(self, prato, valor, categoria):
         return super().adicionar(prato, valor, categoria)
@@ -408,7 +414,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
             messagebox.showinfo('ERRO', 'Escolha o tipo de entrega')
 
     def soma_pratos(self):
-        conn = self.conectar()
+        conn = self.conectar_cardapio()
         c = conn.cursor()
         c.execute("""SELECT valor_prato FROM menu WHERE nome_prato = %s""", (self.prato,))
         preco = c.fetchall()
@@ -475,7 +481,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
                 self.tipo_pedido = 2
                 self.boy_label.place(relx=0.1, rely=0.75, relwidth=0.15, relheight=0.1)
                 self.boy_entry.place(relx=0.05, rely=0.83, relwidth=0.25, relheight=0.05)
-                conn = self.conectar()
+                conn = self.conectar_cardapio()
                 c = conn.cursor()
                 c.execute("""SELECT preco FROM bairros WHERE nome_bairro = %s""", (self.end_cliente,))
                 valor = c.fetchall()
@@ -497,7 +503,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
                 self.set_total()
             
     def deseleciona(self, event):
-        conn = self.conectar()
+        conn = self.conectar_cardapio()
         c = conn.cursor()
         for x in self.carrinho.selection():
             quant, prato_carrinho= self.carrinho.item(x, 'values')
@@ -638,7 +644,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
             self.menu.tag_configure('cor4', background="#A14DA0")
             self.menu.tag_configure('cor5', background="#7E1F86")
 
-            conn = self.conectar()
+            conn = self.conectar_cardapio()
             c = conn.cursor()
             c.execute("""SELECT nome_prato, valor_prato, categoria FROM menu ORDER BY nome_prato""")
             global count
@@ -1310,7 +1316,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
             self.carrinho_compras.append(sum(self.extra_poke))
             self.set_total()
 
-            conn = self.conectar()
+            conn = self.conectar_cardapio()
             c = conn.cursor()
             c.execute("""UPDATE menu SET valor_prato = %s WHERE nome_prato = %s""",
             (sum(self.extra_poke), 'Monte seu poke'))
@@ -1353,7 +1359,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
 
     def atualiza_tabela(self):
             self.menu.delete(*self.menu.get_children())
-            conn = self.conectar() 
+            conn = self.conectar_cardapio() 
             c = conn.cursor()
             c.execute("""SELECT * FROM menu ORDER BY nome_prato""")
             global count
@@ -1464,7 +1470,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
 
     def verificacao(self, info_cliente):
         try:
-            conn = self.conectar()
+            conn = self.conectar_cardapio()
             c = conn.cursor()
             c.execute("SELECT nome_cliente FROM clientes WHERE nome_cliente = %s", (info_cliente,))
             resposta = c.fetchall()
