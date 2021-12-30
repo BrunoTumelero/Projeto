@@ -2,12 +2,21 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from PIL import Image, ImageTk
-from Tela import * 
+from Cliente import Cliente
+from Tela import *
+from cardapio_v2 import Cardapio 
 from tela_cliente import tela_cliente
 from Tela import Janela
+from bairrosv2 import Local
 from pedido import Pedido
 
-class Janela_principal(Pedido):
+class Cria_db:
+	def __init__(self):
+		
+		tela_cliente.conectar_cliente()
+		Janela.conectar_func()
+
+class Janela_principal(Cliente, Cardapio, Entregador, Local, Pedido):
 	try:
 		def __init__(self):
 			super(Janela_principal, self).__init__()
@@ -16,7 +25,12 @@ class Janela_principal(Pedido):
 			self.root.geometry('800x500')
 			self.background()
 			self.widegets()
-			self.conectar()
+			self.conectar_cardapio()
+			self.conectar_cliente()
+			self.conectar_func()
+			self.conectar_bairros
+			self.conectar_pedido()
+
 
 			self.root.mainloop()
 
@@ -29,7 +43,7 @@ class Janela_principal(Pedido):
 			fundo.image = photo
 			fundo.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
 			self.back.configure(background = 'snow')
-			
+
 		def widegets(self):
 			self.framebotao = Frame(self.root)
 			self.framebotao.place(relx = 0.0, rely = 0.65, relwidth = 1,
@@ -63,6 +77,8 @@ class Janela_principal(Pedido):
 	except Exception as erro:
 		print(erro)
 
+db = Cria_db
 principal = Janela_principal()
 
+db
 principal
