@@ -25,7 +25,7 @@ class Cliente:
 
     def salvar(self, nome, end):
         try:
-            if nome == ' ':
+            if nome == '' or nome == ' ':
                 messagebox.showinfo('ERRO', 'Insira um nome válido')
             else:
                 conn = self.conectar_cliente()
