@@ -31,7 +31,6 @@ class Janela_principal(Cliente, Cardapio, Entregador, Local, Pedido):
 			self.conectar_bairros
 			self.conectar_pedido()
 
-
 			self.root.mainloop()
 
 		def background(self):

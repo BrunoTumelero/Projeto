@@ -204,12 +204,26 @@ class tela_cliente(Cliente):
     self.endereco_entry.place(relx=0.585, rely=0.4, relwidth=0.3, relheight=0.28)
 
   def botoes(self):
-    def verifica():
-        if self.nome_entry == '':
-            messagebox.showinfo('ERRO', 'Insira um nome válido')
-        if self.nome_entry == '':
-            messagebox.showinfo('ERRO', 'Informe o nome do cliente')
-            return
+    def verificacao():
+        def chamar_cardapio():
+            tela_cardapio(self.root, self.nome_entry.get().title(),
+            self.endereco_entry.get().title(), self.fundo, self.botoes_inicio),
+            self.frame_botao.destroy(), self.data_frame.destroy(), self.tree_frame.destroy()
+        if self.nome_entry.get() == '':
+            messagebox.showinfo('Info', 'Informe o nome do cliente')
+        if self.endereco_entry.get() != '':
+            conectar = Local.conectar_bairros(self)
+            con = conectar.cursor()
+            con.execute('''SELECT nome_bairro FROM bairros WHERE nome_bairro = %s''', (self.endereco_entry.get(),))
+            bairro = con.fetchall()
+            try:
+                if bairro[0][0] == self.endereco_entry.get():
+                    chamar_cardapio()
+            except IndexError:
+                messagebox.showwarning('Alerta', f'Bairro {self.endereco_entry.get()} não cadastrado')
+                self.nome_entry.delete(0, 'end')
+                self.endereco_entry.delete(0, 'end')
+
     self.frame_botao = Frame(self.root_clientes)
     self.frame_botao.place(relx=0.05, rely=0.8, relwidth=0.9, relheight=0.18)
     self.frame_botao.configure(background='snow')
@@ -231,9 +245,7 @@ class tela_cliente(Cliente):
     new_pedido = Button(self.frame_botao, text= 'Novo\nPedido', image= img_new, compound=LEFT,
     relief=FLAT, activebackground='lightblue', background='snow', activeforeground='snow',
     highlightbackground='snow',
-    command= lambda:[verifica(), tela_cardapio(self.root, self.nome_entry.get().title(),
-    self.endereco_entry.get().title(), self.fundo, self.botoes_inicio),
-    self.frame_botao.destroy(), self.data_frame.destroy(), self.tree_frame.destroy()])
+    command= lambda:[verificacao()])
     new_pedido.configure(font=('Roman', 14))
     new_pedido.place(relx=0.42, rely=0.3, relwidth=0.2, relheight=0.52)
     new_pedido.imagem = img_new
@@ -299,8 +311,6 @@ class tela_cardapio(Cardapio, Pedido, Local):
         self.memoria = {}
         self.quant = 1
         self.contador = 0
-        if info_cliente == '':
-            messagebox.showwarning('AVISO', 'Selecione o cliente para fazer o pedido')
                 
     def conectar_cardapio(self):
         return super().conectar_cardapio()

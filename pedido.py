@@ -29,55 +29,58 @@ class Pedido:
     #Função para fazer novo pedido
     def novo_pedido(self, nome_c, prato, func, tele, tipo, data):
         try:
-            conn = self.conectar_pedido()
-            c = conn.cursor()
-            #cria a tabela dos items pedidos
-            c.execute("""CREATE TABLE IF NOT EXISTS itens_pedidos(id_pedido integer,
-            prato varchar(255), valor integer)""")
+            if nome_c == '':
+                messagebox.showinfo('Info', 'Informe o nome do cliente')
+            else:
+                conn = self.conectar_pedido()
+                c = conn.cursor()
+                #cria a tabela dos items pedidos
+                c.execute("""CREATE TABLE IF NOT EXISTS itens_pedidos(id_pedido integer,
+                prato varchar(255), valor integer)""")
 
-            #seleciona o valor do prato pelo id do pedido
-            lista_pratos = []
-            for i in prato.keys():
-                c.execute("""SELECT valor_prato FROM menu 
-                    WHERE nome_prato = %s """, (i,))
-                valor1 = c.fetchall()
-                lista_pratos.append(valor1[0][0])
-                self.total_pratos = sum(lista_pratos)
+                #seleciona o valor do prato pelo id do pedido
+                lista_pratos = []
+                for i in prato.keys():
+                    c.execute("""SELECT valor_prato FROM menu 
+                        WHERE nome_prato = %s """, (i,))
+                    valor1 = c.fetchall()
+                    lista_pratos.append(valor1[0][0])
+                    self.total_pratos = sum(lista_pratos)
+                
+                #adiciona a tele para o funcionario
+                c.execute('SELECT entregas, pagar FROM funcionarios WHERE nome_func = %s', (func,))
+                for x, y in c.fetchall():
+                    soma = x + 1
+                    pagar = y + tele
+                    c.execute("""UPDATE funcionarios SET Entregas = %s WHERE Nome_func = %s""", (soma, func))
+                    c.execute("""UPDATE funcionarios SET pagar = %s WHERE Nome_func = %s""", (pagar, func))
+
+                conn.commit()
+                #soma o valor do prato e da tele
+                total = self.total_pratos + tele
             
-            #adiciona a tele para o funcionario
-            c.execute('SELECT entregas, pagar FROM funcionarios WHERE nome_func = %s', (func,))
-            for x, y in c.fetchall():
-                soma = x + 1
-                pagar = y + tele
-                c.execute("""UPDATE funcionarios SET Entregas = %s WHERE Nome_func = %s""", (soma, func))
-                c.execute("""UPDATE funcionarios SET pagar = %s WHERE Nome_func = %s""", (pagar, func))
+                c.execute("""INSERT INTO pedidos(nome_cliente, nome_func, valor_total, tipo_tele, dia) 
+                VALUES(%s, %s, %s, %s, %s)""", (nome_c, func, total, tipo, data))
+                conn.commit()
 
-            conn.commit()
-            #soma o valor do prato e da tele
-            total = self.total_pratos + tele
-        
-            c.execute("""INSERT INTO pedidos(nome_cliente, nome_func, valor_total, tipo_tele, dia) 
-            VALUES(%s, %s, %s, %s, %s)""", (nome_c, func, total, tipo, data))
-            conn.commit()
+                #seleciona o id do cliente
+                c.execute("""SELECT id_pedido FROM pedidos
+                    WHERE nome_cliente = %s""", (nome_c,))
+                id_p = c.fetchall()
+                num_id = id_p[0][0]
+                
+                contador = 0
+                if contador <= len(prato.keys()):
+                    for p in prato.keys():
+                        c.execute("""INSERT INTO itens_pedidos(id_pedido, prato, valor) VALUES(%s, %s, %s)""",
+                                    (num_id, p, valor1[0][0]))
+                        contador += 1
+                conn.commit()
 
-            #seleciona o id do cliente
-            c.execute("""SELECT id_pedido FROM pedidos
-                WHERE nome_cliente = %s""", (nome_c,))
-            id_p = c.fetchall()
-            num_id = id_p[0][0]
-            
-            contador = 0
-            if contador <= len(prato.keys()):
-                for p in prato.keys():
-                    c.execute("""INSERT INTO itens_pedidos(id_pedido, prato, valor) VALUES(%s, %s, %s)""",
-                                (num_id, p, valor1[0][0]))
-                    contador += 1
-            conn.commit()
-
-            conn.close()
+                conn.close()
         except AttributeError:
             messagebox.showerror('Pedido', 'Selecione o tipo de entrega')
-        except Exception:
+        except TypeError:
             messagebox.showinfo('Info', 'Algo deu errado')
     #selec com as informações de cada pedido
     def monta_poke(self):
