@@ -1314,7 +1314,6 @@ class tela_cardapio(Cardapio, Pedido, Local):
                     json.dump(poke, f, indent=2)
                 memory = open('Escolhas.json', 'r')
                  
-
         pag4 = Button(self.pag4, text='ADD', activebackground='lightblue', highlightbackground='snow',
         command=lambda:[verifica_pag4(), add_poke()])
         pag4.place(relx=0.8, rely=0.85, relwidth=0.1, relheight=0.1)

@@ -85,12 +85,41 @@ class conf_cardapio(Cardapio, Pedido, Local):
         nome_prato.configure(background='snow')
         prato_entry = Entry(frame_prato)
         prato_entry.place(relx=0.1, rely=0.25, relwidth=0.25, relheight=0.12)
+        self.prato_entry = prato_entry.get().title()
 
         valor_prato =  Label(frame_prato, text='Valor')
         valor_prato.place(relx=0.45, rely=0.1, relwidth=0.15, relheight=0.12)
         valor_prato.configure(background='snow')
         valor_entry = Entry(frame_prato)
         valor_entry.place(relx=0.45, rely=0.25, relwidth=0.15, relheight=0.12)
+
+        try:
+            lista_cat = []
+            cat_pratos = open('categoria_pratos.json', 'r', encoding='utf8')
+            memoria_cat = json.load(cat_pratos)
+            cat_pratos.close()
+            memoria_cat = memoria_cat[0]
+            for x in memoria_cat.values():
+                lista_cat.append(x)
+            cat_pratos =  open('categoria_pratos.json', 'w', encoding= 'utf8')
+            json.dump(memoria_cat, cat_pratos, indent=2)
+            cat_pratos.close() 
+        except FileNotFoundError:
+            poke = [{0: 'Sem categoria'}]
+            with open('categoria_pratos.json', 'w', encoding= 'utf8') as f:
+                json.dump(poke, f, indent=2)
+            cat_pratos = open('categoria_pratos.json', 'r')
+            memoria_cat = json.load(cat_pratos)
+            cat_pratos.close()
+            memoria_cat = memoria_cat[0]
+            for x in memoria_cat.values():
+                lista_cat.append(x)
+        finally:
+            categoria =  Label(frame_prato, text='Categoria')
+            categoria.place(relx=0.72, rely=0.1, relwidth=0.15, relheight=0.12)
+            categoria.configure(background='snow')
+            categoria_box = ttk.Combobox(frame_prato, values=lista_cat)
+            categoria_box.place(relx=0.7, rely=0.25, relwidth=0.15, relheight=0.12)
 
     def seleciona(self, event):
         for x in self.menu.selection():
