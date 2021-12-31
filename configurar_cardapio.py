@@ -70,7 +70,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
         pratos.configure(font=letra)
 
         catego = Button(self.frame_botao, text='Categoria', relief=FLAT, activebackground='snow', highlightbackground='snow',
-        background='snow', activeforeground='lightblue')
+        background='snow', activeforeground='lightblue', command=lambda:[self.nova_cat()])
         catego.place(relx=0.6, rely=0.2, relwidth=0.235, relheight=0.235)
         catego.configure(font=letra)
 
@@ -120,6 +120,22 @@ class conf_cardapio(Cardapio, Pedido, Local):
             categoria.configure(background='snow')
             categoria_box = ttk.Combobox(frame_prato, values=lista_cat)
             categoria_box.place(relx=0.7, rely=0.25, relwidth=0.15, relheight=0.12)
+
+    def nova_cat(self):
+        self.frame_botao.destroy()
+        frame_categoria = Frame(self.root_cardapio)
+        frame_categoria.place(relx=0.0, rely=0.66, relwidth=1, relheight=0.4)
+        frame_categoria.configure(background='snow')
+
+        nome_categoria =  Label(frame_categoria, text='Nome')
+        nome_categoria.place(relx=0.425, rely=0.1, relwidth=0.15, relheight=0.12)
+        nome_categoria.configure(background='snow')
+        cat_entry = Entry(frame_categoria)
+        cat_entry.place(relx=0.385, rely=0.25, relwidth=0.25, relheight=0.12)
+        self.cat_entry = cat_entry.get().title()
+
+        def add_cat():
+            pass
 
     def seleciona(self, event):
         for x in self.menu.selection():
