@@ -5,6 +5,7 @@ from entregadoresv2 import *
 from pedido import Pedido
 from Cliente import Cliente 
 from tela_cliente import tela_cardapio
+from configurar_cardapio import conf_cardapio
 from tkinter import messagebox
 from PIL import Image, ImageTk
 from janela_bairros import Tela_bairros
@@ -61,7 +62,7 @@ class Janela(Entregador, Pedido):
         
         option_menu.add_command(label="Tabela bairros", command= lambda:[Tela_bairros(self.root_entregas)])
         option_menu.add_command(label="Funcionarios", command= lambda:[self.tela_cadastrar()])
-        option_menu.add_command(label="Cardapio", command=lambda:[tela_cardapio(self.root,
+        option_menu.add_command(label="Cardapio", command=lambda:[conf_cardapio(self.root,
         None, None, self.fundo, self.botoes_inicio), self.elimina_caixa(), self.frame_tele.destroy(), self.data_frame.destroy(),
         self.button_frame.destroy()])
         option_menu.add_separator()
@@ -139,7 +140,7 @@ class Janela(Entregador, Pedido):
             
             option_menu.add_command(label="Tabela bairros", command= lambda:[Tela_bairros(self.root_entregas)])
             option_menu.add_command(label="Funcionarios", command= lambda:[self.tela_cadastrar()])
-            option_menu.add_command(label="Cardapio", command=lambda:[tela_cardapio(self.root,
+            option_menu.add_command(label="Cardapio", command=lambda:[conf_cardapio(self.root,
             None, None, self.fundo, self.botoes_inicio), self.elimina()])
             option_menu.add_separator()
             option_menu.add_command(label="Exit", command=self.root_entregas.quit)

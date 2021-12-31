@@ -28,7 +28,7 @@ class Janela_principal(Cliente, Cardapio, Entregador, Local, Pedido):
 			self.conectar_cardapio()
 			self.conectar_cliente()
 			self.conectar_func()
-			self.conectar_bairros
+			self.conectar_bairros()
 			self.conectar_pedido()
 
 			self.root.mainloop()

@@ -1,293 +1,13 @@
-from os import error
 from tkinter import *
 from tkinter import ttk
 from tkinter import font
 from PIL import Image, ImageTk
-from Cliente import *
 from cardapio_v2 import Cardapio, Modelo_prato
 from pedido import *
 from bairrosv2 import Local
-from configurar_cardapio import conf_cardapio
 import json
-#from cardapio import tela_cardapio
 
-class tela_cliente(Cliente):
-  def __init__(self, root, fundo, botoes_inicio, escquece1, esquece2):
-    super().__init__()
-    self.root = root
-    self.root_clientes = root
-    self.fundo = fundo
-    self.botoes_inicio = botoes_inicio
-    self.esq1 = escquece1
-    self.esq2 = esquece2
-    self.root_clientes.title('Cliente')
-    self.root_clientes.configure(background='snow')
-    self.tabela_geral()
-    self.clientes_geral()
-    self.acessorios()
-    self.botoes()
-    self.menu()
-
-    self.root_clientes.mainloop()
-
-  def conectar_cliente(self):
-    return super().conectar_cliente()
-
-  def mostrar(self):
-    return super().mostrar()
-
-  def salvar(self, nome, end):
-    return super().salvar(nome, end)
-
-  def apagar(self):
-    return super().apagar()
-
-  def atualizar(self, lista):
-    return super().atualizar(lista)
-
-  def limpa(self, nome, endereco):
-    return super().limpa(nome, endereco)
-
-  def pesquisar(self, nome, lista):
-    lista.delete(*lista.get_children())
-    
-    conn = self.conectar_cliente()
-    c = conn.cursor()
-    nome_pesquisa = f'%{nome}%'.title()
-    c.execute("""SELECT * FROM clientes
-            WHERE nome_cliente LIKE %s""", (nome_pesquisa,))
-
-    global contador_cliente
-    contador_cliente = 0
-
-    for num, nome, end in c.fetchall():
-        if contador_cliente % 2 == 0:
-            lista.insert(parent='', index='0', text='',
-                           values=(num, nome, end),
-                           tags=('cor1',))
-
-        else:
-          lista.insert(parent='', index='0', text='',
-                                 values=(num, nome, end),
-                                 tags=('cor2',))
-        contador_cliente += 1
-        conn.close()
-  
-  def menu(self):
-    # Add Menu
-    menu_opcoes = Menu(self.root_clientes)
-    self.root_clientes.config(menu=menu_opcoes)
-
-    menu_opcoes.add_command(label='Inicio', command=lambda:[self.tree_frame.destroy(),
-    menu_opcoes.destroy(), self.data_frame.place_forget(), self.frame_botao.place_forget(),
-    self.fundo, self.botoes_inicio])
-    # Configurar menu
-    menu_cliente = Menu(menu_opcoes, tearoff=0)
-    menu_opcoes.add_cascade(label="Opções", menu=menu_cliente)
-    # opcoes do menu
-    menu_cliente.add_command(label='Clientes', command=lambda:[self.clientes_geral()])
-    menu_cliente.add_command(label='Clientes com pedidos', command=lambda:[self.tabela()])
-
-  def tabela_geral(self):
-    estilo = ttk.Style()
-    estilo.theme_use('default')
-    estilo.configure("geral.Treeview", background="#D3D3D3", foreground="black",
-                    rowheight=25, fieldbackground="#D3D3D3", font='Helvetica')
-    estilo.map('geral.treeview', background=[('selected', "#347083")])
-    self.tree_frame = Frame(self.root_clientes)
-    self.tree_frame.place(relx=0.02, rely=0.05, relwidth=0.95, relheight=0.5)
-    self.tree_frame.configure(background='snow')
-    self.barra = Scrollbar(self.tree_frame)
-    self.barra.place(relx=0.97, rely=0.0, relwidth=0.02, relheight=1)
-    self.barra.configure(background='snow')
-
-    self.tabela_clientes = ttk.Treeview(self.tree_frame, style= 'geral.Treeview', 
-                                    yscrollcommand=self.barra.set, selectmode="extended")
-    self.tabela_clientes.place(relx=0.02, rely=0.0, relwidth=0.95, relheight=1)
-
-    self.barra.config(command=self.tabela_clientes.yview)
-
-  def clientes_geral(self):
-    try:
-      self.tabela_clientes.delete(*self.tabela_clientes.get_children())
-    except TypeError as er:
-      print(er)
-    finally:
-      self.tabela_clientes['columns'] = ("Id", "Nome", "Endereço")
-      self.tabela_clientes.column("#0", width=0, stretch=NO)
-      self.tabela_clientes.column("Id", anchor=W, width=20)
-      self.tabela_clientes.column("Nome", anchor=CENTER, width=450)
-      self.tabela_clientes.column("Endereço", anchor=CENTER, width=200)
-
-      self.tabela_clientes.heading("#0", text="", anchor=W)
-      self.tabela_clientes.heading("Id", text="Id", anchor=CENTER)
-      self.tabela_clientes.heading("Nome", text="Nome", anchor=CENTER)
-      self.tabela_clientes.heading("Endereço", text="Endereço", anchor=CENTER)
-
-      self.tabela_clientes.tag_configure('cor1', background="white")
-      self.tabela_clientes.tag_configure('cor2', background="lightblue")
-
-      conn = self.conectar_cliente()
-
-      c = conn.cursor()
-      c.execute("""SELECT * FROM clientes""")
-
-      global contador_cliente
-      contador_cliente = 0
-
-      for idd, nome, loc in c.fetchall():
-          if contador_cliente % 2 == 0:
-              self.tabela_clientes.insert(parent='', index='end', text='',
-              values=(idd, nome, loc), tags=('cor2',))
-          else:
-              self.tabela_clientes.insert(parent='', index='end', text='',
-              values=(idd, nome, loc), tags=('cor1',))
-          contador_cliente += 1
-      conn.close()
-      self.tabela_clientes.bind('<Double-Button-1>', self.seleciona_cliente)
-
-  def tabela(self):
-    self.tabela_clientes.delete(*self.tabela_clientes.get_children())
-    self.tabela_clientes['columns'] = ("Nome", "Endereço", "Numero_de_pedidos")
-    self.tabela_clientes.column("#0", width=0, stretch=NO)
-    self.tabela_clientes.column("Nome", anchor=W, width=250)
-    self.tabela_clientes.column("Endereço", anchor=W, width=250)
-    self.tabela_clientes.column("Numero_de_pedidos", anchor=CENTER, width=200)
-
-    self.tabela_clientes.heading("#0", text="", anchor=W)
-    self.tabela_clientes.heading("Nome", text="Nome", anchor=CENTER)
-    self.tabela_clientes.heading("Endereço", text="Endereço", anchor=CENTER)
-    self.tabela_clientes.heading("Numero_de_pedidos", text="Numero de pedidos", anchor=CENTER)
-
-    self.tabela_clientes.tag_configure('cor1', background="white")
-    self.tabela_clientes.tag_configure('cor2', background="lightblue")
-
-    conn = self.conectar_cliente()
-    c = conn.cursor()
-    c.execute("""SELECT cl.nome_cliente, cl.endereco, COUNT(pe.nome_cliente) 
-                    FROM clientes as cl
-                    JOIN pedidos as pe on cl.nome_cliente = pe.nome_cliente
-                    GROUP BY cl.nome_cliente""")
-
-    global contador_cliente
-    contador_cliente = 0
-
-    for nome, end, num in c.fetchall():
-        if contador_cliente % 2 == 0:
-            self.tabela_clientes.insert(parent='', index='end', text='',
-                        values=(nome, end, num),
-                        tags=('cor2',))
-
-        else:
-            self.tabela_clientes.insert(parent='', index='end', text='',
-                                values=(nome, end, num),
-                                tags=('cor1',))
-        contador_cliente += 1
-    conn.close()
-    self.tabela_clientes.bind('<Double-Button-1>', self.seleciona)
-        
-  def acessorios(self):
-    self.data_frame = LabelFrame(self.root_clientes, text= 'Novo cliente')
-    self.data_frame.place(relx=0.05, rely=0.58, relwidth=0.9, relheight=0.2)
-    self.data_frame.configure(background='snow')
-
-    nome_label = Label(self.data_frame, text="Nome")
-    nome_label.configure(font=('helvetica', 16), background='snow')
-    nome_label.place(relx=0.15, rely=0.1, relwidth=0.2, relheight=0.35)
-    self.nome_entry = Entry(self.data_frame, relief=FLAT, highlightbackground='lightblue')
-    self.nome_entry.place(relx=0.1, rely=0.4, relwidth=0.3, relheight=0.28)
-    self.nome_entry.focus()
-
-    endereco_label = Label(self.data_frame, text="Bairro")
-    endereco_label.configure(font=('helvetica', 16), background='snow')
-    endereco_label.place(relx=0.64, rely=0.1, relwidth=0.2, relheight=0.35)
-    self.endereco_entry = Entry(self.data_frame, relief=FLAT, highlightbackground='lightblue')
-    self.endereco_entry.place(relx=0.585, rely=0.4, relwidth=0.3, relheight=0.28)
-
-  def botoes(self):
-    def verificacao():
-        def chamar_cardapio():
-            tela_cardapio(self.root, self.nome_entry.get().title(),
-            self.endereco_entry.get().title(), self.fundo, self.botoes_inicio),
-            self.frame_botao.destroy(), self.data_frame.destroy(), self.tree_frame.destroy()
-        if self.nome_entry.get() == '':
-            messagebox.showinfo('Info', 'Informe o nome do cliente')
-        if self.endereco_entry.get() != '':
-            conectar = Local.conectar_bairros(self)
-            con = conectar.cursor()
-            con.execute('''SELECT nome_bairro FROM bairros WHERE nome_bairro = %s''', (self.endereco_entry.get(),))
-            bairro = con.fetchall()
-            try:
-                if bairro[0][0] == self.endereco_entry.get():
-                    chamar_cardapio()
-            except IndexError:
-                messagebox.showwarning('Alerta', f'Bairro {self.endereco_entry.get()} não cadastrado')
-                self.nome_entry.delete(0, 'end')
-                self.endereco_entry.delete(0, 'end')
-
-    self.frame_botao = Frame(self.root_clientes)
-    self.frame_botao.place(relx=0.05, rely=0.8, relwidth=0.9, relheight=0.18)
-    self.frame_botao.configure(background='snow')
-    bt_cadastra = Image.open('Imagens/add.ico')
-    img1 = ImageTk.PhotoImage(bt_cadastra)
-    botao_salvar = Button(self.frame_botao, text= 'Cadastrar', image= img1, compound=LEFT,
-    relief=FLAT, activebackground='lightblue', background='snow', activeforeground='snow',
-    highlightbackground='snow',
-    command= lambda: [self.salvar(self.nome_entry.get().title(), self.endereco_entry.get().title()),
-    self.limpa(self.nome_entry, self.endereco_entry), self.clientes_geral()])
-    botao_salvar.configure(font=('Roman', 14))
-    botao_salvar.place(relx=0.1, rely=0.3, relwidth=0.2, relheight=0.45)
-    botao_salvar.imagem = img1
-
-    bt_fpedido = Image.open('Imagens/pagar.png')
-    img_fpedido = ImageTk.PhotoImage(bt_fpedido)
-    bt_new = Image.open('Imagens/carrinho.ico')
-    img_new = ImageTk.PhotoImage(bt_new)
-    new_pedido = Button(self.frame_botao, text= 'Novo\nPedido', image= img_new, compound=LEFT,
-    relief=FLAT, activebackground='lightblue', background='snow', activeforeground='snow',
-    highlightbackground='snow',
-    command= lambda:[verificacao()])
-    new_pedido.configure(font=('Roman', 14))
-    new_pedido.place(relx=0.42, rely=0.3, relwidth=0.2, relheight=0.52)
-    new_pedido.imagem = img_new
-
-    bt_pesquisa = Image.open('Imagens/consultar.ico')
-    img_pesquisar = ImageTk.PhotoImage(bt_pesquisa)
-    pesquisar = Button(self.frame_botao, text= 'Pesquisar', image= img_pesquisar, compound=LEFT,
-    relief=FLAT, activebackground='lightblue', background='snow', activeforeground='snow',
-    highlightbackground='snow',
-    command= lambda: [self.clientes_geral() ,self.pesquisar(self.nome_entry.get(), self.tabela_clientes), 
-    self.limpa(self.nome_entry, self.endereco_entry)])
-    pesquisar.configure(font=('Roman', 14))
-    pesquisar.place(relx=0.75, rely=0.3, relwidth=0.2, relheight=0.45)
-    pesquisar.imagem = img_pesquisar
-  
-  def inserir(self, name, end):
-    self.nome_entry.insert(name, 'end')
-    self.endereco_entry.insert(end, 'end')
-
-  def seleciona(self, event):
-    self.limpa(self.nome_entry, self.endereco_entry)
-    for x in self.tabela_clientes.selection():
-      n, e, p = self.tabela_clientes.item(x, 'values')
-      self.nome_entry.insert(END, n)
-      self.endereco_entry.insert(END, e)
-    return self.nome_entry.get()
-  
-  def seleciona_cliente(self, event):
-    self.limpa(self.nome_entry, self.endereco_entry)
-    for x in self.tabela_clientes.selection():
-      i, n, e= self.tabela_clientes.item(x, 'values')
-      self.nome_entry.insert(END, n)
-      self.endereco_entry.insert(END, e)
-
-  def dados(self):
-    name = self.nome_entry.get()
-    local = self.endereco_entry.get()
-    print(name, local)
-    return name, local
-
-class tela_cardapio(Cardapio, Pedido, Local):
+class conf_cardapio(Cardapio, Pedido, Local):
     def __init__(self, root, info_cliente, end_cliente, fundo, botoes_inicio):
         super().__init__()
         self.root_cardapio = root
@@ -302,15 +22,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
         self.acessorios()
         self.info_cliente = info_cliente
         self.end_cliente = end_cliente
-        self.nome_pedido(info_cliente)
-        self.tabela()
-        self.valor_total = 0
-        self.total_pedido(self.valor_total)
         self.modelo = Modelo_prato()
-        self.carrinho_compras = []
-        self.memoria = {}
-        self.quant = 1
-        self.contador = 0
                 
     def conectar_cardapio(self):
         return super().conectar_cardapio()
@@ -330,232 +42,63 @@ class tela_cardapio(Cardapio, Pedido, Local):
     def limpa(self, nome, valor):
         return super().limpa(nome, valor)
 
-    def novo_pedido(self, nome_c, prato, func, tele, tipo, data):
-        return super().novo_pedido(nome_c, prato, func, tele, tipo, data)
-
-    def valor_ifood(self):
-        return super().valor_ifood()
-
-    def retirada(self):
-        return super().retirada()
-
-    def valor_tele(self, bairro):
-        return super().valor_tele(bairro)
-
-    def nome_pedido(self, nome_cliente):
-        self.name = LabelFrame(self.root_cardapio, text=nome_cliente)
-        self.name.place(relx=0.665, rely=0.07, relwidth=0.32, relheight=0.55)
-        self.name.configure(background='snow')
-
     def opcoes(self):
         # Add Menu
         my_menu = Menu(self.root_cardapio)
         self.root_cardapio.config(menu=my_menu)
 
-        my_menu.add_command(label='Inicio', command=lambda:[self.name.destroy(),
-        self.frame_menu.destroy(), self.frame_botao.destroy(), self.total.destroy(), self.frame_cardapio.destroy(),
-        self.fundo_inicio, self.inicio_botoes, my_menu.destroy(), self.frame_total.destroy()])
+        my_menu.add_command(label='Inicio', command=lambda:[
+        self.frame_menu.destroy(), self.frame_botao.destroy(), self.frame_cardapio.destroy(),
+        self.fundo_inicio, self.inicio_botoes, my_menu.destroy()])
         # Configurar menu
         option_menu = Menu(my_menu, tearoff=0)
         my_menu.add_cascade(label="Opções", menu=option_menu)
         # opcoes do menu
-        option_menu.add_command(label="Configurar pratos", command= lambda:[conf_cardapio(self.root_cardapio, self.info_cliente,
-        self.end_cliente, self.fundo_inicio, self.inicio_botoes)])
+        option_menu.add_command(label="Configurar pratos", command= lambda:[])
         option_menu.add_command(label="Monte seu poke", command= lambda:[self.monte_poke()])
         option_menu.add_command(label="Menu", command= lambda:[self.frame_cardapio.destroy(), self.menu_geral()])
 
-    def total_pedido(self, valor):
-        self.frame_total = Frame(self.root_cardapio)
-        self.frame_total.place(relx=0.7, rely=0.65, relwidth=0.2, relheight=0.1)
-        self.total = Label(self.frame_total, text=f'TOTAL: {valor}$')
-        self.total.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
-        self.total.configure(background='snow')
-
-    def set_total(self):
-        try:
-            self.frame_total.destroy()
-            self.tipo_tele()
-            self.valor_total = sum(self.carrinho_compras) + self.tipo_tele()
-            self.total_pedido(self.valor_total)
-        except AttributeError:
-            self.tipo_tele()
-            self.valor_total = sum(self.carrinho_compras) + self.tipo_tele()
-            self.total_pedido(self.valor_total)
-        except TypeError as erro:
-            messagebox.showinfo('ERRO', 'Escolha o tipo de entrega')
-
-    def soma_pratos(self):
-        conn = self.conectar_cardapio()
-        c = conn.cursor()
-        c.execute("""SELECT valor_prato FROM menu WHERE nome_prato = %s""", (self.prato,))
-        preco = c.fetchall()
-        for x in preco:
-            self.carrinho_compras.append(x[0])
-
     def acessorios(self):
         self.frame_botao = Frame(self.root_cardapio)
-        self.frame_botao.place(relx=0.0, rely=0.63, relwidth=1, relheight=0.4)
+        self.frame_botao.place(relx=0.0, rely=0.66, relwidth=1, relheight=0.4)
         self.frame_botao.configure(background='snow')
-        self.boy_label = Label(self.frame_botao, text='Motoboy')
-        self.boy_label.configure(background='snow')
-        self.boy_entry = Entry(self.frame_botao)
+        letra = font.Font(size=28)
 
-        self.data_label = Label(self.frame_botao, text='Data')
-        self.data_label.configure(background='snow')
-        self.data_label.place(relx=0.4, rely=0.35, relwidth=0.15, relheight=0.08)
-            
-        self.data_entry = Entry(self.frame_botao)
-        self.data_entry.place(relx=0.4, rely=0.5, relwidth=0.2, relheight=0.1)
+        pratos = Button(self.frame_botao, text='Pratos', relief=FLAT, activebackground='snow', highlightbackground='snow',
+        background='snow', activeforeground='lightblue', command=lambda:[self.novo_prato()])
+        pratos.place(relx=0.21, rely=0.2, relwidth=0.15, relheight=0.2)
+        pratos.configure(font=letra)
 
-        self.tipo = IntVar(self.frame_botao)
-        retirada = Radiobutton(self.frame_botao, text= 'Retirada', variable= self.tipo, value=1,
-        activeforeground='blue', highlightbackground='snow', activebackground='snow')
-        retirada.place(relx=0.05, rely=0.15, relwidth=0.12, relheight=0.1)
-        retirada.configure(background='snow')
-        ifood = Radiobutton(self.frame_botao, text= 'Ifood', variable= self.tipo, value=2,
-        activeforeground='blue', highlightbackground='snow', activebackground='snow')
-        ifood.place(relx=0.27, rely=0.15, relwidth=0.1, relheight=0.1)
-        ifood.configure(background='snow')
-        particular = Radiobutton(self.frame_botao, text= 'Tele Wonder', variable= self.tipo, value=3,
-        activeforeground='blue', highlightbackground='snow', activebackground='snow')
-        particular.place(relx=0.48, rely=0.15, relwidth=0.15, relheight=0.1)
-        particular.configure(background='snow')
+        catego = Button(self.frame_botao, text='Categoria', relief=FLAT, activebackground='snow', highlightbackground='snow',
+        background='snow', activeforeground='lightblue')
+        catego.place(relx=0.6, rely=0.2, relwidth=0.235, relheight=0.235)
+        catego.configure(font=letra)
 
-        bt_fpedido = Image.open('Imagens/pagar.png')
-        img_fpedido = ImageTk.PhotoImage(bt_fpedido)
-        finalizar = Button(self.frame_botao, image= img_fpedido, compound=CENTER, background='snow',
-        activebackground='lightblue', highlightbackground='snow', relief=FLAT,
-        command=lambda:[self.novo_pedido(self.info_cliente, self.memoria, self.boy_entry.get().title(),
-        self.tipo_tele(), self.tipo_pedido, self.data_entry.get()),
-        self.carrinho.delete(*self.carrinho.get_children()), self.boy_entry.delete(0, 'end'),
-        self.data_entry.delete(0, 'end')])
-        finalizar.place(relx=0.8, rely=0.5, relwidth=0.1, relheight=0.18)
-        finalizar.imagem = img_fpedido
+    def novo_prato(self):
+        self.frame_botao.destroy()
+        frame_prato = Frame(self.root_cardapio)
+        frame_prato.place(relx=0.0, rely=0.66, relwidth=1, relheight=0.4)
+        frame_prato.configure(background='snow')
 
-    def tipo_tele(self):
-        try:
-            if self.tipo.get() == 1:
-                self.boy_entry.delete(0, 'end')
-                self.boy_entry.insert('end', 'Wonder')
-                self.tipo_pedido = 0
-                tele = 0
-                self.boy_label.forget()
-                self.boy_entry.forget()
-                return tele
-            elif self.tipo.get() == 2:
-                self.tipo_pedido = 1
-                tele = 10
-                self.boy_label.place(relx=0.1, rely=0.4, relwidth=0.15, relheight=0.08)
-                self.boy_entry.place(relx=0.05, rely=0.52, relwidth=0.25, relheight=0.1)
-                return tele
-            elif self.tipo.get() == 3:
-                self.tipo_pedido = 2
-                self.boy_label.place(relx=0.1, rely=0.75, relwidth=0.15, relheight=0.1)
-                self.boy_entry.place(relx=0.05, rely=0.83, relwidth=0.25, relheight=0.05)
-                conn = self.conectar_cardapio()
-                c = conn.cursor()
-                c.execute("""SELECT preco FROM bairros WHERE nome_bairro = %s""", (self.end_cliente,))
-                valor = c.fetchall()
-                print(valor)
-                return valor[0][0]
-        except AttributeError:
-            messagebox.showerror('Pedido', 'Selecione o tipo de entrega')
-            
+        nome_prato =  Label(frame_prato, text='Nome')
+        nome_prato.place(relx=0.15, rely=0.1, relwidth=0.15, relheight=0.12)
+        nome_prato.configure(background='snow')
+        prato_entry = Entry(frame_prato)
+        prato_entry.place(relx=0.1, rely=0.25, relwidth=0.25, relheight=0.12)
+
+        valor_prato =  Label(frame_prato, text='Valor')
+        valor_prato.place(relx=0.45, rely=0.1, relwidth=0.15, relheight=0.12)
+        valor_prato.configure(background='snow')
+        valor_entry = Entry(frame_prato)
+        valor_entry.place(relx=0.45, rely=0.25, relwidth=0.15, relheight=0.12)
+
     def seleciona(self, event):
         for x in self.menu.selection():
             self.prato, self.preco = self.menu.item(x, 'values')
-            if self.prato not in self.memoria.keys():
-                self.memoria[self.prato] = 1
-                self.modelo.set_prato(self.valor.get()), self.inserir(), self.soma_pratos(), self.total.destroy()
-                self.set_total()
-            else:
-                self.memoria[self.prato] +=1
-                self.modelo.set_prato(self.valor.get()), self.inserir(), self.soma_pratos(), 
-                self.set_total()
-            
-    def deseleciona(self, event):
-        conn = self.conectar_cardapio()
-        c = conn.cursor()
-        for x in self.carrinho.selection():
-            quant, prato_carrinho= self.carrinho.item(x, 'values')
-            print(self.preco, prato_carrinho)
-            if self.memoria[prato_carrinho] == 1:
-                del self.memoria[prato_carrinho]
-                c.execute("""SELECT valor_prato FROM menu WHERE nome_prato = %s""", (prato_carrinho,))
-                menos = c.fetchall()
-                tira_prato = menos[0][0]
-                self.carrinho_compras.append(-tira_prato)
-                print(self.carrinho_compras)
-                self.inserir()
-            else:
-                print(prato_carrinho)
-                self.memoria[prato_carrinho] -= 1
-                print(self.memoria)
-                c.execute("""SELECT valor_prato FROM menu WHERE nome_prato = %s""", (prato_carrinho,))
-                menos = c.fetchall()
-                tira_prato = menos[0][0]
-                self.carrinho_compras.append(-tira_prato)
-                print(self.carrinho_compras)
-                self.inserir()
-
-    def tabela(self):
-        style = ttk.Style()
-        style.theme_use('default')
-        style.configure("Treeview",
-                background="#D3D3D3",
-                foreground="black",
-                rowheight=25,
-                fieldbackground="#D3D3D3",
-                font=('Helvetica', 11))
-        style.map('Treeview', background=[('selected', "#347083")])
-
-        tree_scroll = Scrollbar(self.name)
-        tree_scroll.place(relx=0.95, rely=0.02, relwidth=0.05, relheight=0.98)
-        tree_scroll.configure(background='snow')
-
-        self.carrinho = ttk.Treeview(self.name, yscrollcommand=tree_scroll.set,
-                             selectmode="extended")
-        self.carrinho.place(relx=0.01, rely=0.02, relwidth=0.935, relheight=0.98)
-
-        tree_scroll.config(command=self.carrinho.yview)
-
-        self.carrinho['columns'] = ("Quant", "Prato")
-        self.carrinho.column("#0", width=0, stretch=NO)
-        self.carrinho.column("Quant", anchor=W, width=50)
-        self.carrinho.column("Prato", anchor=W, width=250)
-
-        self.carrinho.heading("#0", text="", anchor=W)
-        self.carrinho.heading("Prato", text="Prato", anchor=CENTER)
-        self.carrinho.heading("Quant", text="Quant", anchor=CENTER)
-
-        self.carrinho.tag_configure('cor1', background="#D7FDF0")
-        self.carrinho.tag_configure('cor2', background="#B2FFD6")
-        self.carrinho.tag_configure('cor2', background="#B4D6D3")
-        self.carrinho.tag_configure('cor2', background="#B8BAC8")
-
-        self.carrinho.bind('<Double-Button-3>', self.deseleciona)
-
-    def select_pratos(self):    
-        for x in self.memoria.keys():
-            return x
-
-    def inserir(self):
-        self.carrinho.delete(*self.carrinho.get_children())
-        global contador
-        contador = 0
-        for p, q in self.memoria.items():
-            if contador % 2 == 0:
-                self.carrinho.insert(parent='', index='end', text='',
-                                values=(q, p), tags=('cor2',))
-            else:
-                self.carrinho.insert(parent='', index='end', text='',
-                                    values=(q, p), tags=('cor1',))
-            contador +=1
-            self.set_total()
     #Menu
     def cria_menu(self):
         self.frame_cardapio = Frame(self.root_cardapio)
-        self.frame_cardapio.place(relx=0.01, rely=0.02, relwidth=0.65, relheight=0.6)
+        self.frame_cardapio.place(relx=0.01, rely=0.02, relwidth=0.98, relheight=0.65)
         self.frame_cardapio.configure(background='snow')
         style = ttk.Style()
         style.theme_use('default')
@@ -574,7 +117,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
 
     def cria_poke(self):
         self.frame_menu = Frame(self.root_cardapio)
-        self.frame_menu.place(relx=0.01, rely=0.02, relwidth=0.65, relheight=0.6)
+        self.frame_menu.place(relx=0.01, rely=0.02, relwidth=0.98, relheight=0.65)
         self.frame_menu.configure(background='snow')
         style = ttk.Style()
         style.theme_use('default')
@@ -593,9 +136,8 @@ class tela_cardapio(Cardapio, Pedido, Local):
 
     def menu_geral(self):
         try:
-            self.pag1.place_forget()
-            self.cria_menu()
-            
+            self.pag1.destroy()
+            self.cria_menu()    
         except:
             pass
         finally:
@@ -723,7 +265,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
                     count += 1
 
             self.menu.bind('<Button-3>', self.seleciona)
-
+'''
     def monte_poke(self):
         try:
             self.frame_cardapio.place_forget()
@@ -1141,9 +683,8 @@ class tela_cardapio(Cardapio, Pedido, Local):
                     self.crunch_it.clear()
                 
                 self.poke_4()
-            except error:
-                messagebox.showerror('ERRO', "Erro inesperado, contate o programador")
-
+            except TypeError as e:
+                print(e)
         bt_avancar = Image.open('Imagens/avancar.png')
         img_avancar = ImageTk.PhotoImage(bt_avancar)
         pag3 = Button(top_master, image= img_avancar, compound=CENTER, activebackground='lightblue',
@@ -1263,10 +804,9 @@ class tela_cardapio(Cardapio, Pedido, Local):
                     self.finish_it.clear()
                 self.finish = self.finish_it
                 #self.finish_it.clear()
+            except TypeError as e:
+                print(e)
                 
-            except error:
-                messagebox.showerror('ERRO', "Erro inesperado, contate o programador")
-
         def add_poke():
             self.memoria.items()
             self.carrinho.delete(*self.carrinho.get_children())
@@ -1438,5 +978,4 @@ class tela_cardapio(Cardapio, Pedido, Local):
                         self.menu.insert(parent='Bebida', index='end', text='',
                                     values=(prato, (valor,'$')), tags=('cor1',))
                     count += 1
-
-
+'''
