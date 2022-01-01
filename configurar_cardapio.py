@@ -48,16 +48,31 @@ class conf_cardapio(Cardapio, Pedido, Local):
         my_menu = Menu(self.root_cardapio)
         self.root_cardapio.config(menu=my_menu)
 
-        my_menu.add_command(label='Inicio', command=lambda:[
-        self.frame_menu.destroy(), self.frame_botao.destroy(), self.frame_cardapio.destroy(),
+        my_menu.add_command(label='Inicio', command=lambda:[self.destruir(), self.frame_menu.destroy(),
         self.fundo_inicio, self.inicio_botoes, my_menu.destroy()])
         # Configurar menu
         option_menu = Menu(my_menu, tearoff=0)
         my_menu.add_cascade(label="Opções", menu=option_menu)
         # opcoes do menu
-        option_menu.add_command(label="Configurar pratos", command= lambda:[])
         option_menu.add_command(label="Monte seu poke", command= lambda:[self.monte_poke()])
         option_menu.add_command(label="Menu", command= lambda:[self.frame_cardapio.destroy(), self.menu_geral()])
+
+    def destruir(self):
+        try:
+            self.frame_cardapio.destroy()
+            self.frame_categoria.destroy()
+            self.frame_botao.destroy()
+        except AttributeError:
+            self.destruir2()
+
+    def destruir2(self):
+        try:
+            self.frame_cardapio.destroy()
+            self.frame_prato.destroy()
+            self.frame_botao.destroy()
+        except AttributeError:
+            self.frame_cardapio.destroy()
+            self.frame_botao.destroy()
 
     def acessorios(self):
         lista = []
@@ -90,41 +105,41 @@ class conf_cardapio(Cardapio, Pedido, Local):
             with open('categoria_pratos.json', 'w', encoding= 'utf8') as f:
                 json.dump(padrao, f, indent=2)
                 lista.append('Sem categoria')
+        finally:
+            self.frame_botao.destroy()
+            self.frame_prato = Frame(self.root_cardapio)
+            self.frame_prato.place(relx=0.0, rely=0.66, relwidth=1, relheight=0.4)
+            self.frame_prato.configure(background='snow')
 
-        self.frame_botao.destroy()
-        frame_prato = Frame(self.root_cardapio)
-        frame_prato.place(relx=0.0, rely=0.66, relwidth=1, relheight=0.4)
-        frame_prato.configure(background='snow')
+            nome_prato =  Label(self.frame_prato, text='Nome')
+            nome_prato.place(relx=0.15, rely=0.1, relwidth=0.15, relheight=0.12)
+            nome_prato.configure(background='snow')
+            prato_entry = Entry(self.frame_prato)
+            prato_entry.place(relx=0.1, rely=0.25, relwidth=0.25, relheight=0.12)
+            self.prato_entry = prato_entry.get().title()
 
-        nome_prato =  Label(frame_prato, text='Nome')
-        nome_prato.place(relx=0.15, rely=0.1, relwidth=0.15, relheight=0.12)
-        nome_prato.configure(background='snow')
-        prato_entry = Entry(frame_prato)
-        prato_entry.place(relx=0.1, rely=0.25, relwidth=0.25, relheight=0.12)
-        self.prato_entry = prato_entry.get().title()
+            valor_prato =  Label(self.frame_prato, text='Valor')
+            valor_prato.place(relx=0.45, rely=0.1, relwidth=0.15, relheight=0.12)
+            valor_prato.configure(background='snow')
+            valor_entry = Entry(self.frame_prato)
+            valor_entry.place(relx=0.45, rely=0.25, relwidth=0.15, relheight=0.12)
 
-        valor_prato =  Label(frame_prato, text='Valor')
-        valor_prato.place(relx=0.45, rely=0.1, relwidth=0.15, relheight=0.12)
-        valor_prato.configure(background='snow')
-        valor_entry = Entry(frame_prato)
-        valor_entry.place(relx=0.45, rely=0.25, relwidth=0.15, relheight=0.12)
-
-        categoria =  Label(frame_prato, text='Categoria')
-        categoria.place(relx=0.72, rely=0.1, relwidth=0.15, relheight=0.12)
-        categoria.configure(background='snow')
-        categoria_box = ttk.Combobox(frame_prato, values=lista)
-        categoria_box.place(relx=0.7, rely=0.25, relwidth=0.15, relheight=0.12)
+            categoria =  Label(self.frame_prato, text='Categoria')
+            categoria.place(relx=0.72, rely=0.1, relwidth=0.15, relheight=0.12)
+            categoria.configure(background='snow')
+            categoria_box = ttk.Combobox(self.frame_prato, values=lista)
+            categoria_box.place(relx=0.7, rely=0.25, relwidth=0.15, relheight=0.12)
 
     def nova_cat(self):
         self.frame_botao.destroy()
-        frame_categoria = Frame(self.root_cardapio)
-        frame_categoria.place(relx=0.0, rely=0.66, relwidth=1, relheight=0.4)
-        frame_categoria.configure(background='snow')
+        self.frame_categoria = Frame(self.root_cardapio)
+        self.frame_categoria.place(relx=0.0, rely=0.66, relwidth=1, relheight=0.4)
+        self.frame_categoria.configure(background='snow')
 
-        nome_categoria =  Label(frame_categoria, text='Nome')
+        nome_categoria =  Label(self.frame_categoria, text='Nome')
         nome_categoria.place(relx=0.425, rely=0.1, relwidth=0.15, relheight=0.12)
         nome_categoria.configure(background='snow')
-        self.cat_entry = Entry(frame_categoria)
+        self.cat_entry = Entry(self.frame_categoria)
         self.cat_entry.place(relx=0.385, rely=0.25, relwidth=0.25, relheight=0.12)
         
         def add_cat(new_cat):
@@ -150,7 +165,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
                     json.dump(padrao, f, indent=2)
                 cria_json()                    
 
-        add_categoria = Button(frame_categoria, text='Add categoria', relief=FLAT, activebackground='snow', background='snow',
+        add_categoria = Button(self.frame_categoria, text='Add categoria', relief=FLAT, activebackground='snow', background='snow',
 		highlightbackground='snow', activeforeground='green', command=lambda:[add_cat(self.cat_entry.get().title()),
         self.cat_entry.delete(0, 'end')])
         add_categoria.place(relx=0.385, rely=0.55, relwidth=0.25, relheight=0.12)
@@ -162,7 +177,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
     def cria_menu(self):
         self.frame_cardapio = Frame(self.root_cardapio)
         self.frame_cardapio.place(relx=0.01, rely=0.02, relwidth=0.98, relheight=0.65)
-        self.frame_cardapio.configure(background='snow')
+        self.frame_cardapio.configure(background='blue')
         style = ttk.Style()
         style.theme_use('default')
         style.configure("tema_cardapio",
@@ -200,8 +215,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
     def menu_geral(self):
         try:
             self.pag1.destroy()
-            self.cria_menu()    
-        except:
+        except AttributeError:
             pass
         finally:
             self.menu.delete(*self.menu.get_children())
@@ -328,10 +342,10 @@ class conf_cardapio(Cardapio, Pedido, Local):
                     count += 1
 
             self.menu.bind('<Button-3>', self.seleciona)
-'''
+
     def monte_poke(self):
         try:
-            self.frame_cardapio.place_forget()
+            self.frame_cardapio.destroy()
         except:
             pass
         finally:
@@ -1041,4 +1055,3 @@ class conf_cardapio(Cardapio, Pedido, Local):
                         self.menu.insert(parent='Bebida', index='end', text='',
                                     values=(prato, (valor,'$')), tags=('cor1',))
                     count += 1
-'''
