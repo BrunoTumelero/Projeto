@@ -23,6 +23,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
         self.info_cliente = info_cliente
         self.end_cliente = end_cliente
         self.modelo = Modelo_prato()
+        self.lista_cat = []
                 
     def conectar_cardapio(self):
         return super().conectar_cardapio()
@@ -59,13 +60,14 @@ class conf_cardapio(Cardapio, Pedido, Local):
         option_menu.add_command(label="Menu", command= lambda:[self.frame_cardapio.destroy(), self.menu_geral()])
 
     def acessorios(self):
+        lista = []
         self.frame_botao = Frame(self.root_cardapio)
         self.frame_botao.place(relx=0.0, rely=0.66, relwidth=1, relheight=0.4)
         self.frame_botao.configure(background='snow')
         letra = font.Font(size=28)
 
         pratos = Button(self.frame_botao, text='Pratos', relief=FLAT, activebackground='snow', highlightbackground='snow',
-        background='snow', activeforeground='lightblue', command=lambda:[self.novo_prato()])
+        background='snow', activeforeground='lightblue', command=lambda:[self.novo_prato(lista)])
         pratos.place(relx=0.21, rely=0.2, relwidth=0.15, relheight=0.2)
         pratos.configure(font=letra)
 
@@ -74,7 +76,21 @@ class conf_cardapio(Cardapio, Pedido, Local):
         catego.place(relx=0.6, rely=0.2, relwidth=0.235, relheight=0.235)
         catego.configure(font=letra)
 
-    def novo_prato(self):
+    def novo_prato(self, lista):
+        try:
+            cat_pratos = open('categoria_pratos.json', 'r', encoding='utf8')
+            todas_cat = json.load(cat_pratos)
+            cat_pratos.close()
+            print(todas_cat)
+            for x in todas_cat:
+                for y in x.values():
+                    lista.append(y)
+        except FileNotFoundError:
+            padrao = [{1: 'Sem categoria'}]
+            with open('categoria_pratos.json', 'w', encoding= 'utf8') as f:
+                json.dump(padrao, f, indent=2)
+                lista.append('Sem categoria')
+
         self.frame_botao.destroy()
         frame_prato = Frame(self.root_cardapio)
         frame_prato.place(relx=0.0, rely=0.66, relwidth=1, relheight=0.4)
@@ -93,33 +109,11 @@ class conf_cardapio(Cardapio, Pedido, Local):
         valor_entry = Entry(frame_prato)
         valor_entry.place(relx=0.45, rely=0.25, relwidth=0.15, relheight=0.12)
 
-        try:
-            lista_cat = []
-            cat_pratos = open('categoria_pratos.json', 'r', encoding='utf8')
-            memoria_cat = json.load(cat_pratos)
-            cat_pratos.close()
-            memoria_cat = memoria_cat[0]
-            for x in memoria_cat.values():
-                lista_cat.append(x)
-            cat_pratos =  open('categoria_pratos.json', 'w', encoding= 'utf8')
-            json.dump(memoria_cat, cat_pratos, indent=2)
-            cat_pratos.close() 
-        except FileNotFoundError:
-            poke = [{0: 'Sem categoria'}]
-            with open('categoria_pratos.json', 'w', encoding= 'utf8') as f:
-                json.dump(poke, f, indent=2)
-            cat_pratos = open('categoria_pratos.json', 'r')
-            memoria_cat = json.load(cat_pratos)
-            cat_pratos.close()
-            memoria_cat = memoria_cat[0]
-            for x in memoria_cat.values():
-                lista_cat.append(x)
-        finally:
-            categoria =  Label(frame_prato, text='Categoria')
-            categoria.place(relx=0.72, rely=0.1, relwidth=0.15, relheight=0.12)
-            categoria.configure(background='snow')
-            categoria_box = ttk.Combobox(frame_prato, values=lista_cat)
-            categoria_box.place(relx=0.7, rely=0.25, relwidth=0.15, relheight=0.12)
+        categoria =  Label(frame_prato, text='Categoria')
+        categoria.place(relx=0.72, rely=0.1, relwidth=0.15, relheight=0.12)
+        categoria.configure(background='snow')
+        categoria_box = ttk.Combobox(frame_prato, values=lista)
+        categoria_box.place(relx=0.7, rely=0.25, relwidth=0.15, relheight=0.12)
 
     def nova_cat(self):
         self.frame_botao.destroy()
@@ -130,12 +124,36 @@ class conf_cardapio(Cardapio, Pedido, Local):
         nome_categoria =  Label(frame_categoria, text='Nome')
         nome_categoria.place(relx=0.425, rely=0.1, relwidth=0.15, relheight=0.12)
         nome_categoria.configure(background='snow')
-        cat_entry = Entry(frame_categoria)
-        cat_entry.place(relx=0.385, rely=0.25, relwidth=0.25, relheight=0.12)
-        self.cat_entry = cat_entry.get().title()
+        self.cat_entry = Entry(frame_categoria)
+        self.cat_entry.place(relx=0.385, rely=0.25, relwidth=0.25, relheight=0.12)
+        
+        def add_cat(new_cat):
+            def cria_json():
+                cat_pratos = open('categoria_pratos.json', 'r', encoding='utf8')
+                todas_cat = json.load(cat_pratos)
+                cat_pratos.close()
+                dici_cat = todas_cat[0]
+                print(dici_cat)
+                for x in dici_cat.values():
+                    indice = len(todas_cat) + 1
+                    if new_cat not in dici_cat.values():
+                        todas_cat.append({indice: new_cat})
+                        self.lista_cat.append(new_cat)
+                cat_pratos =  open('categoria_pratos.json', 'w', encoding= 'utf8')
+                json.dump(todas_cat, cat_pratos, indent=2)
+                cat_pratos.close()
+            try:
+                 cria_json()
+            except FileNotFoundError:
+                padrao = [{1: 'Sem categoria'}]
+                with open('categoria_pratos.json', 'w', encoding= 'utf8') as f:
+                    json.dump(padrao, f, indent=2)
+                cria_json()                    
 
-        def add_cat():
-            pass
+        add_categoria = Button(frame_categoria, text='Add categoria', relief=FLAT, activebackground='snow', background='snow',
+		highlightbackground='snow', activeforeground='green', command=lambda:[add_cat(self.cat_entry.get().title()),
+        self.cat_entry.delete(0, 'end')])
+        add_categoria.place(relx=0.385, rely=0.55, relwidth=0.25, relheight=0.12)
 
     def seleciona(self, event):
         for x in self.menu.selection():
