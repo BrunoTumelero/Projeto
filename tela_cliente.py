@@ -593,9 +593,8 @@ class tela_cardapio(Cardapio, Pedido, Local):
 
     def menu_geral(self):
         try:
-            self.pag1.place_forget()
+            self.pag1.destroy()
             self.cria_menu()
-            
         except:
             pass
         finally:

@@ -237,111 +237,48 @@ class conf_cardapio(Cardapio, Pedido, Local):
             conn = self.conectar_cardapio()
             c = conn.cursor()
             c.execute("""SELECT nome_prato, valor_prato, categoria FROM menu ORDER BY nome_prato""")
+            bd_menu = c.fetchall()
             global count
             count = 0
-            self.menu.insert('', 'end', 'Snack', tags=('cor3',), values=('⮯Snacks'))
-            self.menu.insert('', 'end', 'Bowl', tags=('cor4',), values='⮯Bowls')
-            self.menu.insert('', 'end', 'Salada', tags=('cor3',), values='⮯Saladas')
-            self.menu.insert('', 'end', 'Brunch', tags=('cor4',), values='⮯Brunch')            
-            self.menu.insert('', 'end', 'Pizza', tags=('cor3',), values='⮯Pizzas')
-            self.menu.insert('', 'end', 'Burger', tags=('cor4',), values='⮯Burgers')
-            self.menu.insert('', 'end', 'Poke', tags=('cor3',), values='⮯Pokes')
-            self.menu.insert('', 'end', 'Doce', tags=('cor4',), values='⮯Doces')
-            self.menu.insert('', 'end', 'Cafe', tags=('cor3',), values='⮯Cafés')
-            self.menu.insert('', 'end', 'Suco', tags=('cor4',), values='⮯Sucos')
-            self.menu.insert('', 'end', 'Bebida', tags=('cor3',), values='⮯Bebidas')
+            self.l = []
+            arq_json = open('categoria_pratos.json', 'r', encoding='utf8')
+            list_cat = json.load(arq_json)
+            for x in list_cat:
+                for y in x.values():
+                    self.l.append(y)
+            indice = 1
 
-            for prato, valor, categoria in c.fetchall():
-                if categoria == 'Snack':
-                    if count % 2 == 0:
+            def inserir_cat(indice, nome_cat):
+                self.menu.insert('', 'end', nome_cat, tags=('cor3',), values=(('⮯', nome_cat), ''))
+                indice += 1
+            
+            def inserir_prato(cat):
+                for prato, valor, categoria in c.fetchall():
+                    print(prato, categoria)
+                    if categoria == cat:
+                        if count % 2 == 0:
+                                self.menu.insert(parent='Snack', index='end', text='',
+                                        values=(prato, (valor,'$')), tags=('cor2',))
+                        else:
                             self.menu.insert(parent='Snack', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Snack', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 2
-                elif categoria == 'Bowl':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Bowl', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Bowl', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Salada':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Salada', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Salada', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Brunch':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Brunch', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Brunch', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Pizza':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Pizza', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Pizza', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Burger':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Burger', index='end', text='',
-                                        values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Burger', index='end', text='',
                                         values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Poke':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Poke', index='end', text='',
-                                        values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Poke', index='end', text='',
-                                        values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Doce':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Doce', index='end', text='',
-                                        values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Doce', index='end', text='',
-                                        values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Cafe':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Cafe', index='end', text='',
-                                        values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Cafe', index='end', text='',
-                                        values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Suco':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Suco', index='end', text='',
-                                        values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Suco', index='end', text='',
-                                        values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Bebida':
-                    if count % 2 == 0:
-                            self.menu.insert(parent='Bebida', index='end', text='',
-                                        values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Bebida', index='end', text='',
-                                        values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
 
-            self.menu.bind('<Button-3>', self.seleciona)
+                self.menu.bind('<Button-3>', self.seleciona)
+            while indice <= len(self.l):
+                self.menu.delete(*self.menu.get_children())
+                for a in self.l:
+                    for prato, valor, categoria in c.fetchall():
+                        print(prato, categoria)
+                        if categoria == a:
+                            if count % 2 == 0:
+                                    self.menu.insert(parent=a, index='end', text='',
+                                            values=(prato, (valor,'$')), tags=('cor2',))
+                            else:
+                                self.menu.insert(parent=a, index='end', text='',
+                                            values=(prato, (valor,'$')), tags=('cor1',))
+
+                        self.menu.bind('<Button-3>', self.seleciona)
+                inserir_cat(indice, a)
 
     def monte_poke(self):
         try:
