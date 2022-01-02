@@ -249,12 +249,15 @@ class conf_cardapio(Cardapio, Pedido, Local):
             indice = 1
 
             def inserir_cat(indice, nome_cat):
-                self.menu.insert('', 'end', nome_cat, tags=('cor3',), values=(('⮯', nome_cat), ''))
-                indice += 1
-            
+                print('chegou')
+                #self.menu.delete(*self.menu.get_children())
+                try:
+                    self.menu.insert('', 'end', nome_cat, tags=('cor3',), values=(('⮯', nome_cat), ''))
+                except Exception:
+                    pass
+
             def inserir_prato(cat):
                 for prato, valor, categoria in c.fetchall():
-                    print(prato, categoria)
                     if categoria == cat:
                         if count % 2 == 0:
                                 self.menu.insert(parent='Snack', index='end', text='',
@@ -265,20 +268,22 @@ class conf_cardapio(Cardapio, Pedido, Local):
 
                 self.menu.bind('<Button-3>', self.seleciona)
             while indice <= len(self.l):
-                self.menu.delete(*self.menu.get_children())
+                
                 for a in self.l:
-                    for prato, valor, categoria in c.fetchall():
-                        print(prato, categoria)
-                        if categoria == a:
-                            if count % 2 == 0:
-                                    self.menu.insert(parent=a, index='end', text='',
-                                            values=(prato, (valor,'$')), tags=('cor2',))
-                            else:
-                                self.menu.insert(parent=a, index='end', text='',
-                                            values=(prato, (valor,'$')), tags=('cor1',))
+                    for categoria in bd_menu:
+                        if a == categoria[2]:
+                            inserir_cat(indice, a)
+                            if categoria[2] == a:
+                                print(self.menu)
+                                if count % 2 == 0:
+                                        self.menu.insert(a, 'end',
+                                                values=(categoria[0], (categoria[1],'$')), tags=('cor2',))
+                                else:
+                                    self.menu.insert(a, 'end',
+                                                values=(categoria[0], (categoria[1],'$')), tags=('cor1',))
 
-                        self.menu.bind('<Button-3>', self.seleciona)
-                inserir_cat(indice, a)
+                            self.menu.bind('<Button-3>', self.seleciona)
+                indice += 1
 
     def monte_poke(self):
         try:
