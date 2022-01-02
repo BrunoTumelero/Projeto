@@ -249,8 +249,6 @@ class conf_cardapio(Cardapio, Pedido, Local):
             indice = 1
 
             def inserir_cat(indice, nome_cat):
-                print('chegou')
-                #self.menu.delete(*self.menu.get_children())
                 try:
                     self.menu.insert('', 'end', nome_cat, tags=('cor3',), values=(('⮯', nome_cat), ''))
                 except Exception:
@@ -267,6 +265,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
                                         values=(prato, (valor,'$')), tags=('cor1',))
 
                 self.menu.bind('<Button-3>', self.seleciona)
+            controle = []
             while indice <= len(self.l):
                 
                 for a in self.l:
@@ -274,15 +273,18 @@ class conf_cardapio(Cardapio, Pedido, Local):
                         if a == categoria[2]:
                             inserir_cat(indice, a)
                             if categoria[2] == a:
-                                print(self.menu)
-                                if count % 2 == 0:
+                                if categoria[0] not in controle:
+                                    controle.append(categoria[0])
+                                    print(controle)
+                                    if count % 2 == 0:
+                                            self.menu.insert(a, 'end',
+                                                    values=(categoria[0], (categoria[1],'$')), tags=('cor2',))
+                                    else:
                                         self.menu.insert(a, 'end',
-                                                values=(categoria[0], (categoria[1],'$')), tags=('cor2',))
+                                                    values=(categoria[0], (categoria[1],'$')), tags=('cor1',))
                                 else:
-                                    self.menu.insert(a, 'end',
-                                                values=(categoria[0], (categoria[1],'$')), tags=('cor1',))
-
-                            self.menu.bind('<Button-3>', self.seleciona)
+                                    pass
+                                self.menu.bind('<Button-3>', self.seleciona)
                 indice += 1
 
     def monte_poke(self):
