@@ -45,9 +45,10 @@ class Cardapio():
             
         conn.close()
 
-    def limpa(self, nome, valor):
+    def limpa(self, nome, valor, cetegory):
         nome.delete(0, 'end')
         valor.delete(0, 'end')
+        cetegory.delete(0, 'end')
 
 class Modelo_prato():
     def __init__(self):

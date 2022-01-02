@@ -9,7 +9,6 @@ from pedido import *
 from bairrosv2 import Local
 from configurar_cardapio import conf_cardapio
 import json
-#from cardapio import tela_cardapio
 
 class tela_cliente(Cliente):
   def __init__(self, root, fundo, botoes_inicio, escquece1, esquece2):
@@ -725,7 +724,7 @@ class tela_cardapio(Cardapio, Pedido, Local):
 
     def monte_poke(self):
         try:
-            self.frame_cardapio.place_forget()
+            self.frame_cardapio.destroy()
         except:
             pass
         finally:
@@ -1436,5 +1435,3 @@ class tela_cardapio(Cardapio, Pedido, Local):
                         self.menu.insert(parent='Bebida', index='end', text='',
                                     values=(prato, (valor,'$')), tags=('cor1',))
                     count += 1
-
-

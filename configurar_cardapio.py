@@ -1,3 +1,4 @@
+from os import remove
 from tkinter import *
 from tkinter import ttk
 from tkinter import font
@@ -116,7 +117,6 @@ class conf_cardapio(Cardapio, Pedido, Local):
             nome_prato.configure(background='snow')
             prato_entry = Entry(self.frame_prato)
             prato_entry.place(relx=0.1, rely=0.25, relwidth=0.25, relheight=0.12)
-            self.prato_entry = prato_entry.get().title()
 
             valor_prato =  Label(self.frame_prato, text='Valor')
             valor_prato.place(relx=0.45, rely=0.1, relwidth=0.15, relheight=0.12)
@@ -129,6 +129,52 @@ class conf_cardapio(Cardapio, Pedido, Local):
             categoria.configure(background='snow')
             categoria_box = ttk.Combobox(self.frame_prato, values=lista)
             categoria_box.place(relx=0.7, rely=0.25, relwidth=0.15, relheight=0.12)
+
+            def verification_add():
+                if prato_entry.get() != '' or ' ':
+                    print(prato_entry.get())
+                    messagebox.showerror('ERRO', 'Insira um nome válido')
+                elif valor_entry.get() == '' or ' ':
+                    messagebox.showerror('ERRO', 'Insira o valor do prato')
+                    if valor_entry.get() is str:
+                        messagebox.showerror('ERRO', 'Insira apenas numeros no valor')
+                elif categoria_box.get() == '' or ' ':
+                    messagebox.showerror('ERRO', 'Selecione a categoria do prato')
+                else:
+                    self.adicionar(prato_entry.get().title(), valor_entry.get(), categoria_box.get())
+                    self.limpa(prato_entry, valor_entry, categoria_box)
+
+            def verification_update():
+                if prato_entry.get() == '' or ' ':
+                    messagebox.showerror('ERRO', 'Insira um nome válido')
+                elif valor_entry.get() == '' or ' ':
+                    messagebox.showerror('ERRO', 'Insira o valor do prato')
+                    if valor_entry.get() is str:
+                        messagebox.showerror('ERRO', 'Insira apenas numeros no valor')
+                elif categoria_box.get() == '' or ' ':
+                    messagebox.showerror('ERRO', 'Selecione a categoria do prato')
+                else:
+                    self.atualizar(prato_entry.get().title(), valor_entry.get(), categoria_box.get())
+                    self.limpa(prato_entry, valor_entry, categoria_box)
+
+            def verification_remove():
+                if prato_entry.get == '' or ' ':
+                    messagebox.showerror('ERRO', 'Informe o nome do prato antes de remove-lo')
+                else:
+                    self.apagar(prato_entry.get().title())
+                    self.limpa(prato_entry, valor_entry, categoria_box)
+
+            add_button = Button(self.frame_prato, text='Adicionar', relief=FLAT, activebackground='snow',
+			highlightbackground='snow', activeforeground='green', background='snow', command=lambda:[verification_add()])
+            add_button.place(relx=0.7, rely=0.6, relwidth=0.15, relheight=0.12)
+
+            update_button = Button(self.frame_prato, text='Atualizar', relief=FLAT, activebackground='snow',
+			highlightbackground='snow', activeforeground='gold', background='snow', command=lambda:[verification_update()])
+            update_button.place(relx=0.45, rely=0.6, relwidth=0.15, relheight=0.12)
+
+            remove_button = Button(self.frame_prato, text='Remover', relief=FLAT, activebackground='snow',
+			highlightbackground='snow', activeforeground='red', background='snow', command=lambda:[verification_remove()])
+            remove_button.place(relx=0.1, rely=0.6, relwidth=0.15, relheight=0.12)
 
     def nova_cat(self):
         self.frame_botao.destroy()
@@ -254,20 +300,8 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 except Exception:
                     pass
 
-            def inserir_prato(cat):
-                for prato, valor, categoria in c.fetchall():
-                    if categoria == cat:
-                        if count % 2 == 0:
-                                self.menu.insert(parent='Snack', index='end', text='',
-                                        values=(prato, (valor,'$')), tags=('cor2',))
-                        else:
-                            self.menu.insert(parent='Snack', index='end', text='',
-                                        values=(prato, (valor,'$')), tags=('cor1',))
-
-                self.menu.bind('<Button-3>', self.seleciona)
             controle = []
             while indice <= len(self.l):
-                
                 for a in self.l:
                     for categoria in bd_menu:
                         if a == categoria[2]:
