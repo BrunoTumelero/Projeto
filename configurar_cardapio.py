@@ -235,8 +235,10 @@ class conf_cardapio(Cardapio, Pedido, Local):
             self.dish, self.price = self.menu.item(x, 'values')
             self.prato_entry.delete(0, 'end')
             self.valor_entry.delete(0, 'end')
-            value = self.price.split('$')
-            print(value)
+            remove = '$'
+            for l in range(len(remove)):
+                self.price = self.price.replace(remove[l], "")
+            self.price = self.price.rstrip()
             self.prato_entry.insert(END, self.dish)
             self.valor_entry.insert(END, self.price)
     #Menu
