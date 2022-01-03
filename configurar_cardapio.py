@@ -315,29 +315,28 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 for y in x.values():
                     self.l.append(y)
             indice = 1
+            count_color = 0
+            
 
-            def inserir_cat(indice, nome_cat):
+            def inserir_cat(count_color, nome_cat, control):
                 try:
                     self.menu.insert('', 'end', nome_cat, tags=('cor3',), values=(('⮯', nome_cat), ''))
-                except Exception:
+                except Exception as e:
                     pass
-
             controle = []
             while indice <= len(self.l):
                 for a in self.l:
                     for categoria in bd_menu:
                         if a == categoria[2]:
-                            inserir_cat(indice, a)
+                            inserir_cat(count_color, a, self.l)
                             if categoria[2] == a:
                                 if categoria[0] not in controle:
                                     controle.append(categoria[0])
-                                    print(controle)
                                     if count % 2 == 0:
-                                            self.menu.insert(a, 'end',
-                                                    values=(categoria[0], (categoria[1],'$')), tags=('cor2',))
+                                            self.menu.insert(a, 'end', values=(categoria[0], (categoria[1],'$')), tags=('cor2',))
                                     else:
-                                        self.menu.insert(a, 'end',
-                                                    values=(categoria[0], (categoria[1],'$')), tags=('cor1',))
+                                        self.menu.insert(a, 'end', values=(categoria[0], (categoria[1],'$')), tags=('cor1',))
+                                    count += 1
                                 else:
                                     pass
                 indice += 1
@@ -983,6 +982,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
                                 else:
                                     self.menu.insert(a, 'end',
                                                 values=(categoria[0], (categoria[1],'$')), tags=('cor1',))
+                                count += 1
                             else:
                                 pass
             indice += 1
