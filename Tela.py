@@ -3,8 +3,6 @@ from tkinter import ttk
 from datetime import *
 from entregadoresv2 import *
 from pedido import Pedido
-from Cliente import Cliente 
-from tela_cliente import tela_cardapio
 from configurar_cardapio import conf_cardapio
 from tkinter import messagebox
 from PIL import Image, ImageTk
@@ -243,10 +241,9 @@ class Janela(Entregador, Pedido):
                         c.execute("""SELECT nome_cliente FROM pedidos WHERE id_pedido= %s""",
                         (idd,))
                         nome = c.fetchall()
-                        conect = Cliente.conectar_cliente()
-                        conect.execute("""SELECT endereco FROM clientes WHERE nome_cliente = %s""",
+                        c.execute("""SELECT endereco FROM clientes WHERE nome_cliente = %s""",
                         (nome[0][0],))
-                        end = conect.fetchall()
+                        end = c.fetchall()
                         c.execute("""SELECT preco FROM bairros WHERE nome_bairro = %s""",
                         (end[0][0],))
                         valor = c.fetchall()

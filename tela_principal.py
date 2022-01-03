@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from PIL import Image, ImageTk
-from Cliente import Cliente
+from Clientes import Cliente
 from Tela import *
 from cardapio_v2 import Cardapio 
 from tela_cliente import tela_cliente

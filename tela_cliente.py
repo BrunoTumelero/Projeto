@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import font
 from PIL import Image, ImageTk
-from Cliente import *
+from Clientes import *
 from cardapio_v2 import Cardapio, Modelo_prato
 from pedido import *
 from bairrosv2 import Local
