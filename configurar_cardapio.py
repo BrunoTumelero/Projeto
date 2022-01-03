@@ -35,14 +35,14 @@ class conf_cardapio(Cardapio, Pedido, Local):
     def apagar(self, prato):
         return super().apagar(prato)
 
-    def atualizar(self, prato, valor):
-        return super().atualizar(prato, valor)
+    def atualizar(self, prato, valor, category):
+        return super().atualizar(prato, valor, category)
 
     def exibir_pratos(self):
         return super().exibir_pratos()
 
-    def limpa(self, nome, valor):
-        return super().limpa(nome, valor)
+    def limpa(self, nome, valor, category):
+        return super().limpa(nome, valor, category)
 
     def opcoes(self):
         # Add Menu
@@ -115,65 +115,79 @@ class conf_cardapio(Cardapio, Pedido, Local):
             nome_prato =  Label(self.frame_prato, text='Nome')
             nome_prato.place(relx=0.15, rely=0.1, relwidth=0.15, relheight=0.12)
             nome_prato.configure(background='snow')
-            prato_entry = Entry(self.frame_prato)
-            prato_entry.place(relx=0.1, rely=0.25, relwidth=0.25, relheight=0.12)
+            self.prato_entry = Entry(self.frame_prato)
+            self.prato_entry.place(relx=0.1, rely=0.25, relwidth=0.25, relheight=0.12)
 
             valor_prato =  Label(self.frame_prato, text='Valor')
             valor_prato.place(relx=0.45, rely=0.1, relwidth=0.15, relheight=0.12)
             valor_prato.configure(background='snow')
-            valor_entry = Entry(self.frame_prato)
-            valor_entry.place(relx=0.45, rely=0.25, relwidth=0.15, relheight=0.12)
+            self.valor_entry = Entry(self.frame_prato)
+            self.valor_entry.place(relx=0.45, rely=0.25, relwidth=0.15, relheight=0.12)
 
             categoria =  Label(self.frame_prato, text='Categoria')
             categoria.place(relx=0.72, rely=0.1, relwidth=0.15, relheight=0.12)
             categoria.configure(background='snow')
-            categoria_box = ttk.Combobox(self.frame_prato, values=lista)
-            categoria_box.place(relx=0.7, rely=0.25, relwidth=0.15, relheight=0.12)
+            self.categoria_box = ttk.Combobox(self.frame_prato, values=lista)
+            self.categoria_box.place(relx=0.7, rely=0.25, relwidth=0.15, relheight=0.12)
 
-            def verification_add():
-                if prato_entry.get() != '' or ' ':
-                    print(prato_entry.get())
+            def verification_add(dish, price, cate):
+                if dish.get() == '':
                     messagebox.showerror('ERRO', 'Insira um nome válido')
-                elif valor_entry.get() == '' or ' ':
-                    messagebox.showerror('ERRO', 'Insira o valor do prato')
-                    if valor_entry.get() is str:
+                elif price.get() is int:
+                    print(price.get())
+                    if price.get() == '' or ' ':
+                        messagebox.showerror('ERRO', 'Insira o valor do prato')
+                    else:
                         messagebox.showerror('ERRO', 'Insira apenas numeros no valor')
-                elif categoria_box.get() == '' or ' ':
+                elif cate.get() == '':
+                    print(cate.get())
                     messagebox.showerror('ERRO', 'Selecione a categoria do prato')
                 else:
-                    self.adicionar(prato_entry.get().title(), valor_entry.get(), categoria_box.get())
-                    self.limpa(prato_entry, valor_entry, categoria_box)
+                    self.adicionar(dish.get().title(), price.get(), cate.get().title())
+                    self.limpa(dish, price, cate)
+                    self.atualiza_tabela()
 
-            def verification_update():
-                if prato_entry.get() == '' or ' ':
-                    messagebox.showerror('ERRO', 'Insira um nome válido')
-                elif valor_entry.get() == '' or ' ':
-                    messagebox.showerror('ERRO', 'Insira o valor do prato')
-                    if valor_entry.get() is str:
+            def verification_update(dish, price, cate):
+                if dish.get() == '':
+                    if dish.get() ==  " ":
+                        messagebox.showerror('ERRO', 'Insira um nome válido')
+                elif price.get() is int: 
+                    if price.get() == ' ':
+                        messagebox.showerror('ERRO', 'Insira o valor do prato')
+                    if price.get() == '':
+                        messagebox.showerror('ERRO', 'Insira o valor do prato')
+                    else:    
                         messagebox.showerror('ERRO', 'Insira apenas numeros no valor')
-                elif categoria_box.get() == '' or ' ':
-                    messagebox.showerror('ERRO', 'Selecione a categoria do prato')
+                elif cate.get() == '':
+                    if cate.get() == ' ':
+                        messagebox.showerror('ERRO', 'Selecione a categoria do prato')
                 else:
-                    self.atualizar(prato_entry.get().title(), valor_entry.get(), categoria_box.get())
-                    self.limpa(prato_entry, valor_entry, categoria_box)
+                    self.atualizar(dish.get().title(), price.get(), cate.get().title())
+                    self.limpa(dish, price, cate)
+                    self.atualiza_tabela()
 
-            def verification_remove():
-                if prato_entry.get == '' or ' ':
-                    messagebox.showerror('ERRO', 'Informe o nome do prato antes de remove-lo')
+            def verification_remove(dish, price, cate):
+                if dish.get == '':
+                    if dish.get == ' ':
+                        messagebox.showerror('ERRO', 'Informe o nome do prato antes de remove-lo')
                 else:
-                    self.apagar(prato_entry.get().title())
-                    self.limpa(prato_entry, valor_entry, categoria_box)
+                    self.apagar(dish.get().title())
+                    self.limpa(dish, price, cate)
+                    self.atualiza_tabela()
 
             add_button = Button(self.frame_prato, text='Adicionar', relief=FLAT, activebackground='snow',
-			highlightbackground='snow', activeforeground='green', background='snow', command=lambda:[verification_add()])
+			highlightbackground='snow', activeforeground='green', background='snow', command=lambda:[verification_add(
+            self.prato_entry, self.valor_entry, self.categoria_box)])
             add_button.place(relx=0.7, rely=0.6, relwidth=0.15, relheight=0.12)
 
             update_button = Button(self.frame_prato, text='Atualizar', relief=FLAT, activebackground='snow',
-			highlightbackground='snow', activeforeground='gold', background='snow', command=lambda:[verification_update()])
+			highlightbackground='snow', activeforeground='gold', background='snow', command=lambda:[verification_update(
+            self.prato_entry, self.valor_entry, self.categoria_box)])
             update_button.place(relx=0.45, rely=0.6, relwidth=0.15, relheight=0.12)
 
             remove_button = Button(self.frame_prato, text='Remover', relief=FLAT, activebackground='snow',
-			highlightbackground='snow', activeforeground='red', background='snow', command=lambda:[verification_remove()])
+			highlightbackground='snow', activeforeground='red', background='snow', command=lambda:[verification_remove(
+            self.prato_entry, self.valor_entry, self.categoria_box)])
             remove_button.place(relx=0.1, rely=0.6, relwidth=0.15, relheight=0.12)
 
     def nova_cat(self):
@@ -218,7 +232,13 @@ class conf_cardapio(Cardapio, Pedido, Local):
 
     def seleciona(self, event):
         for x in self.menu.selection():
-            self.prato, self.preco = self.menu.item(x, 'values')
+            self.dish, self.price = self.menu.item(x, 'values')
+            self.prato_entry.delete(0, 'end')
+            self.valor_entry.delete(0, 'end')
+            value = self.price.split('$')
+            print(value)
+            self.prato_entry.insert(END, self.dish)
+            self.valor_entry.insert(END, self.price)
     #Menu
     def cria_menu(self):
         self.frame_cardapio = Frame(self.root_cardapio)
@@ -318,8 +338,8 @@ class conf_cardapio(Cardapio, Pedido, Local):
                                                     values=(categoria[0], (categoria[1],'$')), tags=('cor1',))
                                 else:
                                     pass
-                                self.menu.bind('<Button-3>', self.seleciona)
                 indice += 1
+            self.menu.bind('<Double-Button-3>', self.seleciona)
 
     def monte_poke(self):
         try:
@@ -924,112 +944,44 @@ class conf_cardapio(Cardapio, Pedido, Local):
         pag3.imagem = img_voltar
 
     def atualiza_tabela(self):
-            self.menu.delete(*self.menu.get_children())
-            conn = self.conectar_cardapio() 
-            c = conn.cursor()
-            c.execute("""SELECT * FROM menu ORDER BY nome_prato""")
-            global count
-            count = 0
-            self.menu.insert('', 'end', 'Snack', text='Snack', tags=('cor3',), values='⮯Snacks')
-            self.menu.insert('', 'end', 'Bowl', text='Bowls', tags=('cor4',), values='⮯Bowls')
-            self.menu.insert('', 'end', 'Salada', text='Saladas', tags=('cor3',), values='⮯Saladas')
-            self.menu.insert('', 'end', 'Brunch', text='Brunch', tags=('cor4',), values='⮯Brunch')            
-            self.menu.insert('', 'end', 'Pizza', text='Pizzas', tags=('cor3',), values='⮯Pizzas')
-            self.menu.insert('', 'end', 'Burger', text='Burgers', tags=('cor4',), values='⮯Burgers')
-            self.menu.insert('', 'end', 'Poke', text='Poke', tags=('cor3',), values='⮯Pokes')
-            self.menu.insert('', 'end', 'Doce', text='Doces', tags=('cor4',), values='⮯Doces')
-            self.menu.insert('', 'end', 'Cafe', text='Cafe', tags=('cor3',), values='⮯Cafés')
-            self.menu.insert('', 'end', 'Suco', text='Suco', tags=('cor4',), values='⮯Sucos')
-            self.menu.insert('', 'end', 'Bebida', text='Bebida', tags=('cor3',), values='⮯Bebidas')
+        self.menu.delete(*self.menu.get_children())
+        conn = self.conectar_cardapio() 
+        c = conn.cursor()
+        c.execute("""SELECT nome_prato, valor_prato, categoria FROM menu ORDER BY nome_prato""")
+        bd_menu = c.fetchall()
+        global count
+        count = 0
+        self.l = []
+        arq_json = open('categoria_pratos.json', 'r', encoding='utf8')
+        list_cat = json.load(arq_json)
+        for x in list_cat:
+            for y in x.values():
+                self.l.append(y)
+        indice = 1
 
-            for idd, prato, valor, categoria in c.fetchall():
-                if categoria == 'Snack':
-                    self.indice = '0'
-                    if count == 0:
-                        self.menu.insert(parent='Snack', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                        count += 1
-                    else:
-                        self.menu.insert(parent='Snack', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                        count -= 1
-                if categoria == 'Bowl':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Bowl', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Bowl', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Salada':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Salada', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Salada', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Brunch':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Brunch', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Brunch', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Pizza':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Pizza', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Pizza', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Burger':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Burger', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Burger', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Poke':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Poke', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Poke', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Doce':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Doce', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Doce', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Cafe':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Cafe', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Cafe', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Suco':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Suco', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Suco', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
-                elif categoria == 'Bebida':
-                    if count % 2 == 0:
-                        self.menu.insert(parent='Bebida', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor2',))
-                    else:
-                        self.menu.insert(parent='Bebida', index='end', text='',
-                                    values=(prato, (valor,'$')), tags=('cor1',))
-                    count += 1
+        def inserir_cat(indice, nome_cat):
+            try:
+                self.menu.insert('', 'end', nome_cat, tags=('cor3',), values=(('⮯', nome_cat), ''))
+            except Exception:
+                pass
+
+        controle = []
+        while indice <= len(self.l):
+            for a in self.l:
+                for categoria in bd_menu:
+                    if a == categoria[2]:
+                        inserir_cat(indice, a)
+                        if categoria[2] == a:
+                            if categoria[0] not in controle:
+                                controle.append(categoria[0])
+                                print(controle)
+                                if count % 2 == 0:
+                                        self.menu.insert(a, 'end',
+                                                values=(categoria[0], (categoria[1],'$')), tags=('cor2',))
+                                else:
+                                    self.menu.insert(a, 'end',
+                                                values=(categoria[0], (categoria[1],'$')), tags=('cor1',))
+                            else:
+                                pass
+            indice += 1
+        self.menu.bind('<Double-Button-3>', self.seleciona)
