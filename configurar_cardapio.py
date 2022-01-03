@@ -333,7 +333,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
                                 if categoria[0] not in controle:
                                     controle.append(categoria[0])
                                     if count % 2 == 0:
-                                            self.menu.insert(a, 'end', values=(categoria[0], (categoria[1],'$')), tags=('cor2',))
+                                        self.menu.insert(a, 'end', values=(categoria[0], (categoria[1],'$')), tags=('cor2',))
                                     else:
                                         self.menu.insert(a, 'end', values=(categoria[0], (categoria[1],'$')), tags=('cor1',))
                                     count += 1
