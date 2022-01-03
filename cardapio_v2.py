@@ -29,10 +29,11 @@ class Cardapio():
         conn.commit()
         conn.close()
 
-    def atualizar(self, prato, valor):
+    def atualizar(self, prato, valor, category):
         conn = self.conectar_cardapio()
         c = conn.cursor()
         c.execute("""UPDATE menu SET valor_prato = %s WHERE nome_prato = %s""", (valor, prato))
+        c.execute("""UPDATE menu SET categoria = %s WHERE nome_prato = %s""", (category, prato))
         conn.commit()
         conn.close()
 
