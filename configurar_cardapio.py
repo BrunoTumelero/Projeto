@@ -414,7 +414,6 @@ class conf_cardapio(Cardapio, Pedido, Local):
                     arq_base = json.load(type_base)
                     type_base.close()
                     dici_base = arq_base[0]
-                    print(dici_base)
                     for x in dici_base.keys():
                         index = len(arq_base) + 1
                         if description not in dici_base.keys():
@@ -425,6 +424,32 @@ class conf_cardapio(Cardapio, Pedido, Local):
                     type_base.close()
             
             options_poke()
+
+            list_control_poke = []
+            arq_json = open('create_poke.json', 'r', encoding='utf8')
+            arq_poke = json.load(arq_json)
+            for x in arq_poke:
+                for y in x.keys():
+                    list_control_poke.append(y)
+            indice = 1
+
+            def insert_option(nome_cat, control):
+                try:
+                    poke_op = Checkbutton(self.pag1, text='Arroz de sushi', variable= self.base_1,
+            highlightbackground='snow', activebackground='snow', activeforeground='blue4', relief=FLAT,
+            anchor='w')
+                    poke_op.place(relx=0.02, rely=0.25, relwidth=0.25, relheight=0.1)
+                except Exception as e:
+                    pass
+            controle = []
+            while indice <= len(list_control_poke):
+                for key in list_control_poke:
+                    for type_op in arq_poke:
+                            if key in type_op:# key tem todas as chaves
+                                pass
+                                if key not in controle:
+                                    controle.append(key) #contole e uma lista com todas as chaves
+                indice += 1
 
             self.extra_poke = []
             self.escolha_base = []
@@ -461,7 +486,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
             self.op_base_5.place(relx=0.02, rely=0.65, relwidth=0.4, relheight=0.25)
             self.op_base_5.configure(background='snow')
 
-            proteina = Label(self.pag1, text='1.PROTEÍNAS 120g', anchor='w')
+            proteina = Label(self.pag1, text='2.PROTEÍNAS 120g', anchor='w')
             proteina.place(relx=0.45, rely=0.02, relwidth=0.55, relheight=0.15)
             proteina.configure(font=letra, background='snow')
             escolha_prot = Label(self.pag1, text='Escolha até 2 (60g de cada)', foreground='blue',
