@@ -377,28 +377,29 @@ class conf_cardapio(Cardapio, Pedido, Local):
 
                 def settings_base(frame):
                     frame.destroy()
-                    settings_frame = Frame(self.root_cardapio)
-                    settings_frame.place(relx=0.0, rely=0.7, relwidth=1, relheight=0.3)
-                    settings_frame.configure(background='red')
+                    settings_frame_base = Frame(self.root_cardapio)
+                    settings_frame_base.place(relx=0.0, rely=0.7, relwidth=1, relheight=0.3)
+                    settings_frame_base.configure(background='snow')
 
-                    op = Label(settings_frame, text='Opção do poke')
-                    op.place(relx=0.25, rely=0.2, relwidth=0.2, relheight=0.15)
-                    input_op = Entry(settings_frame)
-                    input_op.place(relx=0.2, rely=0.45, relwidth=0.2, relheight=0.2)
+                    op = Label(settings_frame_base, text='Opção do poke', anchor='w')
+                    op.configure(background='snow')
+                    op.place(relx=0.05, rely=0.15, relwidth=0.2, relheight=0.15)
+                    input_op = Entry(settings_frame_base)
+                    input_op.place(relx=0.05, rely=0.35, relwidth=0.45, relheight=0.15)
 
-                    value_extra = Checkbutton(settings_frame, text='Valor extra', background='snow', highlightbackground='snow', 
-                    activebackground='snow', activeforeground='lightblue')
-                    value_extra.place(relx=0.55, rely=0.2, relwidth=0.2, relheight=0.15)
-                    value_extra_entry = Entry(settings_frame)
-                    value_extra_entry.place(relx=0.55, rely=0.45, relwidth=0.2, relheight=0.2)
+                    value_extra = Checkbutton(settings_frame_base, text='Valor extra', background='snow', highlightbackground='snow', 
+                    activebackground='snow', activeforeground='blue4', anchor='w')
+                    value_extra.place(relx=0.75, rely=0.15, relwidth=0.13, relheight=0.15)
+                    value_extra_entry = Entry(settings_frame_base)
+                    value_extra_entry.place(relx=0.75, rely=0.35, relwidth=0.12, relheight=0.15)
 
-                    add_op = Button(settings_frame, text='Adicionar', background='snow', highlightbackground='snow', 
-                    activebackground='snow', activeforeground='green', command=lambda:[cria_json(input_op.get()),
-                    input_op.delete(0, 'end'), value_extra.delete(0, 'end')])
-                    add_op.place(relx=0.65, rely=0.65, relwidth=0.2, relheight=0.2)
-                    remove_op = Button(settings_frame, text='Remover', background='snow', highlightbackground='snow', 
+                    add_op = Button(settings_frame_base, text='Adicionar', background='snow', highlightbackground='snow', 
+                    activebackground='snow', activeforeground='green', relief=FLAT, command=lambda:[cria_json(input_op.get()),
+                    input_op.delete(0, 'end'), value_extra_entry.delete(0, 'end')])
+                    add_op.place(relx=0.65, rely=0.65, relwidth=0.1, relheight=0.2)
+                    remove_op = Button(settings_frame_base, text='Remover', relief=FLAT, background='snow', highlightbackground='snow', 
                     activebackground='snow', activeforeground='red')
-                    remove_op.place(relx=0.25, rely=0.65, relwidth=0.2, relheight=0.2)
+                    remove_op.place(relx=0.2, rely=0.65, relwidth=0.1, relheight=0.2)
 
                     try:
                         cria_json(input_op.get())
