@@ -1,4 +1,4 @@
-from os import remove
+from os import read, remove
 from tkinter import *
 from tkinter import ttk
 from tkinter import font
@@ -19,6 +19,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
         self.cria_menu()
         self.cria_poke()
         self.menu_geral()
+        self.cria_db_poke()
         self.opcoes()
         self.acessorios()
         self.info_cliente = info_cliente
@@ -341,6 +342,14 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 indice += 1
             self.menu.bind('<Double-Button-3>', self.seleciona)
 
+    def cria_db_poke(self):
+        conn = self.conectar_bairros()
+        c = conn.cursor()
+        c. execute('''CREATE TABLE IF NOT EXISTS op_poke(id_poke serial, base varchar, proteina varchar, crunch_it varchar,
+        make_it varchar, top_it varchar, finish_it varchar)''')
+        conn.commit()
+        conn.close()
+
     def monte_poke(self):
         try:
             self.frame_cardapio.destroy()
@@ -376,6 +385,20 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 conf_prot.place(relx=0.6, rely=0.4, relwidth=0.24, relheight=0.25)
 
                 def settings_base(frame):
+                    def add_op(description):
+                        conn = self.conectar_cardapio()
+                        c = conn.cursor()
+                        c.execute('''INSERT INTO op_poke(base) VALUES (%s)''', (description,))
+                        conn.commit()
+                        conn.close()
+                
+                    def read():
+                        conn = self.conectar_cardapio()
+                        c = conn.cursor()
+                        c.execute('''SELECT base FROM op_poke''')
+                        for x in c.fetchall():
+                            print(x)
+
                     frame.destroy()
                     settings_frame_base = Frame(self.root_cardapio)
                     settings_frame_base.place(relx=0.0, rely=0.7, relwidth=1, relheight=0.3)
@@ -394,35 +417,13 @@ class conf_cardapio(Cardapio, Pedido, Local):
                     value_extra_entry.place(relx=0.75, rely=0.35, relwidth=0.12, relheight=0.15)
 
                     add_op = Button(settings_frame_base, text='Adicionar', background='snow', highlightbackground='snow', 
-                    activebackground='snow', activeforeground='green', relief=FLAT, command=lambda:[cria_json(input_op.get()),
+                    activebackground='snow', activeforeground='green', relief=FLAT, command=lambda:[
                     input_op.delete(0, 'end'), value_extra_entry.delete(0, 'end')])
                     add_op.place(relx=0.65, rely=0.65, relwidth=0.1, relheight=0.2)
                     remove_op = Button(settings_frame_base, text='Remover', relief=FLAT, background='snow', highlightbackground='snow', 
                     activebackground='snow', activeforeground='red')
                     remove_op.place(relx=0.2, rely=0.65, relwidth=0.1, relheight=0.2)
 
-                    try:
-                        cria_json(input_op.get())
-                    except FileNotFoundError:
-                        padrao = [{input_op.get(): 0}]
-                        with open('create_poke.json', 'w', encoding= 'utf8') as f:
-                            json.dump(padrao, f, indent=2)
-                            cria_json(input_op.get())
-
-                def cria_json(description):
-                    type_base = open('create_poke.json', 'r', encoding='utf8')
-                    arq_base = json.load(type_base)
-                    type_base.close()
-                    dici_base = arq_base[0]
-                    for x in dici_base.keys():
-                        index = len(arq_base) + 1
-                        if description not in dici_base.keys():
-                            arq_base.append({description: index})
-                            self.lista_cat.append(description)
-                    type_base =  open('create_poke.json', 'w', encoding= 'utf8')
-                    json.dump(arq_base, type_base, indent=2)
-                    type_base.close()
-            
             options_poke()
 
             list_control_poke = []
@@ -431,11 +432,10 @@ class conf_cardapio(Cardapio, Pedido, Local):
             for x in arq_poke:
                 for y in x.keys():
                     list_control_poke.append(y)
-            indice = 0
+            indice = 1
 
             def insert_option(option, control_place, variable):
                 try:
-                    print(222)
                     variable = Checkbutton(self.pag1, text=option,
                     highlightbackground='snow', activebackground='snow', activeforeground='blue4', relief=FLAT,
                     anchor='w', background='snow')
@@ -444,18 +444,15 @@ class conf_cardapio(Cardapio, Pedido, Local):
                     print(e)
             controle = []
             place = 0.25
+            n = 0
             while indice <= len(list_control_poke):
                 for key in list_control_poke:
-                    if key == '':
-                        pass
-                    elif key not in list_control_poke:
-                        list_control_poke.append(key)
-                    for type_op in arq_poke:
-                            if key in list_control_poke:# key tem todas as chaves
-                                insert_option(key, place, indice)
-                                print(key, place, indice)
+                    if key not in controle:
+                        controle.append(key)
+                        insert_option(controle[n], place, indice)
                 place += 0.10
                 indice += 1
+                n += 1
 
             self.extra_poke = []
             self.escolha_base = []
