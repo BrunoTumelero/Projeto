@@ -431,24 +431,30 @@ class conf_cardapio(Cardapio, Pedido, Local):
             for x in arq_poke:
                 for y in x.keys():
                     list_control_poke.append(y)
-            indice = 1
+            indice = 0
 
-            def insert_option(nome_cat, control):
+            def insert_option(option, control_place, variable):
                 try:
-                    poke_op = Checkbutton(self.pag1, text='Arroz de sushi', variable= self.base_1,
-            highlightbackground='snow', activebackground='snow', activeforeground='blue4', relief=FLAT,
-            anchor='w')
-                    poke_op.place(relx=0.02, rely=0.25, relwidth=0.25, relheight=0.1)
+                    print(222)
+                    variable = Checkbutton(self.pag1, text=option,
+                    highlightbackground='snow', activebackground='snow', activeforeground='blue4', relief=FLAT,
+                    anchor='w', background='snow')
+                    variable.place(relx=0.02, rely=control_place, relwidth=0.25, relheight=0.1)
                 except Exception as e:
-                    pass
+                    print(e)
             controle = []
+            place = 0.25
             while indice <= len(list_control_poke):
                 for key in list_control_poke:
+                    if key == '':
+                        pass
+                    elif key not in list_control_poke:
+                        list_control_poke.append(key)
                     for type_op in arq_poke:
-                            if key in type_op:# key tem todas as chaves
-                                pass
-                                if key not in controle:
-                                    controle.append(key) #contole e uma lista com todas as chaves
+                            if key in list_control_poke:# key tem todas as chaves
+                                insert_option(key, place, indice)
+                                print(key, place, indice)
+                place += 0.10
                 indice += 1
 
             self.extra_poke = []
@@ -459,32 +465,6 @@ class conf_cardapio(Cardapio, Pedido, Local):
             self.base_3 = IntVar(self.pag1) 
             self.base_4 = IntVar(self.pag1) 
             self.base_5 = IntVar(self.pag1)
-
-            self.op_base_1 = Checkbutton(self.pag1, text='Arroz de sushi', variable= self.base_1,
-            highlightbackground='snow', activebackground='snow', activeforeground='blue4', relief=FLAT,
-            anchor='w')
-            self.op_base_1.place(relx=0.02, rely=0.25, relwidth=0.25, relheight=0.1)
-            self.op_base_1.configure(background='snow')
-            self.op_base_2 = Checkbutton(self.pag1, text='Arroz negro(+ R$4)', anchor='w', relief=FLAT,
-            variable= self.base_2, highlightbackground='snow', activeforeground='blue4',
-            activebackground='snow')
-            self.op_base_2.place(relx=0.02, rely=0.35, relwidth=0.3, relheight=0.1)
-            self.op_base_2.configure(background='snow')
-            self.op_base_3 = Checkbutton(self.pag1, text='Quinoa(+R$4)', anchor='w', relief=FLAT,
-            variable= self.base_3, highlightbackground='snow', activeforeground='blue4',
-            activebackground='snow')
-            self.op_base_3.place(relx=0.02, rely=0.45, relwidth=0.25, relheight=0.1)
-            self.op_base_3.configure(background='snow')
-            self.op_base_4 = Checkbutton(self.pag1, text='Espaguete de abobrinha', anchor='w', relief=FLAT,
-            variable= self.base_4, highlightbackground='snow', activeforeground='blue4',
-            activebackground='snow')
-            self.op_base_4.place(relx=0.02, rely=0.55, relwidth=0.4, relheight=0.1)
-            self.op_base_4.configure(background='snow')
-            self.op_base_5 = Checkbutton(self.pag1, text='Espaguete de palmito de\n pupunha ao pesto(+ R$5)',
-            relief=FLAT, anchor='w', variable= self.base_5, highlightbackground='snow', 
-            activeforeground='blue4', activebackground='snow')
-            self.op_base_5.place(relx=0.02, rely=0.65, relwidth=0.4, relheight=0.25)
-            self.op_base_5.configure(background='snow')
 
             proteina = Label(self.pag1, text='2.PROTEÍNAS 120g', anchor='w')
             proteina.place(relx=0.45, rely=0.02, relwidth=0.55, relheight=0.15)
