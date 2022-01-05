@@ -628,7 +628,6 @@ class tela_cardapio(Cardapio, Pedido, Local):
             indice = 1
             count_color = 0
             
-
             def inserir_cat(count_color, nome_cat, control):
                 try:
                     self.menu.insert('', 'end', nome_cat, tags=('cor3',), values=(('⮯', nome_cat), ''))
