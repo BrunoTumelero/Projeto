@@ -385,19 +385,26 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 conf_prot.place(relx=0.6, rely=0.4, relwidth=0.24, relheight=0.25)
 
                 def settings_base(frame):
-                    def add_op(description):
-                        conn = self.conectar_cardapio()
-                        c = conn.cursor()
-                        c.execute('''INSERT INTO op_poke(base) VALUES (%s)''', (description,))
-                        conn.commit()
-                        conn.close()
-                
-                    def read():
-                        conn = self.conectar_cardapio()
-                        c = conn.cursor()
-                        c.execute('''SELECT base FROM op_poke''')
-                        for x in c.fetchall():
-                            print(x)
+                    def add_choice_poke(choice_input):
+                        def cria_json():
+                            poke_json = open('create_poke.json', 'r', encoding='utf8')
+                            arq_json = json.load(poke_json)
+                            poke_json.close()
+                            dici_poke = arq_json[0]
+                            for x in dici_poke.keys():
+                                indice = len(arq_json) + 1
+                                if choice_input not in dici_poke.keys():
+                                    arq_json.append({choice_input: indice})
+                            poke_json =  open('create_poke.json', 'w', encoding= 'utf8')
+                            json.dump(arq_json, poke_json, indent=2)
+                            poke_json.close()
+                        try:
+                            cria_json()
+                        except FileNotFoundError:
+                            defaultt = [{choice_input: 0}]
+                            with open('create_poke.json', 'w', encoding= 'utf8') as f:
+                                json.dump(defaultt, f, indent=2)
+                            cria_json()
 
                     frame.destroy()
                     settings_frame_base = Frame(self.root_cardapio)
@@ -417,7 +424,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
                     value_extra_entry.place(relx=0.75, rely=0.35, relwidth=0.12, relheight=0.15)
 
                     add_op = Button(settings_frame_base, text='Adicionar', background='snow', highlightbackground='snow', 
-                    activebackground='snow', activeforeground='green', relief=FLAT, command=lambda:[
+                    activebackground='snow', activeforeground='green', relief=FLAT, command=lambda:[add_choice_poke(input_op.get()),
                     input_op.delete(0, 'end'), value_extra_entry.delete(0, 'end')])
                     add_op.place(relx=0.65, rely=0.65, relwidth=0.1, relheight=0.2)
                     remove_op = Button(settings_frame_base, text='Remover', relief=FLAT, background='snow', highlightbackground='snow', 
@@ -445,14 +452,14 @@ class conf_cardapio(Cardapio, Pedido, Local):
             controle = []
             place = 0.25
             n = 0
-            while indice <= len(list_control_poke):
-                for key in list_control_poke:
-                    if key not in controle:
-                        controle.append(key)
-                        insert_option(controle[n], place, indice)
+            for key in list_control_poke:
                 place += 0.10
                 indice += 1
                 n += 1
+                print(key)
+                insert_option(key, place, indice)
+                print(key, place, indice)
+            
 
             self.extra_poke = []
             self.escolha_base = []
