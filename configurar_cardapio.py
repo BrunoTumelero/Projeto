@@ -384,62 +384,73 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 activeforeground='lightblue', relief=FLAT, font=letra4, command=lambda:[settings_base(options_frame)])
                 conf_prot.place(relx=0.6, rely=0.4, relwidth=0.24, relheight=0.25)
 
-                def settings_base(frame):
-                    def add_choice_poke(choice_input):
-                        def cria_json():
-                            poke_json = open('create_poke.json', 'r', encoding='utf8')
-                            arq_json = json.load(poke_json)
-                            poke_json.close()
-                            dici_poke = arq_json[0]
-                            for x in dici_poke.keys():
-                                indice = len(arq_json) + 1
-                                if choice_input not in dici_poke.keys():
-                                    arq_json.append({choice_input: indice})
-                            poke_json =  open('create_poke.json', 'w', encoding= 'utf8')
-                            json.dump(arq_json, poke_json, indent=2)
-                            poke_json.close()
-                        try:
-                            cria_json()
-                        except FileNotFoundError:
-                            defaultt = [{choice_input: 0}]
-                            with open('create_poke.json', 'w', encoding= 'utf8') as f:
-                                json.dump(defaultt, f, indent=2)
-                            cria_json()
+            def settings_base(frame):
+                frame.destroy()
+                settings_frame_base = Frame(self.root_cardapio)
+                settings_frame_base.place(relx=0.0, rely=0.7, relwidth=1, relheight=0.3)
+                settings_frame_base.configure(background='snow')
 
-                    frame.destroy()
-                    settings_frame_base = Frame(self.root_cardapio)
-                    settings_frame_base.place(relx=0.0, rely=0.7, relwidth=1, relheight=0.3)
-                    settings_frame_base.configure(background='snow')
+                op = Label(settings_frame_base, text='Opção do poke', anchor='w')
+                op.configure(background='snow')
+                op.place(relx=0.05, rely=0.15, relwidth=0.2, relheight=0.15)
+                input_op = Entry(settings_frame_base)
+                input_op.place(relx=0.05, rely=0.35, relwidth=0.45, relheight=0.15)
 
-                    op = Label(settings_frame_base, text='Opção do poke', anchor='w')
-                    op.configure(background='snow')
-                    op.place(relx=0.05, rely=0.15, relwidth=0.2, relheight=0.15)
-                    input_op = Entry(settings_frame_base)
-                    input_op.place(relx=0.05, rely=0.35, relwidth=0.45, relheight=0.15)
+                value_extra = Checkbutton(settings_frame_base, text='Valor extra', background='snow', highlightbackground='snow', 
+                activebackground='snow', activeforeground='blue4', anchor='w')
+                value_extra.place(relx=0.75, rely=0.15, relwidth=0.13, relheight=0.15)
+                value_extra_entry = Entry(settings_frame_base)
+                value_extra_entry.place(relx=0.75, rely=0.35, relwidth=0.12, relheight=0.15)
 
-                    value_extra = Checkbutton(settings_frame_base, text='Valor extra', background='snow', highlightbackground='snow', 
-                    activebackground='snow', activeforeground='blue4', anchor='w')
-                    value_extra.place(relx=0.75, rely=0.15, relwidth=0.13, relheight=0.15)
-                    value_extra_entry = Entry(settings_frame_base)
-                    value_extra_entry.place(relx=0.75, rely=0.35, relwidth=0.12, relheight=0.15)
+                add_op = Button(settings_frame_base, text='Adicionar', background='snow', highlightbackground='snow', 
+                activebackground='snow', activeforeground='green', relief=FLAT, command=lambda:[add_choice_poke(),
+                input_op.delete(0, 'end'), value_extra_entry.delete(0, 'end')])
+                add_op.place(relx=0.65, rely=0.65, relwidth=0.1, relheight=0.2)
+                remove_op = Button(settings_frame_base, text='Remover', relief=FLAT, background='snow', highlightbackground='snow', 
+                activebackground='snow', activeforeground='red')
+                remove_op.place(relx=0.2, rely=0.65, relwidth=0.1, relheight=0.2)
+                def cria_json_base():
+                    poke_json = open('create_poke.json', 'r', encoding='utf8')
+                    arq_json = json.load(poke_json)
+                    poke_json.close()
+                    dici_poke = arq_json[0]
+                    for x in dici_poke.keys():
+                        indice = len(arq_json) + 1
+                        if input_op.get() not in dici_poke.keys():
+                            arq_json.append({input_op.get(): indice})
+                    poke_json =  open('create_poke.json', 'w', encoding= 'utf8')
+                    json.dump(arq_json, poke_json, indent=2)
+                    poke_json.close()
 
-                    add_op = Button(settings_frame_base, text='Adicionar', background='snow', highlightbackground='snow', 
-                    activebackground='snow', activeforeground='green', relief=FLAT, command=lambda:[add_choice_poke(input_op.get()),
-                    input_op.delete(0, 'end'), value_extra_entry.delete(0, 'end')])
-                    add_op.place(relx=0.65, rely=0.65, relwidth=0.1, relheight=0.2)
-                    remove_op = Button(settings_frame_base, text='Remover', relief=FLAT, background='snow', highlightbackground='snow', 
-                    activebackground='snow', activeforeground='red')
-                    remove_op.place(relx=0.2, rely=0.65, relwidth=0.1, relheight=0.2)
+                def add_choice_poke():
+                    try:
+                        cria_json_base()
+                    except FileNotFoundError:
+                        defaultt = [{input_op.get(): 0}]
+                        with open('create_poke.json', 'w', encoding= 'utf8') as f:
+                            json.dump(defaultt, f, indent=2)
+                        cria_json_base()
 
+                try:
+                    cria_json_base()
+                except FileNotFoundError:
+                    defaultt = [{input_op: 0}]
+                    with open('create_poke.json', 'w', encoding= 'utf8') as f:
+                        json.dump(defaultt, f, indent=2)
+                    cria_json_base()
             options_poke()
-
-            list_control_poke = []
-            arq_json = open('create_poke.json', 'r', encoding='utf8')
-            arq_poke = json.load(arq_json)
-            for x in arq_poke:
-                for y in x.keys():
-                    list_control_poke.append(y)
-            indice = 1
+            try:
+                list_control_poke = []
+                arq_json = open('create_poke.json', 'r', encoding='utf8')
+                arq_poke = json.load(arq_json)
+                for x in arq_poke:
+                    for y in x.keys():
+                        list_control_poke.append(y)
+                indice = 1
+            except FileNotFoundError:
+                start = [{'':0}]
+                with open('create_poke.json', 'w', encoding= 'utf8') as f:
+                        json.dump(start, f, indent=2)
 
             def insert_option(option, control_place, variable):
                 try:
