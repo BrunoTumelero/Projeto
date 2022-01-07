@@ -19,7 +19,6 @@ class conf_cardapio(Cardapio, Pedido, Local):
         self.cria_menu()
         self.cria_poke()
         self.menu_geral()
-        self.cria_db_poke()
         self.opcoes()
         self.acessorios()
         self.info_cliente = info_cliente
@@ -47,14 +46,14 @@ class conf_cardapio(Cardapio, Pedido, Local):
 
     def opcoes(self):
         # Add Menu
-        my_menu = Menu(self.root_cardapio)
-        self.root_cardapio.config(menu=my_menu)
+        self.my_menu = Menu(self.root_cardapio)
+        self.root_cardapio.config(menu=self.my_menu)
 
-        my_menu.add_command(label='Inicio', command=lambda:[self.destruir(), self.frame_menu.destroy(),
-        self.fundo_inicio, self.inicio_botoes, my_menu.destroy()])
+        self.my_menu.add_command(label='Inicio', command=lambda:[self.destruir(), self.frame_menu.destroy(),
+        self.fundo_inicio, self.inicio_botoes, self.my_menu.destroy()])
         # Configurar menu
-        option_menu = Menu(my_menu, tearoff=0)
-        my_menu.add_cascade(label="Opções", menu=option_menu)
+        option_menu = Menu(self.my_menu, tearoff=0)
+        self.my_menu.add_cascade(label="Opções", menu=option_menu)
         # opcoes do menu
         option_menu.add_command(label="Monte seu poke", command= lambda:[self.monte_poke()])
         option_menu.add_command(label="Menu", command= lambda:[self.frame_cardapio.destroy(), self.menu_geral()])
@@ -342,20 +341,13 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 indice += 1
             self.menu.bind('<Double-Button-3>', self.seleciona)
 
-    def cria_db_poke(self):
-        conn = self.conectar_bairros()
-        c = conn.cursor()
-        c. execute('''CREATE TABLE IF NOT EXISTS op_poke(id_poke serial, base varchar, proteina varchar, crunch_it varchar,
-        make_it varchar, top_it varchar, finish_it varchar)''')
-        conn.commit()
-        conn.close()
-
     def monte_poke(self):
         try:
             self.frame_cardapio.destroy()
         except:
             pass
         finally:
+            self.new_menu()
             self.pag1 = Frame(self.frame_menu)
             self.pag1.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
             self.pag1.configure(background='snow')
@@ -396,15 +388,16 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 input_op = Entry(settings_frame_base)
                 input_op.place(relx=0.05, rely=0.35, relwidth=0.45, relheight=0.15)
 
+                value_collected = IntVar()
                 value_extra = Checkbutton(settings_frame_base, text='Valor extra', background='snow', highlightbackground='snow', 
-                activebackground='snow', activeforeground='blue4', anchor='w')
+                activebackground='snow', activeforeground='blue4', anchor='w', onvalue= 1, offvalue=0, variable=value_collected,
+                command=lambda:[verification_value()])
                 value_extra.place(relx=0.75, rely=0.15, relwidth=0.13, relheight=0.15)
                 value_extra_entry = Entry(settings_frame_base)
-                value_extra_entry.place(relx=0.75, rely=0.35, relwidth=0.12, relheight=0.15)
 
                 add_op = Button(settings_frame_base, text='Adicionar', background='snow', highlightbackground='snow', 
                 activebackground='snow', activeforeground='green', relief=FLAT, command=lambda:[add_choice_poke(),
-                input_op.delete(0, 'end'), value_extra_entry.delete(0, 'end')])
+                input_op.delete(0, 'end')])
                 add_op.place(relx=0.65, rely=0.65, relwidth=0.1, relheight=0.2)
                 retunr_button = Button(settings_frame_base, text='Retornar', background='snow', highlightbackground='snow', 
                 activebackground='snow', activeforeground='yellow', relief=FLAT, command=lambda:[settings_frame_base.destroy(),
@@ -413,6 +406,13 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 remove_op = Button(settings_frame_base, text='Remover', relief=FLAT, background='snow', highlightbackground='snow', 
                 activebackground='snow', activeforeground='red')
                 remove_op.place(relx=0.2, rely=0.65, relwidth=0.1, relheight=0.2)
+                
+                def verification_value():
+                    if value_collected.get() == 1:
+                        value_extra_entry.place(relx=0.75, rely=0.35, relwidth=0.12, relheight=0.15)
+                    if value_collected.get() == 0:
+                        value_extra_entry.place_forget()
+
                 def cria_json_base():
                     poke_json = open('create_poke.json', 'r', encoding='utf8')
                     arq_json = json.load(poke_json)
@@ -508,11 +508,12 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 input_op = Entry(settings_frame_protein)
                 input_op.place(relx=0.05, rely=0.3, relwidth=0.45, relheight=0.15)
 
+                value_collected = IntVar()
                 value_extra = Checkbutton(settings_frame_protein, text='Valor extra', background='snow', highlightbackground='snow', 
-                activebackground='snow', activeforeground='blue4', anchor='w')
+                activebackground='snow', activeforeground='blue4', anchor='w', onvalue= 1, offvalue=0, variable=value_collected,
+                command=lambda:[verification_value()])
                 value_extra.place(relx=0.75, rely=0.1, relwidth=0.13, relheight=0.15)
                 value_extra_entry = Entry(settings_frame_protein)
-                value_extra_entry.place(relx=0.75, rely=0.3, relwidth=0.12, relheight=0.15)
 
                 add_op = Button(settings_frame_protein, text='Adicionar', background='snow', highlightbackground='snow', 
                 activebackground='snow', activeforeground='green', relief=FLAT, command=lambda:[add_protein(),
@@ -525,6 +526,12 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 remove_op = Button(settings_frame_protein, text='Remover', relief=FLAT, background='snow', highlightbackground='snow', 
                 activebackground='snow', activeforeground='red')
                 remove_op.place(relx=0.2, rely=0.65, relwidth=0.1, relheight=0.2)
+
+                def verification_value():
+                        if value_collected.get() == 1:
+                            value_extra_entry.place(relx=0.75, rely=0.35, relwidth=0.12, relheight=0.15)
+                        if value_collected.get() == 0:
+                            value_extra_entry.place_forget()
 
                 def cria_json_protein():
                     poke_json = open('create_protein.json', 'r', encoding='utf8')
@@ -1097,6 +1104,21 @@ class conf_cardapio(Cardapio, Pedido, Local):
         pag3.place(relx=0.2, rely=0.85, relwidth=0.1, relheight=0.1)
         pag3.configure(background='snow')
         pag3.imagem = img_voltar
+
+    def new_menu(self):
+        self.my_menu.destroy()
+        # Add Menu
+        my_menu2 = Menu(self.root_cardapio)
+        self.root_cardapio.config(menu=my_menu2)
+
+        my_menu2.add_command(label='Inicio', command=lambda:[self.destruir(), self.frame_menu.destroy(),
+        self.fundo_inicio, self.inicio_botoes, my_menu2.destroy()])
+        # Configurar menu
+        option_menu = Menu(my_menu2, tearoff=0)
+        my_menu2.add_cascade(label="Opções", menu=option_menu)
+        # opcoes do menu
+        option_menu.add_command(label="Monte seu poke", command= lambda:[self.monte_poke()])
+        option_menu.add_command(label="Menu", command= lambda:[self.frame_cardapio.destroy(), self.menu_geral()])
 
     def atualiza_tabela(self):
         self.menu.delete(*self.menu.get_children())
