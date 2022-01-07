@@ -381,7 +381,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 conf_base.place(relx=0.165, rely=0.4, relwidth=0.145, relheight=0.25)
 
                 conf_prot = Button(options_frame, text='Proteína', background='snow', highlightbackground='snow', activebackground='snow',
-                activeforeground='lightblue', relief=FLAT, font=letra4, command=lambda:[settings_base(options_frame)])
+                activeforeground='lightblue', relief=FLAT, font=letra4, command=lambda:[settings_protein(options_frame)])
                 conf_prot.place(relx=0.6, rely=0.4, relwidth=0.24, relheight=0.25)
 
             def settings_base(frame):
@@ -438,6 +438,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
                     with open('create_poke.json', 'w', encoding= 'utf8') as f:
                         json.dump(defaultt, f, indent=2)
                     cria_json_base()
+
             options_poke()
             try:
                 list_control_poke = []
@@ -451,6 +452,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 start = [{'':0}]
                 with open('create_poke.json', 'w', encoding= 'utf8') as f:
                         json.dump(start, f, indent=2)
+                        f.close()
 
             def insert_option(option, control_place, variable):
                 try:
@@ -460,17 +462,14 @@ class conf_cardapio(Cardapio, Pedido, Local):
                     variable.place(relx=0.02, rely=control_place, relwidth=0.25, relheight=0.1)
                 except Exception as e:
                     print(e)
-            controle = []
             place = 0.25
-            n = 0
             for key in list_control_poke:
+                if key == '':
+                    pass
+                else:
+                    insert_option(key, place, indice)
                 place += 0.10
                 indice += 1
-                n += 1
-                print(key)
-                insert_option(key, place, indice)
-                print(key, place, indice)
-            
 
             self.extra_poke = []
             self.escolha_base = []
@@ -481,6 +480,86 @@ class conf_cardapio(Cardapio, Pedido, Local):
             self.base_4 = IntVar(self.pag1) 
             self.base_5 = IntVar(self.pag1)
 
+            def settings_protein(frame):
+                frame.destroy()
+                settings_frame_base = Frame(self.root_cardapio)
+                settings_frame_base.place(relx=0.0, rely=0.7, relwidth=1, relheight=0.3)
+                settings_frame_base.configure(background='snow')
+
+                op = Label(settings_frame_base, text='Opção do poke', anchor='w')
+                op.configure(background='snow')
+                op.place(relx=0.05, rely=0.15, relwidth=0.2, relheight=0.15)
+                input_op = Entry(settings_frame_base)
+                input_op.place(relx=0.05, rely=0.35, relwidth=0.45, relheight=0.15)
+
+                value_extra = Checkbutton(settings_frame_base, text='Valor extra', background='snow', highlightbackground='snow', 
+                activebackground='snow', activeforeground='blue4', anchor='w')
+                value_extra.place(relx=0.75, rely=0.15, relwidth=0.13, relheight=0.15)
+                value_extra_entry = Entry(settings_frame_base)
+                value_extra_entry.place(relx=0.75, rely=0.35, relwidth=0.12, relheight=0.15)
+
+                add_op = Button(settings_frame_base, text='Adicionar', background='snow', highlightbackground='snow', 
+                activebackground='snow', activeforeground='green', relief=FLAT, command=lambda:[add_protein(),
+                input_op.delete(0, 'end'), value_extra_entry.delete(0, 'end')])
+                add_op.place(relx=0.65, rely=0.65, relwidth=0.1, relheight=0.2)
+                remove_op = Button(settings_frame_base, text='Remover', relief=FLAT, background='snow', highlightbackground='snow', 
+                activebackground='snow', activeforeground='red')
+                remove_op.place(relx=0.2, rely=0.65, relwidth=0.1, relheight=0.2)
+
+                def cria_json_protein():
+                    poke_json = open('create_protein.json', 'r', encoding='utf8')
+                    arq_json = json.load(poke_json)
+                    poke_json.close()
+                    dici_poke = arq_json[0]
+                    for x in dici_poke.keys():
+                        indice = len(arq_json) + 1
+                        if input_op.get() not in dici_poke.keys():
+                            arq_json.append({input_op.get(): indice})
+                    poke_json =  open('create_protein.json', 'w', encoding= 'utf8')
+                    json.dump(arq_json, poke_json, indent=2)
+                    poke_json.close()
+
+                def add_protein():
+                    try:
+                        cria_json_protein()
+                    except FileNotFoundError:
+                        defaultt = [{input_op.get(): 0}]
+                        with open('create_protein.json', 'w', encoding= 'utf8') as f:
+                            json.dump(defaultt, f, indent=2)
+                        cria_json_protein()
+
+            try:
+                list_protein = []
+                arq_json = open('create_protein.json', 'r', encoding='utf8')
+                arq_poke = json.load(arq_json)
+                for x in arq_poke:
+                    for y in x.keys():
+                        list_protein.append(y)
+                indice = 1
+            except FileNotFoundError:
+                start = [{'':0}]
+                with open('create_protein.json', 'w', encoding= 'utf8') as f:
+                        json.dump(start, f, indent=2)
+                        f.close()
+
+            def insert_option(option, control_place, variable):
+                try:
+                    variable = Checkbutton(self.pag1, text=option,
+                    highlightbackground='snow', activebackground='snow', activeforeground='blue4', relief=FLAT,
+                    anchor='w', background='snow')
+                    variable.place(relx=0.45, rely=control_place, relwidth=0.15, relheight=0.1)
+                except Exception as e:
+                    print(e)
+
+            place_protein = 0.25
+            for protein in list_protein:
+                if protein == '':
+                    pass
+                else:
+                    insert_option(protein, place_protein, indice)
+                place_protein += 0.10
+                indice += 1
+            
             proteina = Label(self.pag1, text='2.PROTEÍNAS 120g', anchor='w')
             proteina.place(relx=0.45, rely=0.02, relwidth=0.55, relheight=0.15)
             proteina.configure(font=letra, background='snow')
@@ -497,23 +576,6 @@ class conf_cardapio(Cardapio, Pedido, Local):
             self.prot2 = IntVar(self.root_cardapio)
             self.prot3 = IntVar(self.root_cardapio)
             self.prot4 = IntVar(self.root_cardapio)
-            op_prot1 = Checkbutton(self.pag1, text='Salmão', anchor='w', variable=self.prot1,
-            highlightbackground='snow', activeforeground='blue4',)
-            op_prot1.place(relx=0.45, rely=0.35, relwidth=0.25, relheight=0.1)
-            op_prot1.configure(background='snow')
-            op_prot2 = Checkbutton(self.pag1, text='Atum', anchor='w', variable=self.prot2,
-            highlightbackground='snow', activeforeground='blue4',)
-            op_prot2.place(relx=0.45, rely=0.45, relwidth=0.3, relheight=0.1)
-            op_prot2.configure(background='snow')
-            op_prot3 = Checkbutton(self.pag1, text='Camarão', anchor='w', variable=self.prot3,
-            highlightbackground='snow', activeforeground='blue4',)
-            op_prot3.place(relx=0.45, rely=0.55, relwidth=0.25, relheight=0.1)
-            op_prot3.configure(background='snow')
-            op_prot4 = Checkbutton(self.pag1, text='Shitake', anchor='w', variable=self.prot4,
-            highlightbackground='snow', activeforeground='blue4')
-            op_prot4.place(relx=0.45, rely=0.65, relwidth=0.25, relheight=0.1)
-            op_prot4.configure(background='snow')
-
             def erros():
                 if len(self.escolha_base) > 1:
                     messagebox.showerror('ERRO', 'Escolha apenas uma opção para base')
