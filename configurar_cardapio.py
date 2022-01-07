@@ -347,7 +347,6 @@ class conf_cardapio(Cardapio, Pedido, Local):
         except:
             pass
         finally:
-            self.new_menu()
             self.pag1 = Frame(self.frame_menu)
             self.pag1.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
             self.pag1.configure(background='snow')
@@ -443,7 +442,6 @@ class conf_cardapio(Cardapio, Pedido, Local):
                         json.dump(defaultt, f, indent=2)
                     cria_json_base()
 
-            options_poke()
             try:
                 list_control_poke = []
                 arq_json = open('create_poke.json', 'r', encoding='utf8')
@@ -1104,21 +1102,6 @@ class conf_cardapio(Cardapio, Pedido, Local):
         pag3.place(relx=0.2, rely=0.85, relwidth=0.1, relheight=0.1)
         pag3.configure(background='snow')
         pag3.imagem = img_voltar
-
-    def new_menu(self):
-        self.my_menu.destroy()
-        # Add Menu
-        my_menu2 = Menu(self.root_cardapio)
-        self.root_cardapio.config(menu=my_menu2)
-
-        my_menu2.add_command(label='Inicio', command=lambda:[self.destruir(), self.frame_menu.destroy(),
-        self.fundo_inicio, self.inicio_botoes, my_menu2.destroy()])
-        # Configurar menu
-        option_menu = Menu(my_menu2, tearoff=0)
-        my_menu2.add_cascade(label="Opções", menu=option_menu)
-        # opcoes do menu
-        option_menu.add_command(label="Monte seu poke", command= lambda:[self.monte_poke()])
-        option_menu.add_command(label="Menu", command= lambda:[self.frame_cardapio.destroy(), self.menu_geral()])
 
     def atualiza_tabela(self):
         self.menu.delete(*self.menu.get_children())
