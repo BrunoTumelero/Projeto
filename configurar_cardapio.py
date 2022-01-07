@@ -390,7 +390,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 settings_frame_base.place(relx=0.0, rely=0.7, relwidth=1, relheight=0.3)
                 settings_frame_base.configure(background='snow')
 
-                op = Label(settings_frame_base, text='Opção do poke', anchor='w')
+                op = Label(settings_frame_base, text='Opção base', anchor='w')
                 op.configure(background='snow')
                 op.place(relx=0.05, rely=0.15, relwidth=0.2, relheight=0.15)
                 input_op = Entry(settings_frame_base)
@@ -406,6 +406,10 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 activebackground='snow', activeforeground='green', relief=FLAT, command=lambda:[add_choice_poke(),
                 input_op.delete(0, 'end'), value_extra_entry.delete(0, 'end')])
                 add_op.place(relx=0.65, rely=0.65, relwidth=0.1, relheight=0.2)
+                retunr_button = Button(settings_frame_base, text='Retornar', background='snow', highlightbackground='snow', 
+                activebackground='snow', activeforeground='yellow', relief=FLAT, command=lambda:[settings_frame_base.destroy(),
+                options_poke()])
+                retunr_button.place(relx=0.42, rely=0.65, relwidth=0.1, relheight=0.2)
                 remove_op = Button(settings_frame_base, text='Remover', relief=FLAT, background='snow', highlightbackground='snow', 
                 activebackground='snow', activeforeground='red')
                 remove_op.place(relx=0.2, rely=0.65, relwidth=0.1, relheight=0.2)
@@ -471,6 +475,18 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 place += 0.10
                 indice += 1
 
+            proteina = Label(self.pag1, text='2.PROTEÍNAS 120g', anchor='w')
+            proteina.place(relx=0.45, rely=0.02, relwidth=0.55, relheight=0.15)
+            proteina.configure(font=letra, background='snow')
+            escolha_prot = Label(self.pag1, text='Escolha até 2 (60g de cada)', foreground='blue',
+            anchor='w')
+            escolha_prot.place(relx=0.45, rely=0.15, relwidth=0.5, relheight=0.08)
+            escolha_prot.configure(font=letra2, background='snow')
+            info_prot = Label(self.pag1, text='-Sera considerada a proteína de maior valor-',
+            anchor='w')
+            info_prot.place(relx=0.45, rely=0.23, relwidth=0.55, relheight=0.08)
+            info_prot.configure(font=letra3, background='snow')
+
             self.extra_poke = []
             self.escolha_base = []
             self.proteina = []
@@ -482,27 +498,31 @@ class conf_cardapio(Cardapio, Pedido, Local):
 
             def settings_protein(frame):
                 frame.destroy()
-                settings_frame_base = Frame(self.root_cardapio)
-                settings_frame_base.place(relx=0.0, rely=0.7, relwidth=1, relheight=0.3)
-                settings_frame_base.configure(background='snow')
+                settings_frame_protein = Frame(self.root_cardapio)
+                settings_frame_protein.place(relx=0.0, rely=0.7, relwidth=1, relheight=0.3)
+                settings_frame_protein.configure(background='snow')
 
-                op = Label(settings_frame_base, text='Opção do poke', anchor='w')
+                op = Label(settings_frame_protein, text='Opção proteína', anchor='w')
                 op.configure(background='snow')
-                op.place(relx=0.05, rely=0.15, relwidth=0.2, relheight=0.15)
-                input_op = Entry(settings_frame_base)
-                input_op.place(relx=0.05, rely=0.35, relwidth=0.45, relheight=0.15)
+                op.place(relx=0.05, rely=0.1, relwidth=0.2, relheight=0.15)
+                input_op = Entry(settings_frame_protein)
+                input_op.place(relx=0.05, rely=0.3, relwidth=0.45, relheight=0.15)
 
-                value_extra = Checkbutton(settings_frame_base, text='Valor extra', background='snow', highlightbackground='snow', 
+                value_extra = Checkbutton(settings_frame_protein, text='Valor extra', background='snow', highlightbackground='snow', 
                 activebackground='snow', activeforeground='blue4', anchor='w')
-                value_extra.place(relx=0.75, rely=0.15, relwidth=0.13, relheight=0.15)
-                value_extra_entry = Entry(settings_frame_base)
-                value_extra_entry.place(relx=0.75, rely=0.35, relwidth=0.12, relheight=0.15)
+                value_extra.place(relx=0.75, rely=0.1, relwidth=0.13, relheight=0.15)
+                value_extra_entry = Entry(settings_frame_protein)
+                value_extra_entry.place(relx=0.75, rely=0.3, relwidth=0.12, relheight=0.15)
 
-                add_op = Button(settings_frame_base, text='Adicionar', background='snow', highlightbackground='snow', 
+                add_op = Button(settings_frame_protein, text='Adicionar', background='snow', highlightbackground='snow', 
                 activebackground='snow', activeforeground='green', relief=FLAT, command=lambda:[add_protein(),
                 input_op.delete(0, 'end'), value_extra_entry.delete(0, 'end')])
                 add_op.place(relx=0.65, rely=0.65, relwidth=0.1, relheight=0.2)
-                remove_op = Button(settings_frame_base, text='Remover', relief=FLAT, background='snow', highlightbackground='snow', 
+                retunr_button = Button(settings_frame_protein, text='Retornar', background='snow', highlightbackground='snow', 
+                activebackground='snow', activeforeground='yellow', relief=FLAT, command=lambda:[settings_frame_protein.destroy(),
+                options_poke()])
+                retunr_button.place(relx=0.42, rely=0.65, relwidth=0.1, relheight=0.2)
+                remove_op = Button(settings_frame_protein, text='Remover', relief=FLAT, background='snow', highlightbackground='snow', 
                 activebackground='snow', activeforeground='red')
                 remove_op.place(relx=0.2, rely=0.65, relwidth=0.1, relheight=0.2)
 
@@ -560,18 +580,6 @@ class conf_cardapio(Cardapio, Pedido, Local):
                 place_protein += 0.10
                 indice += 1
             
-            proteina = Label(self.pag1, text='2.PROTEÍNAS 120g', anchor='w')
-            proteina.place(relx=0.45, rely=0.02, relwidth=0.55, relheight=0.15)
-            proteina.configure(font=letra, background='snow')
-            escolha_prot = Label(self.pag1, text='Escolha até 2 (60g de cada)', foreground='blue',
-            anchor='w')
-            escolha_prot.place(relx=0.45, rely=0.15, relwidth=0.5, relheight=0.08)
-            escolha_prot.configure(font=letra2, background='snow')
-            info_prot = Label(self.pag1, text='-Sera considerada a proteína de maior valor-',
-            anchor='w')
-            info_prot.place(relx=0.45, rely=0.23, relwidth=0.55, relheight=0.08)
-            info_prot.configure(font=letra3, background='snow')
-
             self.prot1 = IntVar(self.root_cardapio)
             self.prot2 = IntVar(self.root_cardapio)
             self.prot3 = IntVar(self.root_cardapio)
