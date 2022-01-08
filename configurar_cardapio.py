@@ -5,6 +5,7 @@ from PIL import Image, ImageTk
 from cardapio_v2 import Cardapio, Modelo_prato
 from pedido import *
 from bairrosv2 import Local
+from personalize import Make_dish
 import json
 
 class conf_cardapio(Cardapio, Pedido, Local):
@@ -16,7 +17,6 @@ class conf_cardapio(Cardapio, Pedido, Local):
         self.fundo_inicio = fundo
         self.inicio_botoes = botoes_inicio
         self.cria_menu()
-        self.cria_poke()
         self.menu_geral()
         self.opcoes()
         self.acessorios()
@@ -54,7 +54,8 @@ class conf_cardapio(Cardapio, Pedido, Local):
         option_menu = Menu(self.my_menu, tearoff=0)
         self.my_menu.add_cascade(label="Opções", menu=option_menu)
         # opcoes do menu
-        option_menu.add_command(label="Monte seu poke", command= lambda:[self.monte_poke(), self.options_poke()])
+        option_menu.add_command(label="Monte seu poke", command= lambda:[Make_dish(self.root_cardapio, self.info_cliente,
+        self.end_cliente, self.fundo_inicio, self.inicio_botoes)])
         option_menu.add_command(label="Menu", command= lambda:[self.frame_cardapio.destroy(), self.menu_geral()])
 
     def destruir(self):
@@ -259,7 +260,7 @@ class conf_cardapio(Cardapio, Pedido, Local):
     def cria_menu(self):
         self.frame_cardapio = Frame(self.root_cardapio)
         self.frame_cardapio.place(relx=0.01, rely=0.02, relwidth=0.98, relheight=0.65)
-        self.frame_cardapio.configure(background='blue')
+        self.frame_cardapio.configure(background='snow')
         style = ttk.Style()
         style.theme_use('default')
         style.configure("tema_cardapio",
@@ -273,25 +274,6 @@ class conf_cardapio(Cardapio, Pedido, Local):
         self.valor = StringVar(self.frame_cardapio)
 
         self.menu = ttk.Treeview(self.frame_cardapio, selectmode="browse")
-        self.menu.place(relx=0.0, rely=0.0, relwidth=0.972, relheight=1)
-
-    def cria_poke(self):
-        self.frame_menu = Frame(self.root_cardapio)
-        self.frame_menu.place(relx=0.01, rely=0.02, relwidth=0.98, relheight=0.65)
-        self.frame_menu.configure(background='snow')
-        style = ttk.Style()
-        style.theme_use('default')
-        style.configure("tema_cardapio",
-                background="white",
-                foreground="black",
-                rowheight=25,
-                fieldbackground="#D3D3D3",
-                font=('Helvetica', 11))
-        style.map('tema_cardapio', background=[('selected', "#347083")])
-
-        self.valor = StringVar(self.frame_menu)
-
-        self.menu = ttk.Treeview(self.frame_menu, selectmode="browse")
         self.menu.place(relx=0.0, rely=0.0, relwidth=0.972, relheight=1)
 
     def menu_geral(self):
