@@ -36,7 +36,7 @@ class Janela_principal(Cliente, Cardapio, Entregador, Local, Pedido):
 		def background(self):
 			self.back = Frame(self.root)
 			self.back.place(relx=0.0, rely=0.0, relwidth=1, relheight=0.65)
-			imagem = Image.open('Imagens/indice.png')
+			imagem = Image.open('Imagens/menu_restaurante.jpg')
 			photo = ImageTk.PhotoImage(imagem)
 			fundo = Label(self.back, image= photo, anchor='n', background = 'snow')
 			fundo.image = photo
