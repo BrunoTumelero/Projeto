@@ -17,6 +17,10 @@ class Make_dish(Cardapio):
         self.info_cliente = info_cliente
         self.end_cliente = end_cliente
         self.cria_poke()
+        self.monte_poke()
+        self.options_poke()
+        self.read_poke()
+        self.list_control_poke = []
 
     def cria_poke(self):
         self.frame_menu = Frame(self.root_make)
@@ -48,7 +52,6 @@ class Make_dish(Cardapio):
         except:
             pass
         finally:
-            self.insert_option()
             self.pag1 = Frame(self.frame_menu)
             self.pag1.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
             self.pag1.configure(background='snow')
@@ -166,7 +169,6 @@ class Make_dish(Cardapio):
             self.cria_json_base()
 
         try:
-            self.list_control_poke = []
             arq_json = open('create_poke.json', 'r', encoding='utf8')
             arq_poke = json.load(arq_json)
             for x in arq_poke:
@@ -195,6 +197,26 @@ class Make_dish(Cardapio):
                 self.insert_option(key, place, indice)
             place += 0.10
             indice += 1
+    
+    def read_poke(self):
+        variable = 1
+        control_place = 0.35
+        try:
+            poke_json = open('create_poke.json', 'r', encoding='utf8')
+            arq_json = json.load(poke_json)
+            poke_json.close()
+            dici_poke = arq_json[0]
+            print(dici_poke)
+            for x in dici_poke.keys():
+                print(x)
+                variable = Checkbutton(self.pag1, text=x,
+                highlightbackground='snow', activebackground='snow', activeforeground='blue4', relief=FLAT,
+                anchor='w', background='snow')
+                variable.place(relx=0.45, rely=control_place, relwidth=0.15, relheight=0.1)
+            variable += 1
+            control_place += 0.1
+        except:
+            pass
 
     def settings_protein(self, frame):
         frame.destroy()
@@ -279,11 +301,11 @@ class Make_dish(Cardapio):
                     print(e)
 
             place_protein = 0.25
-            for protein in list_protein:
-                if protein == '':
+            for option in list_protein:
+                if option == '':
                     pass
                 else:
-                    insert_option(protein, place_protein, indice)
+                    insert_option(option, place_protein, indice)
                 place_protein += 0.10
                 indice += 1
             
