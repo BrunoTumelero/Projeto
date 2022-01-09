@@ -48,15 +48,32 @@ class conf_cardapio(Cardapio, Pedido, Local):
         self.my_menu = Menu(self.root_cardapio)
         self.root_cardapio.config(menu=self.my_menu)
 
-        self.my_menu.add_command(label='Inicio', command=lambda:[self.destruir(), self.frame_menu.destroy(),
-        self.fundo_inicio, self.inicio_botoes, self.my_menu.destroy()])
+        self.my_menu.add_command(label='Inicio', command=lambda:[self.destruir(),
+        self.fundo_inicio(), self.inicio_botoes(), self.my_menu.destroy()])
         # Configurar menu
         option_menu = Menu(self.my_menu, tearoff=0)
         self.my_menu.add_cascade(label="Opções", menu=option_menu)
         # opcoes do menu
-        option_menu.add_command(label="Monte seu poke", command= lambda:[Make_dish(self.root_cardapio, self.info_cliente,
-        self.end_cliente, self.fundo_inicio, self.inicio_botoes)])
+        option_menu.add_command(label="Monte seu poke", command= lambda:[self.go_personalize(), 
+        Make_dish(self.root_cardapio, self.info_cliente, self.end_cliente, self.fundo_inicio, self.inicio_botoes)])
         option_menu.add_command(label="Menu", command= lambda:[self.frame_cardapio.destroy(), self.menu_geral()])
+
+    def go_personalize(self):
+        try:
+            self.frame_cardapio.destroy()
+            self.frame_botao.destroy()
+            self.frame_prato.destroy()
+        except AttributeError:
+            self.go_personalize2()
+
+    def go_personalize2(self):
+        try:
+            self.frame_cardapio.destroy()
+            self.frame_botao.destroy()
+            self.frame_categoria.destroy()
+        except AttributeError:
+            self.frame_cardapio.destroy()
+            self.frame_botao.destroy()
 
     def destruir(self):
         try:
