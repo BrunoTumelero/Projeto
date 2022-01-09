@@ -38,9 +38,9 @@ class Janela_principal(Cliente, Cardapio, Entregador, Local, Pedido):
 			self.back.place(relx=0.0, rely=0.0, relwidth=1, relheight=0.65)
 			imagem = Image.open('Imagens/menu_restaurante.jpg')
 			photo = ImageTk.PhotoImage(imagem)
-			fundo = Label(self.back, image= photo, anchor='n', background = 'snow')
-			fundo.image = photo
-			fundo.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
+			self.fundo = Label(self.back, image= photo, anchor='n', background = 'snow')
+			self.fundo.image = photo
+			self.fundo.place(relx=0.0, rely=0.0, relwidth=1, relheight=1)
 			self.back.configure(background = 'snow')
 
 		def widegets(self):
@@ -56,8 +56,8 @@ class Janela_principal(Cliente, Cardapio, Entregador, Local, Pedido):
 			cadastra_cliente = Button(self.framebotao, text = 'Clientes', image=img2, compound=LEFT,
 			relief=FLAT, activebackground='lightblue',
 			highlightbackground='snow', anchor='w', command= lambda: 
-			[self.back.place_forget(), self.framebotao.place_forget(), tela_cliente(self.root,
-			self.background(), self.widegets(), self.framebotao, self.back)])
+			[self.fundo.destroy(), self.back.destroy(), tela_cliente(self.root,
+			self.background, self.widegets, self.framebotao, self.back)])
 			cadastra_cliente.place(relx = 0.22, rely = 0.5, relwidth = 0.18, relheight = 0.35)
 			cadastra_cliente.imagem = img2
 			cadastra_cliente['background'] = 'Snow'
@@ -65,8 +65,8 @@ class Janela_principal(Cliente, Cardapio, Entregador, Local, Pedido):
 			
 			consultar = Button(self.framebotao, text = 'Entregas', image=img3, compound=LEFT,
 			relief=FLAT, activebackground='lightblue',
-			highlightbackground='snow', command = lambda: [self.back.place_forget(),
-			self.framebotao.place_forget(), Janela(self.root, self.background(), self.widegets())])
+			highlightbackground='snow', command = lambda: [self.back.destroy(),
+			self.framebotao.destroy(), Janela(self.root, self.background, self.widegets)])
 			consultar.place(relx = 0.62, rely = 0.5, relwidth = 0.18,
 										relheight = 0.35)
 			consultar.imagem = img3

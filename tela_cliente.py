@@ -79,7 +79,7 @@ class tela_cliente(Cliente):
 
     menu_opcoes.add_command(label='Inicio', command=lambda:[self.tree_frame.destroy(),
     menu_opcoes.destroy(), self.data_frame.place_forget(), self.frame_botao.place_forget(),
-    self.fundo, self.botoes_inicio])
+    self.fundo(), self.botoes_inicio()])
     # Configurar menu
     menu_cliente = Menu(menu_opcoes, tearoff=0)
     menu_opcoes.add_cascade(label="Opções", menu=menu_cliente)
@@ -353,13 +353,13 @@ class tela_cardapio(Cardapio, Pedido, Local):
 
         my_menu.add_command(label='Inicio', command=lambda:[self.name.destroy(),
         self.frame_menu.destroy(), self.frame_botao.destroy(), self.total.destroy(), self.frame_cardapio.destroy(),
-        self.fundo_inicio, self.inicio_botoes, my_menu.destroy(), self.frame_total.destroy()])
+        self.fundo_inicio(), self.inicio_botoes(), my_menu.destroy(), self.frame_total.destroy()])
         # Configurar menu
         option_menu = Menu(my_menu, tearoff=0)
         my_menu.add_cascade(label="Opções", menu=option_menu)
         # opcoes do menu
         option_menu.add_command(label="Configurar pratos", command= lambda:[conf_cardapio(self.root_cardapio, self.info_cliente,
-        self.end_cliente, self.fundo_inicio, self.inicio_botoes)])
+        self.end_cliente, self.fundo_inicio(), self.inicio_botoes())])
         option_menu.add_command(label="Monte seu poke", command= lambda:[self.monte_poke()])
         option_menu.add_command(label="Menu", command= lambda:[self.frame_cardapio.destroy(), self.menu_geral()])
 

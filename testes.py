@@ -1,33 +1,39 @@
 from tkinter import *
-root=Tk()
+from tkinter import ttk
+import json
 
-class novo:
-
-        def __init__(self, janela):
-            self.caixa=Frame(janela)
-            self.caixa.grid()
-            self.b=Button(janela, text='Abrir', command=self.new_jan)
-            self.b.grid()
-            self.l1=Label(janela, text='raiz!')
-            self.l1.grid()
-
-        def new_jan(self):
-            self.jan=Toplevel()
-            self.l=Label(self.jan, text='Feche esta para poder voltar a raiz!')
-            self.l.grid()
-            b=Button(self.jan, text='Fechar', command=self.fecha_jan)
-            b.grid()
-            self.jan.geometry('300x200')
-            self.jan.transient(root)#
-            self.jan.focus_force()#
-            self.jan.grab_set()#
-
-        def fecha_jan(self):
-            self.jan.destroy()
+class teste():
+    def __init__(self) -> None:
+        self.root = Tk()
+        self.root.geometry('500x500')
+        self.ap()
+        self.lista = []
+        self.var = ['a', 'b', 'c', 'd']
+        self.root.mainloop()
 
 
-novo(root)
+    def insert_option(self, option, control_place, variable):
+        try:
+            variable = Checkbutton(self.root, text=option,
+            highlightbackground='snow', activebackground='snow', activeforeground='blue4', relief=FLAT,
+            anchor='w', background='snow')
+            variable.place(relx=0.02, rely=control_place, relwidth=0.25, relheight=0.1)
+        except Exception as e:
+            print(e)
 
-root.geometry('300x200')
+    def ap(self):
+        i = 0
+        c = 0.3
+        input = Entry(self.root)
+        input.grid(column=5, row=20)
+        bt = Button(self.root, text= 'add', command=lambda:[self.lista.append(input.get()), input.delete(0, 'end'),
+        le(input.get(), i, c)])
+        bt.grid()
+        def le(input, i , c):
+            for x in self.lista:
+                self.insert_option(x, c, self.var[i])
+                i += 1
+                c += 0.2
 
-root.mainloop()
+t = teste()
+t

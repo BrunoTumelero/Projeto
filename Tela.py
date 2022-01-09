@@ -53,7 +53,7 @@ class Janela(Entregador, Pedido):
         self.root_entregas.config(menu=self.my_menu)
         # Configurar menu
         self.my_menu.add_command(label='Inicio', command=lambda:[self.frame_tele.destroy(), self.elimina_caixa(),
-        self.data_frame.destroy(), self.button_frame.destroy(), self.fundo, self.botoes_inicio,
+        self.data_frame.destroy(), self.button_frame.destroy(), self.fundo(), self.botoes_inicio(),
         self.my_menu.destroy()])
         option_menu = Menu(self.my_menu, tearoff=0)
         self.my_menu.add_cascade(label="Opções", menu=option_menu)
