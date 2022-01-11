@@ -4,7 +4,7 @@ import psycopg2
 class Entregador:
     def __init__(self):
         self.conectar_func()
-        self.default()
+        self.standard()
 
     def conectar_func(self):
         conn = psycopg2.connect('dbname=restaurante user=Programador-mestre password=6cVMAj1B')
@@ -14,14 +14,21 @@ class Entregador:
         conn.commit()
         return conn
     
-    def default(self):
+    def standard(self):
         conn = self.conectar_func()
         c = conn.cursor()
         c.execute('''SELECT nome_func FROM funcionarios''')
         number = c.fetchall()
-        if len(number) == 0:
+        print(number)
+        default = 'Retirada'
+        for x in number:
+            registred = []
+            registred.append(x[0])
+        if default not in registred:
             c.execute('''INSERT INTO funcionarios(nome_func, Entregas, pagar)
                     VALUES(%s, %s, %s)''', ('Retirada', 0, 0))
+            conn.commit()
+        conn.close()
 
     def cadastrar(self, nome):
         conn = self.conectar_func()
