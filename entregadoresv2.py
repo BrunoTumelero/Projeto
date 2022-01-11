@@ -19,7 +19,6 @@ class Entregador:
         c = conn.cursor()
         c.execute('''SELECT nome_func FROM funcionarios''')
         number = c.fetchall()
-        print(number)
         default = 'Retirada'
         for x in number:
             registred = []
