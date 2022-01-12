@@ -199,7 +199,6 @@ class Make_dish(Cardapio):
             indice += 1
     
     def read_poke(self):
-        
         variable = 1
         control_place = 0.25
         poke_json = open('create_poke.json', 'r', encoding='utf8')
