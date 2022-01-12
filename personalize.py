@@ -16,11 +16,11 @@ class Make_dish(Cardapio):
         self.inicio_botoes = botoes_inicio
         self.info_cliente = info_cliente
         self.end_cliente = end_cliente
+        self.list_control_poke = []
         self.cria_poke()
         self.monte_poke()
         self.options_poke()
         self.read_poke()
-        self.list_control_poke = []
 
     def cria_poke(self):
         self.frame_menu = Frame(self.root_make)
@@ -199,24 +199,22 @@ class Make_dish(Cardapio):
             indice += 1
     
     def read_poke(self):
+        
         variable = 1
-        control_place = 0.35
-        try:
-            poke_json = open('create_poke.json', 'r', encoding='utf8')
-            arq_json = json.load(poke_json)
-            poke_json.close()
-            dici_poke = arq_json[0]
-            print(dici_poke)
-            for x in dici_poke.keys():
-                print(x)
-                variable = Checkbutton(self.pag1, text=x,
-                highlightbackground='snow', activebackground='snow', activeforeground='blue4', relief=FLAT,
-                anchor='w', background='snow')
-                variable.place(relx=0.45, rely=control_place, relwidth=0.15, relheight=0.1)
-            variable += 1
-            control_place += 0.1
-        except:
-            pass
+        control_place = 0.25
+        poke_json = open('create_poke.json', 'r', encoding='utf8')
+        arq_json = json.load(poke_json)
+        poke_json.close()
+        dici_poke = arq_json
+        for x in arq_json:
+            for y in x.keys():
+                if y == '':
+                    pass
+                else:
+                    self.insert_option(y, control_place, variable)
+                    variable += 1
+                    control_place += 0.1
+        
 
     def settings_protein(self, frame):
         frame.destroy()
