@@ -20,7 +20,7 @@ class Make_dish(Cardapio):
         self.cria_poke()
         self.monte_poke()
         self.options_poke()
-        self.read_poke()
+        self.create_json()
 
     def cria_poke(self):
         self.frame_menu = Frame(self.root_make)
@@ -101,18 +101,26 @@ class Make_dish(Cardapio):
         activeforeground='lightblue', relief=FLAT, font=letra4, command=lambda:[self.settings_protein(options_frame)])
         conf_prot.place(relx=0.6, rely=0.4, relwidth=0.24, relheight=0.25)
     
-    def cria_json_base(self):#cria o json que vai armazenar as opcoes
-            poke_json = open('create_poke.json', 'r', encoding='utf8')
-            arq_json = json.load(poke_json)
-            poke_json.close()
-            dici_poke = arq_json[0]
-            for x in dici_poke.keys():
-                indice = len(arq_json) + 1
-                if self.input_op.get() not in dici_poke.keys():
-                    arq_json.append({self.input_op.get(): indice})
-            poke_json =  open('create_poke.json', 'w', encoding= 'utf8')
-            json.dump(arq_json, poke_json, indent=2)
-            poke_json.close()
+    def read_json(self):#cria o json que vai armazenar as opcoes
+            dish_json = open('create_dish.json', 'r', encoding='utf8')
+            arq_json = json.load(dish_json)
+            dish_json.close()
+            dici_dish = arq_json[0]
+            for x in dici_dish.keys():
+                options = []
+                if self.input_op.get() not in dici_dish.keys():
+                    arq_json.append({self.input_op.get(): options})
+            dish_json =  open('create_dish.json', 'w', encoding= 'utf8')
+            json.dump(arq_json, dish_json, indent=2)
+            dish_json.close()
+
+    def create_json(self):
+        try:
+            self.read_json()
+        except FileNotFoundError:
+            padrao = [{'': 'Sem categoria'}]
+            with open('create_dish.json', 'w', encoding= 'utf8') as f:
+                json.dump(padrao, f, indent=2)
 
     def settings_base(self, frame):
         frame.destroy()
@@ -161,12 +169,12 @@ class Make_dish(Cardapio):
                 self.cria_json_base()
 
         try:
-            self.cria_json_base()
+            self.cria_json()
         except FileNotFoundError:
             defaultt = [{self.input_op: 0}]
             with open('create_poke.json', 'w', encoding= 'utf8') as f:
                 json.dump(defaultt, f, indent=2)
-            self.cria_json_base()
+            self.cria_json()
 
         try:
             arq_json = open('create_poke.json', 'r', encoding='utf8')
