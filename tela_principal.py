@@ -12,7 +12,6 @@ from pedido import Pedido
 
 class Cria_db:
 	def __init__(self):
-		
 		tela_cliente.conectar_cliente()
 		Janela.conectar_func()
 
