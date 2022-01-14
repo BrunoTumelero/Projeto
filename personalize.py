@@ -17,12 +17,11 @@ class Make_dish(Cardapio):
         self.info_cliente = info_cliente
         self.end_cliente = end_cliente
         self.list_control_poke = []
-        self.cria_poke()
-        self.monte_poke()
+        self.create_dish()
+        self.make_dish()
         self.options_poke()
-        self.create_json()
 
-    def cria_poke(self):
+    def create_dish(self):
         self.frame_menu = Frame(self.root_make)
         self.frame_menu.place(relx=0.01, rely=0.02, relwidth=0.98, relheight=0.65)
         self.frame_menu.configure(background='snow')
@@ -41,7 +40,7 @@ class Make_dish(Cardapio):
         self.menu = ttk.Treeview(self.frame_menu, selectmode="browse")
         self.menu.place(relx=0.0, rely=0.0, relwidth=0.972, relheight=1)
 
-    def monte_poke(self):
+    def make_dish(self):
         def elimination():
             try:
                 self.frame_prato.destroy()
@@ -88,6 +87,7 @@ class Make_dish(Cardapio):
             self.base_5 = IntVar(self.pag1)
 
     def options_poke(self):#opções do poke
+        self.read_json()
         letra4 = font.Font(size=35)
         options_frame = Frame(self.root_make)
         options_frame.place(relx=0.0, rely=0.7, relwidth=1, relheight=0.3)
@@ -102,6 +102,22 @@ class Make_dish(Cardapio):
         conf_prot.place(relx=0.6, rely=0.4, relwidth=0.24, relheight=0.25)
     
     def read_json(self):#cria o json que vai armazenar as opcoes
+            variable = 1
+            control_place = 0.25
+            dish_json = open('create_dish.json', 'r', encoding='utf8')
+            arq_json = json.load(dish_json)
+            dish_json.close()
+            dici_dish = arq_json[0]
+            for x in dici_dish.keys():
+                self.insert_option(x, control_place, variable)
+                variable += 1
+                control_place += 0.1
+            dish_json =  open('create_dish.json', 'w', encoding= 'utf8')
+            json.dump(arq_json, dish_json, indent=2)
+            dish_json.close()
+
+    def create_json(self):
+        try:
             dish_json = open('create_dish.json', 'r', encoding='utf8')
             arq_json = json.load(dish_json)
             dish_json.close()
@@ -113,15 +129,25 @@ class Make_dish(Cardapio):
             dish_json =  open('create_dish.json', 'w', encoding= 'utf8')
             json.dump(arq_json, dish_json, indent=2)
             dish_json.close()
-
-    def create_json(self):
-        try:
-            self.read_json()
-        except FileNotFoundError:
+        except Exception:
             padrao = [{'': 'Sem categoria'}]
             with open('create_dish.json', 'w', encoding= 'utf8') as f:
                 json.dump(padrao, f, indent=2)
 
+    def insert_option(self, option, control_place, variable):
+        try:
+            variable = Checkbutton(self.pag1, text=option,
+            highlightbackground='snow', activebackground='snow', activeforeground='blue4', relief=FLAT,
+            anchor='w', background='snow')
+            variable.place(relx=0.02, rely=control_place, relwidth=0.25, relheight=0.1)
+        except Exception as e:
+            print(e)
+        for key in self.list_control_poke:
+            if key == '':
+                pass
+            else:
+                self.insert_option(key, control_place, variable)
+    
     def settings_base(self, frame):
         frame.destroy()
         settings_frame_base = Frame(self.root_make)
@@ -169,12 +195,12 @@ class Make_dish(Cardapio):
                 self.cria_json_base()
 
         try:
-            self.cria_json()
+            self.read_json()
         except FileNotFoundError:
             defaultt = [{self.input_op: 0}]
             with open('create_poke.json', 'w', encoding= 'utf8') as f:
                 json.dump(defaultt, f, indent=2)
-            self.cria_json()
+            self.read_json()
 
         try:
             arq_json = open('create_poke.json', 'r', encoding='utf8')
@@ -187,41 +213,6 @@ class Make_dish(Cardapio):
             with open('create_poke.json', 'w', encoding= 'utf8') as f:
                     json.dump(start, f, indent=2)
                     f.close()
-
-    def insert_option(self, option, control_place, variable):
-        try:
-            variable = Checkbutton(self.pag1, text=option,
-            highlightbackground='snow', activebackground='snow', activeforeground='blue4', relief=FLAT,
-            anchor='w', background='snow')
-            variable.place(relx=0.02, rely=control_place, relwidth=0.25, relheight=0.1)
-        except Exception as e:
-            print(e)
-        place = 0.25
-        indice = 1
-        for key in self.list_control_poke:
-            if key == '':
-                pass
-            else:
-                self.insert_option(key, place, indice)
-            place += 0.10
-            indice += 1
-    
-    def read_poke(self):
-        variable = 1
-        control_place = 0.25
-        poke_json = open('create_poke.json', 'r', encoding='utf8')
-        arq_json = json.load(poke_json)
-        poke_json.close()
-        dici_poke = arq_json
-        for x in arq_json:
-            for y in x.keys():
-                if y == '':
-                    pass
-                else:
-                    self.insert_option(y, control_place, variable)
-                    variable += 1
-                    control_place += 0.1
-        
 
     def settings_protein(self, frame):
         frame.destroy()
@@ -298,7 +289,7 @@ class Make_dish(Cardapio):
 
             def insert_option(option, control_place, variable):
                 try:
-                    variable = Checkbutton(self.pag1, text=option,
+                    variable = Spinbox(self.pag1, text=option,
                     highlightbackground='snow', activebackground='snow', activeforeground='blue4', relief=FLAT,
                     anchor='w', background='snow')
                     variable.place(relx=0.45, rely=control_place, relwidth=0.15, relheight=0.1)
@@ -318,60 +309,11 @@ class Make_dish(Cardapio):
             self.prot2 = IntVar(self.root_make)
             self.prot3 = IntVar(self.root_make)
             self.prot4 = IntVar(self.root_make)
-            def erros():
-                if len(self.escolha_base) > 1:
-                    messagebox.showerror('ERRO', 'Escolha apenas uma opção para base')
-                    self.escolha_base.clear()
-                    self.proteina.clear()
-                elif len(self.escolha_base) == 0:
-                    messagebox.showerror('ERRO', 'Escolha uma opção para base')
-                    self.proteina.clear()
-                    self.escolha_base.clear()
-                elif len(self.proteina) > 2:
-                    messagebox.showerror('ERRO', 'Escolha apenas 2 opção de proteína')
-                    self.proteina.clear()
-                    self.escolha_base.clear()
-                elif len(self.proteina) == 0:
-                    messagebox.showerror('ERRO', 'Escolha no mínimo uma opção de proteína')
-                    self.proteina.clear()
-                    self.escolha_base.clear()
-                if len(self.escolha_base) == 1 and len(self.proteina) <= 2 and len(self.proteina) > 0 and len(self.proteina) < 3:
-                    self.poke_2()
-            def verificacao():
-                try:
-                    if self.base_1.get() == 1:
-                        self.escolha_base.append(1)
-                    if self.base_2.get() == 1:
-                        self.escolha_base.append(2)
-                        self.extra_poke.append(4)
-                    if self.base_3.get() == 1:
-                        self.escolha_base.append(3)
-                        self.extra_poke.append(4)
-                    if self.base_4.get() == 1:
-                        self.escolha_base.append(4)
-                    if self.base_5.get() == 1:
-                        self.escolha_base.append(5)
-                        self.extra_poke.append(5)
-                    if self.prot1.get() == 1:
-                        self.proteina.append(1)
-                        self.extra_poke.append(54)
-                    if self.prot2.get() == 1:
-                        self.proteina.append(2)
-                        self.extra_poke.append(54)
-                    if self.prot3.get() == 1:
-                        self.proteina.append(3)
-                        self.extra_poke.append(60)
-                    if self.prot4.get() == 1:
-                        self.proteina.append(4)
-                        self.extra_poke.append(50)
-                    erros()
-                except AttributeError as error:
-                    messagebox.showwarning('ERRO', error)
 
             bt_avancar = Image.open('Imagens/avancar.png')
             img_avancar = ImageTk.PhotoImage(bt_avancar)
             pag2 = Button(self.pag1, image= img_avancar, compound=CENTER, activebackground='lightblue',
-            command=lambda:[verificacao()])
+            command=lambda:[])
             pag2.place(relx=0.8, rely=0.85, relwidth=0.1, relheight=0.1)
             pag2.configure(background='snow')
             pag2.imagem = img_avancar
@@ -511,7 +453,7 @@ class Make_dish(Cardapio):
         bt_voltar = Image.open('Imagens/voltar.png')
         img_voltar = ImageTk.PhotoImage(bt_voltar)
         pag1 = Button(self.pag2, image= img_voltar, compound=CENTER, relief=FLAT,
-        highlightbackground='snow', activebackground='lightblue', command=lambda:[self.monte_poke()])
+        highlightbackground='snow', activebackground='lightblue', command=lambda:[self.make_dish()])
         pag1.place(relx=0.2, rely=0.85, relwidth=0.1, relheight=0.1)
         pag1.configure(background='snow')
         pag1.imagem = img_voltar
